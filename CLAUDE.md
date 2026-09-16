@@ -8,7 +8,7 @@ Este archivo da contexto a Claude Code (claude.ai/code) para trabajar en este re
 
 ## Estado del proyecto
 
-Este repo es por ahora un scaffold de `create-next-app` sin modificar (`app/page.tsx` y `app/layout.tsx` siguen siendo la plantilla por defecto). La aplicación real — **Code Quest**, un generador de rutas de aprendizaje sobre el catálogo de cursos de DevTalles — todavía no está construida. La planificación, los requisitos y la investigación viven en `docs/` y `data/` (contexto de proyecto real, no un scratchpad descartable):
+Este repo es todavía mayormente un scaffold de `create-next-app`: `app/page.tsx` sigue siendo la plantilla por defecto y la aplicación real — **Code Quest**, un generador de rutas de aprendizaje sobre el catálogo de cursos de DevTalles — todavía no está construida. Lo que ya salió del scaffold es la base visual (`shadcn/ui` inicializado: `components.json`, `components/ui/`, `lib/utils.ts`; `app/layout.tsx` / `app/globals.css` ya cargan su tema) y los utils de cliente de Supabase (`lib/supabase/{client,server}.ts`, `proxy.ts`) — ver **Notas de arquitectura** para el detalle de ambos. La planificación, los requisitos y la investigación viven en `docs/` y `data/` (contexto de proyecto real, no un scratchpad descartable):
 
 - `docs/ENUNCIADO.md` — los requisitos oficiales del concurso. Cualquier feature debe cumplirlos.
 - `docs/ROADMAP.md` — el plan MVP detallado: modelo de datos, estructura de carpetas (`src/app` con route groups, `src/lib/{supabase,ai,paths,gamification}`), cronograma día a día y el stack elegido (Next.js 16 App Router, Tailwind v4 + shadcn/ui, Supabase para auth/DB con Discord OAuth, Vercel AI SDK, React Flow para el mapa de la ruta).
@@ -20,20 +20,45 @@ Este repo es por ahora un scaffold de `create-next-app` sin modificar (`app/page
 
 Al implementar features, revisar primero `ROADMAP.md` + `ANALISIS-IA.md` + `docs/decisiones/` para la arquitectura y el modelo de datos previstos en vez de inventar uno nuevo — nada de eso está implementado todavía, así que no hay código existente que lo contradiga.
 
-## Agentes
+## Metodología: Spec-Driven Development (SDD)
 
-Definidos en `.claude/agents/`, con su comando en `.claude/commands/`:
+Las features de tamaño no trivial se desarrollan con las skills `spec` / `spec-impl` (instaladas en `.claude/skills/`, contenido real en `.agents/skills/`, origen y hash en `skills-lock.json`). El flujo es obligatorio para ese tipo de trabajo — no arrancar a codear una feature grande directo sobre `main` sin pasar por esto:
+
+1. **`/spec <descripción>`** — hace preguntas de aclaración (alcance, modelo de datos, integración, riesgos) y escribe `specs/NN-slug.md` con estado `Draft`. No escribe código.
+2. El usuario revisa el spec y cambia manualmente su estado a `Approved` cuando está conforme — el agente nunca se auto-aprueba.
+3. **`/spec-impl NN-slug`** — valida que el estado sea `Approved`, crea (o retoma) la rama `spec-NN-slug` según `specs/.spec-config.yml` (`AutoCreateBranch`, default `true`), y luego implementa el plan del spec paso a paso, pausando después de cada paso para revisión. Nunca commitea automáticamente.
+
+`specs/` todavía no existe en este repo — se crea con el primer `/spec`. El detalle completo de fases y reglas vive en `.agents/skills/spec/SKILL.md` y `.agents/skills/spec-impl/SKILL.md`; no lo dupliques aquí, ya se carga solo al invocar la skill.
+
+## Agentes y skills
+
+Subagentes propios del proyecto, definidos en `.claude/agents/` con su comando en `.claude/commands/`:
 
 | Agente | Comando | Cuándo usarlo | Herramientas |
 |---|---|---|---|
-| `devils-advocate` | `/critica <idea>` | Antes de comprometerse con una decisión técnica o de producto. Ataca la idea con los criterios de `ENUNCIADO.md` y el estado real del proyecto — no valida, no propone alternativas más grandes. | Solo lectura: `Read`, `Glob`, `Grep`, `WebSearch`, `WebFetch` (sin `Write`/`Edit`: no puede escribir el registro de la decisión, eso se hace a mano en `docs/decisiones/` una vez decidido). |
-| `craft-reviewer` | `/revisa [ruta]` | Después de escribir código, para revisar legibilidad y buenas prácticas (criterio de evaluación #5, ver abajo). Sin ruta, revisa el diff actual. | `Read`, `Edit`, `Glob`, `Grep`, `Bash`, Context7 (sin `Write`: corrige archivos existentes, no crea nuevos). |
+| `devils-advocate` | `/critique <idea>` | Antes de comprometerse con una decisión técnica o de producto. Ataca la idea con los criterios de `ENUNCIADO.md` y el estado real del proyecto — no valida, no propone alternativas más grandes. | Solo lectura: `Read`, `Glob`, `Grep`, `WebSearch`, `WebFetch` (sin `Write`/`Edit`: no puede escribir el registro de la decisión, eso se hace a mano en `docs/decisiones/` una vez decidido). |
+| `craft-reviewer` | `/review [ruta]` | Después de escribir código, para revisar legibilidad y buenas prácticas (ver la sección de abajo). Sin ruta, revisa el diff actual. | `Read`, `Edit`, `Glob`, `Grep`, `Bash`, Context7 (sin `Write`: corrige archivos existentes, no crea nuevos). |
+
+Skills de terceros instaladas vía `skills-lock.json` (símlinks en `.claude/skills/` → contenido real en `.agents/skills/`; no editar el contenido a mano, se resincroniza desde la fuente):
+
+| Skill | Fuente | Para qué |
+|---|---|---|
+| `spec` / `spec-impl` | `Klerith/fernando-skills` | El flujo SDD descrito arriba. |
+| `shadcn` | `shadcn-ui/ui` | Agregar/editar componentes de `shadcn/ui`, convenciones de composición y estilos — reglas detalladas en `.agents/skills/shadcn/rules/`. Consultarla en vez de improvisar sobre `components/ui/`. |
+| `supabase` | `supabase/agent-skills` | Cualquier trabajo con Supabase: auth (Discord OAuth del `ROADMAP.md`), DB, RLS, `@supabase/ssr` en Next.js, CLI y depuración. |
+| `supabase-postgres-best-practices` | `supabase/agent-skills` | Antes de crear o cambiar tablas, migraciones, índices, políticas RLS o funciones en Postgres. |
+| `next-best-practices` | `vercel-labs/openreview` | Al escribir o revisar código de Next.js: convenciones de archivos (incluye el rename `middleware` → `proxy` en v16), límites RSC, patrones async (`cookies()`/`headers()`/`params` con `await`), metadata, route handlers, optimización de imagen/fuentes y bundling. |
+| `ui-ux-pro-max` | `nextlevelbuilder/ui-ux-pro-max-skill` | Al diseñar, construir o revisar UI: accesibilidad, layout responsive, tipografía/color, animación, formularios, navegación y charts, con guía específica por stack. No aplica a lógica de backend ni trabajo no visual. |
+
+El MCP de Supabase está configurado en `.mcp.json` (server remoto `https://mcp.supabase.com/mcp`, apunta al proyecto `gpbwuvvfffvxpkgzjqzk`) y requiere autenticarse una vez por sesión con `/mcp`. Da acceso directo al proyecto real: `list_tables`, `execute_sql`, `apply_migration`, `get_advisors`, `search_docs`, `get_project_url`/`get_publishable_keys` (para no tener que copiar esos valores a mano), logs (`query_logs`) y Edge Functions — preferirlo sobre pedirle al usuario que pegue esos datos.
+
+## Context7
+
+Todo código que toque una librería o framework externo — Next.js 16, React 19, Tailwind v4, shadcn/ui, Supabase, Vercel AI SDK, zod — se consulta **siempre** en Context7 (`resolve-library-id` → `query-docs`) antes de escribirlo, corregirlo o criticarlo, aunque creas que ya sabes la respuesta: estas versiones son más nuevas que la mayoría de los datos de entrenamiento. Una API o una convención que no verificaste no se escribe ni se aplica en una revisión. Si no se puede verificar, decirlo explícitamente en vez de improvisar.
 
 ## Código limpio y buenas prácticas
 
-Criterio de evaluación #5 del concurso (`docs/ENUNCIADO.md`): *"Código limpio y buenas prácticas: mientras más fácil sea leer y entender el código mucho mejor."*
-
-**Esto no significa que menos código sea mejor.** Un ternario anidado ocupa una línea y es peor que un `if/else` de cinco. La métrica es "se entiende en una sola lectura", no "cuenta de líneas".
+**Legible no es sinónimo de corto.** Un ternario anidado ocupa una línea y es peor que un `if/else` de cinco. La métrica es "se entiende en una sola lectura", no "cuenta de líneas".
 
 **No hacer, aunque acorte el código:**
 - Colapsar un `if/else` claro en ternarios anidados.
@@ -49,8 +74,6 @@ Criterio de evaluación #5 del concurso (`docs/ENUNCIADO.md`): *"Código limpio 
 - Descomponer expresiones largas en pasos con nombre.
 - `tsconfig.json` tiene `"strict": true`: nada de `any` sin comentar por qué hizo falta.
 
-**Verificar antes de afirmar:** Next.js 16, React 19 y Tailwind v4 son más nuevos que la mayoría de los datos de entrenamiento. Antes de declarar algo "mala práctica" de una de estas librerías, consultar Context7 (`resolve-library-id` → `query-docs`). Una convención no verificada no se aplica.
-
 ## Comandos
 
 - `npm run dev` — levanta el servidor de desarrollo de Next.js (también regenera el bloque de reglas para agentes en `AGENTS.md` en cada corrida — ver la nota de arriba).
@@ -62,6 +85,7 @@ Criterio de evaluación #5 del concurso (`docs/ENUNCIADO.md`): *"Código limpio 
 ## Notas de arquitectura
 
 - Next.js **16.3.5** con React **19.2.8** — una versión más nueva que la mayoría de los datos de entrenamiento. Según `AGENTS.md`, hay que leer la guía correspondiente en `node_modules/next/dist/docs/` antes de escribir código relacionado con el framework (routing, middleware, data fetching, etc.), porque las convenciones pueden haber cambiado (por ejemplo, `middleware.ts` ahora es `proxy.ts`).
-- Alias de TypeScript: `@/*` apunta a la raíz del repo (`tsconfig.json`), no a `src/*` — ojo que la arquitectura planeada en `ROADMAP.md` asume una estructura `src/`, así que este alias va a necesitar actualizarse si/cuando se haga esa reestructuración.
+- Alias de TypeScript: `@/*` apunta a la raíz del repo (`tsconfig.json`), no a `src/*` — de ahí resuelven tanto imports propios como los alias de `components.json` (`@/components`, `@/lib`, `@/components/ui`, `@/hooks`) que usa `shadcn/ui`. La arquitectura planeada en `ROADMAP.md` asume una estructura `src/`, así que si se hace esa reestructuración hay que actualizar `tsconfig.json` **y** `components.json` a la vez.
 - Tailwind v4 vía `@tailwindcss/postcss` (sin `tailwind.config` separado; ver `postcss.config.mjs`).
-- El estilo actual usa las fuentes Geist cargadas con `next/font/google` en `app/layout.tsx`.
+- `shadcn/ui` inicializado (`components.json`): estilo `base-vega`, `baseColor` neutral, íconos con `@phosphor-icons/react`, RSC habilitado. El tema (`app/globals.css`) usa variables OKLCH inyectadas por shadcn más `tw-animate-css`; `app/layout.tsx` combina las fuentes Geist (mono) con IBM Plex Sans (`--font-sans`) y Source Sans 3 (`--font-heading`, para encabezados) vía `next/font/google`, unidas con el helper `cn` (`lib/utils.ts`).
+- Clientes de Supabase (`@supabase/ssr` 0.12.7) siguiendo el patrón oficial `getAll`/`setAll` (los métodos `get`/`set`/`remove` están deprecados): `lib/supabase/client.ts` para Client Components (`createBrowserClient`, cookies vía `document.cookie` automático) y `lib/supabase/server.ts` para Server Components/Actions (`createServerClient` + `cookies()` de `next/headers`, con el `setAll` envuelto en `try/catch` porque los Server Components no pueden escribir cookies). `proxy.ts` en la raíz (no `middleware.ts`, ver nota de arriba) hace el refresh de sesión en cada request con `supabase.auth.getClaims()` — método recomendado actualmente por sobre `getSession()`/`getUser()` porque valida el JWT contra las claves de firma en vez de confiar ciegamente en la cookie. Variables de entorno en `.env.example`: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` (la publishable key reemplaza a la legacy `anon` key) y `SUPABASE_DB_PASSWORD` (CLI). Estos tres archivos siguen la ubicación (`lib/supabase/`, no `src/lib/supabase/`) y ROADMAP.md los da por planeados en `src/`; si se hace la reestructuración a `src/` hay que moverlos junto con todo lo demás.
