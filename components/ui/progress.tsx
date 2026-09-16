@@ -3,15 +3,23 @@
 import { Progress as ProgressPrimitive } from "@base-ui/react/progress"
 import { cn } from "cn"
 
+/**
+ * `locale` fijo por defecto: sin esto, Base UI formatea `aria-valuetext`
+ * con `Intl.NumberFormat` usando el locale del entorno, y Node en el
+ * servidor no siempre coincide con el navegador (p. ej. "62%" vs "62 %"),
+ * lo que rompe la hidratación. Sobreescribible pasando `locale` explícito.
+ */
 function Progress({
   className,
   children,
   value,
+  locale = "es-ES",
   ...props
 }: ProgressPrimitive.Root.Props) {
   return (
     <ProgressPrimitive.Root
       value={value}
+      locale={locale}
       data-slot="progress"
       className={cn("flex flex-wrap gap-3", className)}
       {...props}
