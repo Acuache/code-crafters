@@ -1,36 +1,64 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Code Quest
 
-## Getting Started
+Generador de rutas de aprendizaje sobre el catálogo real de cursos de [DevTalles](https://cursos.devtalles.com), hecho para el concurso **Code Quest**.
 
-First, run the development server:
+## Estado actual
+
+| Hecho | Pendiente |
+|---|---|
+| Scaffold de Next.js 16 (App Router, TypeScript, Tailwind v4) | Cuestionario de habilidades e intereses |
+| Catálogo de DevTalles extraído y versionado (`data/`) | Motor de rutas (reglas + personalización con IA) |
+| Documentación del proyecto y decisiones (`docs/`) | Login y registro con Discord |
+| — | Guardar rutas, marcar progreso, deploy |
+
+El detalle del plan está en [`docs/ROADMAP.md`](docs/ROADMAP.md).
+
+## Requisitos previos
+
+- Node.js **20.9.0 o superior** (lo exige Next.js 16).
+- npm.
+
+## Cómo levantarlo
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Abrir [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Otros comandos:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run build   # build de producción
+npm run start   # correr un build de producción
+npm run lint    # ESLint
+```
 
-## Learn More
+## Estructura del repo
 
-To learn more about Next.js, take a look at the following resources:
+- `app/` — la aplicación Next.js (App Router).
+- `docs/` — requisitos del concurso, roadmap e historial de decisiones.
+- `data/` — catálogo de cursos y programas de DevTalles, ya extraído.
+- `.claude/` — agentes y comandos de Claude Code para este proyecto.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## El catálogo de cursos
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+`data/courses.json` tiene **74 cursos activos** de DevTalles (los cursos "Legacy" quedan fuera) y `data/programs.json` tiene sus **15 rutas oficiales**. El detalle de los campos y la procedencia están en [`data/SUMMARY.md`](data/SUMMARY.md). Se extrajo con un scraper de un solo uso que ya cumplió su función y no se conservó en el repo.
 
-## Deploy on Vercel
+## Documentación
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- [`docs/ENUNCIADO.md`](docs/ENUNCIADO.md) — requisitos oficiales del concurso.
+- [`docs/ROADMAP.md`](docs/ROADMAP.md) — plan de desarrollo.
+- [`docs/decisiones/`](docs/decisiones/) — historial de decisiones de arquitectura y producto.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Cómo trabajamos
+
+- `main` es producción, `develop` es integración.
+- Cada tarea en una rama `feature/<tarea>`.
+- Todo entra a `develop` por PR con al menos una revisión.
+- Commits con formato convencional.
+
+## Licencia
+
+MIT. El archivo `LICENSE` se agrega antes de la entrega final.
