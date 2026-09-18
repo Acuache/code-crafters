@@ -14,7 +14,7 @@ Qué problema o disyuntiva obliga a decidir esto. Qué pasa si no se decide.
 
 ## Qué dijo el abogado del diablo
 
-Resumen del veredicto de `devils-advocate` (vía `/critica`): veredicto, el fallo más grave que señaló, y si cambió la opción elegida.
+Resumen del veredicto de `devils-advocate` (vía `/critique`): veredicto, el fallo más grave que señaló, y si cambió la opción elegida.
 
 ## Decisión
 

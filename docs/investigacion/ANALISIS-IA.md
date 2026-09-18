@@ -193,7 +193,11 @@ Lo que más impresiona no es "la IA generó algo", sino que la ruta **se nota he
 
 ## 11. Decisiones para cerrar en la reunión
 
-- [ ] ¿Camino A, B o C? (recomendación: **C**)
+- [x] ¿Camino A, B o C? Cerrado en
+      [`docs/decisiones/0001-motor-de-reglas-con-ia-encima.md`](../decisiones/0001-motor-de-reglas-con-ia-encima.md):
+      una variante recortada de C (motor por reglas siempre + IA como capa de texto, sin `skip`/`add`),
+      más un cambio que no estaba en este documento — el output es un plan con presupuesto de horas, no
+      una lista de cursos filtrada.
 - [ ] ¿Quién revisa el enriquecimiento de los 74 cursos y cuándo? (sugerido: los 3, 20 min cada uno, día 2)
 - [ ] ¿Qué preguntas tiene el cuestionario? (máx. 6–8, una sola de texto libre: la meta)
 - [ ] ¿Cómo combinamos programas para metas fullstack? (tabla meta → programas)

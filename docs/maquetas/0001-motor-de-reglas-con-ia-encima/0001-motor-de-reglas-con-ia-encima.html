@@ -1,0 +1,443 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Maqueta — ADR 0001: motor de reglas + IA como capa de texto</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+  rel="stylesheet"
+  href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&family=Space+Grotesk:wght@500;600;700&display=swap"
+/>
+<link rel="stylesheet" href="0001-motor-de-reglas-con-ia-encima.css" />
+</head>
+<body>
+
+<!--
+  Maqueta puramente visual del ADR 0001 (docs/decisiones/0001-motor-de-reglas-con-ia-encima.md).
+  No hay lógica de negocio: los números de horas, los cursos y las razones son texto fijo en este
+  HTML. El único JS (ver el .js) cambia qué bloque se ve — pasos del cuestionario, estado de la ruta,
+  acordeón de descartes — nunca calcula nada.
+-->
+
+<nav class="top-tabs" aria-label="Pantallas de la maqueta">
+  <div class="top-tabs__inner">
+    <button class="tab-btn" data-tab-target="cuestionario" aria-selected="true" type="button">
+      ① Cuestionario
+    </button>
+    <button class="tab-btn" data-tab-target="ruta" aria-selected="false" type="button">
+      ② Ruta generada
+    </button>
+  </div>
+</nav>
+
+<main class="page">
+
+  <!-- ============================================================ -->
+  <!-- PANTALLA 1 — Cuestionario multi-paso                          -->
+  <!-- ============================================================ -->
+  <section class="screen" id="screen-cuestionario" data-active="true">
+
+    <div class="screen-intro">
+      <p class="eyebrow">Cuestionario</p>
+      <h1>Cuéntanos hacia dónde vas</h1>
+      <p>
+        Cuatro preguntas. Con esto el motor por reglas arma tu ruta sobre los programas oficiales de
+        DevTalles — sin esperar a ninguna IA.
+      </p>
+    </div>
+
+    <div class="card">
+      <div class="steps-indicator">
+        <span class="steps-indicator__label" id="step-label">Paso 1 de 4 — Meta</span>
+        <div class="steps-indicator__track">
+          <div class="steps-indicator__fill" id="step-fill" style="width: 25%"></div>
+        </div>
+      </div>
+
+      <!-- Paso 1: meta profesional -->
+      <div class="step" data-step="1" data-active="true">
+        <div>
+          <h2>¿Cuál es tu meta profesional?</h2>
+          <p class="step-hint">Elegimos el o los programas oficiales según tu respuesta.</p>
+        </div>
+        <div class="option-grid" role="radiogroup" aria-label="Meta profesional">
+          <button class="option-card" type="button" role="radio" aria-checked="false">
+            Frontend con React
+            <span>React, TypeScript, Next.js</span>
+          </button>
+          <button class="option-card" type="button" role="radio" aria-checked="false">
+            Backend con Node / Nest
+            <span>Node, Nest, bases de datos</span>
+          </button>
+          <button class="option-card" type="button" role="radio" aria-checked="true">
+            Fullstack (React + Nest)
+            <span>Combina dos programas oficiales</span>
+          </button>
+          <button class="option-card" type="button" role="radio" aria-checked="false">
+            Datos e Inteligencia Artificial
+            <span>Python, IA aplicada</span>
+          </button>
+        </div>
+        <div class="field">
+          <label for="meta-libre">Cuéntanos con tus palabras (opcional)</label>
+          <textarea
+            id="meta-libre"
+            placeholder="Ej: quiero hacer apps móviles que usen IA para mi emprendimiento"
+          ></textarea>
+          <p class="field-note">
+            La IA lee esto para sugerir ajustes al programa elegido arriba — nunca decide sola.
+          </p>
+        </div>
+      </div>
+
+      <!-- Paso 2: nivel actual -->
+      <div class="step" data-step="2">
+        <div>
+          <h2>¿Qué tecnologías ya dominas?</h2>
+          <p class="step-hint">Esos cursos no van a aparecer en tu ruta.</p>
+        </div>
+        <div class="chip-grid" role="group" aria-label="Tecnologías que ya domina">
+          <button class="chip-toggle" type="button" aria-pressed="true">JavaScript</button>
+          <button class="chip-toggle" type="button" aria-pressed="true">Git</button>
+          <button class="chip-toggle" type="button" aria-pressed="false">HTML / CSS</button>
+          <button class="chip-toggle" type="button" aria-pressed="false">TypeScript</button>
+          <button class="chip-toggle" type="button" aria-pressed="false">React</button>
+          <button class="chip-toggle" type="button" aria-pressed="false">Node</button>
+          <button class="chip-toggle" type="button" aria-pressed="false">SQL</button>
+          <button class="chip-toggle" type="button" aria-pressed="false">Docker</button>
+          <button class="chip-toggle" type="button" aria-pressed="false">Python</button>
+          <button class="chip-toggle" type="button" aria-pressed="false">Java</button>
+          <button class="chip-toggle" type="button" aria-pressed="false">Dart</button>
+        </div>
+      </div>
+
+      <!-- Paso 3: intereses -->
+      <div class="step" data-step="3">
+        <div>
+          <h2>¿Algo que te interese en especial?</h2>
+          <p class="step-hint">Usamos esto para elegir entre los cursos opcionales de tu ruta.</p>
+        </div>
+        <div class="chip-grid" role="group" aria-label="Intereses">
+          <button class="chip-toggle" type="button" aria-pressed="false">Testing</button>
+          <button class="chip-toggle" type="button" aria-pressed="false">Gestión de estado</button>
+          <button class="chip-toggle" type="button" aria-pressed="false">Componentes UI</button>
+          <button class="chip-toggle" type="button" aria-pressed="false">Tiempo real / Sockets</button>
+          <button class="chip-toggle" type="button" aria-pressed="false">IA aplicada</button>
+          <button class="chip-toggle" type="button" aria-pressed="false">Reportes y PDFs</button>
+          <button class="chip-toggle" type="button" aria-pressed="false">Microservicios</button>
+          <button class="chip-toggle" type="button" aria-pressed="false">GraphQL</button>
+        </div>
+      </div>
+
+      <!-- Paso 4: tiempo disponible -->
+      <div class="step" data-step="4">
+        <div>
+          <h2>¿Cuánto tiempo tienes?</h2>
+          <p class="step-hint">Con esto calculamos si tu ruta cabe en tu plazo — y qué recortar si no.</p>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label for="horas-semana">Horas por semana</label>
+            <input id="horas-semana" type="number" value="10" min="1" max="40" />
+          </div>
+          <div class="field">
+            <label for="plazo">¿En cuánto tiempo quieres lograrlo?</label>
+            <select id="plazo">
+              <option>3 meses</option>
+              <option selected>5 meses</option>
+              <option>6 meses</option>
+              <option>12 meses</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="step-nav">
+        <button class="btn btn-outline" id="step-back" type="button" disabled>Atrás</button>
+        <button class="btn btn-primary" id="step-next" type="button">Siguiente</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- PANTALLA 2 — Ruta generada                                    -->
+  <!-- ============================================================ -->
+  <section class="screen" id="screen-ruta" data-route-state="con-ia">
+
+    <div class="screen-intro">
+      <p class="eyebrow">Tu ruta</p>
+      <p style="color: var(--muted-foreground); font-size: 0.8125rem; margin-top: -4px;">
+        Perfil de ejemplo: fullstack React + Nest · ya domina JavaScript y Git · 10h/semana · plazo 5 meses
+      </p>
+    </div>
+
+    <div class="card route-header">
+      <div class="badge-row">
+        <span class="badge badge-official">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 8.5l3 3 7-7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Basada en la ruta oficial de DevTalles
+        </span>
+        <span class="badge badge-ai">
+          <svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 1l1.4 4.6L14 7l-4.6 1.4L8 13l-1.4-4.6L2 7l4.6-1.4L8 1z"/></svg>
+          Personalizada con IA
+        </span>
+      </div>
+
+      <h1 class="route-title" data-variant="plantilla">
+        Tu ruta: Fundamentos + React + Nest
+        <span class="skeleton-line" style="width: 70%"></span>
+      </h1>
+      <h1 class="route-title" data-variant="ia">
+        De las bases a Fullstack con React y NestJS en 5 meses
+      </h1>
+
+      <p class="route-summary" data-variant="plantilla">
+        Ruta oficial de DevTalles combinando los programas de Fundamentos, React y Nest, ajustada a tu
+        plazo de 5 meses.
+        <span class="skeleton-line" style="width: 90%"></span>
+      </p>
+      <p class="route-summary" data-variant="ia">
+        Ya conoces JavaScript y Git, así que saltamos directo a construir con React y Nest. Armamos tu
+        plan para que en 5 meses tengas un proyecto fullstack completo para mostrar.
+      </p>
+    </div>
+
+    <div class="card">
+      <div class="budget-card__top">
+        <div class="budget-card__hours">
+          197.5h <small>de 200h disponibles (10h/semana × 5 meses)</small>
+        </div>
+        <div class="badge badge-level badge-level--recomendado" style="border-radius: var(--radius-md);">
+          ~20 semanas
+        </div>
+      </div>
+      <div class="budget-meter">
+        <div class="budget-meter__fill" style="width: 98.75%"></div>
+      </div>
+      <div class="budget-card__note">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6.25"/><path d="M8 5v3.5l2.2 1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span>
+          La ruta completa eran 236h y no cabía en tu plazo. Quitamos 2 cursos <strong>recomendados</strong>
+          (React PRO y Docker) para que quepa en 200h — ver el detalle abajo, en "Qué quitamos y por qué".
+        </span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="route-group">
+        <p class="route-group__title">Fundamentos</p>
+
+        <div class="course-row">
+          <div class="course-row__top">
+            <span class="course-row__title">Programación para principiantes</span>
+            <div class="course-row__meta">
+              <span class="course-row__hours">8h</span>
+              <span class="badge badge-level badge-level--requerido">Requerido</span>
+            </div>
+          </div>
+          <a class="provenance-chip" href="#">
+            Requerido en la ruta oficial de Fundamentos
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 4h6v6M12 4L4 12" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </a>
+          <p class="reason-text" data-variant="plantilla">Requerido en la ruta oficial de Fundamentos.<span class="skeleton-line" style="width: 60%"></span></p>
+          <p class="reason-text" data-variant="ia">El primer paso de cualquier ruta de Fundamentos — lo dejamos aunque ya sepas JavaScript, porque cubre lógica antes de la sintaxis.</p>
+        </div>
+
+        <div class="course-row">
+          <div class="course-row__top">
+            <span class="course-row__title">Principios SOLID y Clean Code</span>
+            <div class="course-row__meta">
+              <span class="course-row__hours">6.5h</span>
+              <span class="badge badge-level badge-level--requerido">Requerido</span>
+            </div>
+          </div>
+          <a class="provenance-chip" href="#">
+            Requerido en la ruta oficial de Fundamentos
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 4h6v6M12 4L4 12" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </a>
+          <p class="reason-text" data-variant="plantilla">Requerido en la ruta oficial de Fundamentos.<span class="skeleton-line" style="width: 55%"></span></p>
+          <p class="reason-text" data-variant="ia">Te va a servir en los dos programas que combinaste: son las mismas ideas que vas a aplicar en React y en Nest.</p>
+        </div>
+
+        <div class="course-row">
+          <div class="course-row__top">
+            <span class="course-row__title">Patrones de Diseño</span>
+            <div class="course-row__meta">
+              <span class="course-row__hours">10h</span>
+              <span class="badge badge-level badge-level--requerido">Requerido</span>
+            </div>
+          </div>
+          <a class="provenance-chip" href="#">
+            Requerido en la ruta oficial de Fundamentos
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 4h6v6M12 4L4 12" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </a>
+          <p class="reason-text" data-variant="plantilla">Requerido en la ruta oficial de Fundamentos.<span class="skeleton-line" style="width: 50%"></span></p>
+          <p class="reason-text" data-variant="ia">Antes de Nest conviene tener esto claro — el framework asume que ya conoces estos patrones.</p>
+        </div>
+
+        <div class="course-row">
+          <div class="course-row__top">
+            <span class="course-row__title">SQL de cero: PostgreSQL</span>
+            <div class="course-row__meta">
+              <span class="course-row__hours">16h</span>
+              <span class="badge badge-level badge-level--recomendado">Recomendado</span>
+            </div>
+          </div>
+          <a class="provenance-chip" href="#">
+            Recomendado en Fundamentos y en React — lo dejamos una vez
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 4h6v6M12 4L4 12" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </a>
+          <p class="reason-text" data-variant="plantilla">Recomendado en dos de tus programas; lo contamos una sola vez.<span class="skeleton-line" style="width: 65%"></span></p>
+          <p class="reason-text" data-variant="ia">Nest lo va a necesitar para tu backend, así que lo movimos temprano aunque React también lo recomiende.</p>
+        </div>
+      </div>
+
+      <div class="route-group">
+        <p class="route-group__title">React</p>
+
+        <div class="course-row">
+          <div class="course-row__top">
+            <span class="course-row__title">React: de cero a experto</span>
+            <div class="course-row__meta">
+              <span class="course-row__hours">46h</span>
+              <span class="badge badge-level badge-level--requerido">Requerido</span>
+            </div>
+          </div>
+          <a class="provenance-chip" href="#">
+            Requerido en la ruta oficial de React
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 4h6v6M12 4L4 12" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </a>
+          <p class="reason-text" data-variant="plantilla">Requerido en la ruta oficial de React.<span class="skeleton-line" style="width: 45%"></span></p>
+          <p class="reason-text" data-variant="ia">El curso central de tu ruta. Con JavaScript ya dominado, vas a avanzar más rápido que el promedio.</p>
+        </div>
+
+        <div class="course-row">
+          <div class="course-row__top">
+            <span class="course-row__title">TypeScript: guía completa</span>
+            <div class="course-row__meta">
+              <span class="course-row__hours">8.5h</span>
+              <span class="badge badge-level badge-level--recomendado">Recomendado</span>
+            </div>
+          </div>
+          <a class="provenance-chip" href="#">
+            Recomendado en React y en Nest — lo dejamos una vez
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 4h6v6M12 4L4 12" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </a>
+          <p class="reason-text" data-variant="plantilla">Recomendado en dos de tus programas; lo contamos una sola vez.<span class="skeleton-line" style="width: 65%"></span></p>
+          <p class="reason-text" data-variant="ia">Te conviene antes de Next.js y de Nest — los dos asumen tipado desde el primer capítulo.</p>
+        </div>
+
+        <div class="course-row">
+          <div class="course-row__top">
+            <span class="course-row__title">Next.js: framework de React para producción</span>
+            <div class="course-row__meta">
+              <span class="course-row__hours">39h</span>
+              <span class="badge badge-level badge-level--requerido">Requerido</span>
+            </div>
+          </div>
+          <a class="provenance-chip" href="#">
+            Requerido en la ruta oficial de React
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 4h6v6M12 4L4 12" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </a>
+          <p class="reason-text" data-variant="plantilla">Requerido en la ruta oficial de React.<span class="skeleton-line" style="width: 45%"></span></p>
+          <p class="reason-text" data-variant="ia">Cierra tu lado frontend con algo desplegable — bueno para el proyecto fullstack que quieres mostrar.</p>
+        </div>
+      </div>
+
+      <div class="route-group">
+        <p class="route-group__title">Nest</p>
+
+        <div class="course-row">
+          <div class="course-row__top">
+            <span class="course-row__title">Nest: Desarrollo backend escalable con Node</span>
+            <div class="course-row__meta">
+              <span class="course-row__hours">24.5h</span>
+              <span class="badge badge-level badge-level--requerido">Requerido</span>
+            </div>
+          </div>
+          <a class="provenance-chip" href="#">
+            Requerido en la ruta oficial de Nest
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 4h6v6M12 4L4 12" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </a>
+          <p class="reason-text" data-variant="plantilla">Requerido en la ruta oficial de Nest.<span class="skeleton-line" style="width: 45%"></span></p>
+          <p class="reason-text" data-variant="ia">Tu lado backend arranca aquí — con Node como base, esto te va a resultar familiar.</p>
+        </div>
+
+        <div class="course-row">
+          <div class="course-row__top">
+            <span class="course-row__title">Nest + GraphQL: evoluciona tus APIs</span>
+            <div class="course-row__meta">
+              <span class="course-row__hours">18h</span>
+              <span class="badge badge-level badge-level--requerido">Requerido</span>
+            </div>
+          </div>
+          <a class="provenance-chip" href="#">
+            Requerido en la ruta oficial de Nest
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 4h6v6M12 4L4 12" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </a>
+          <p class="reason-text" data-variant="plantilla">Requerido en la ruta oficial de Nest.<span class="skeleton-line" style="width: 45%"></span></p>
+          <p class="reason-text" data-variant="ia">DevTalles lo marca requerido en Nest, aunque tu meta no lo pedía explícitamente — lo respetamos igual.</p>
+        </div>
+
+        <div class="course-row">
+          <div class="course-row__top">
+            <span class="course-row__title">NestJS + Microservicios</span>
+            <div class="course-row__meta">
+              <span class="course-row__hours">21h</span>
+              <span class="badge badge-level badge-level--requerido">Requerido</span>
+            </div>
+          </div>
+          <a class="provenance-chip" href="#">
+            Requerido en la ruta oficial de Nest
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 4h6v6M12 4L4 12" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </a>
+          <p class="reason-text" data-variant="plantilla">Requerido en la ruta oficial de Nest.<span class="skeleton-line" style="width: 45%"></span></p>
+          <p class="reason-text" data-variant="ia">Cierra el backend con algo que se ve bien en un portafolio fullstack: arquitectura de microservicios.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <button class="discard-toggle" id="discard-toggle" type="button" aria-expanded="false" aria-controls="discard-list">
+        Qué quitamos y por qué
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 6l4 4 4-4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <div class="discard-list" id="discard-list">
+        <div class="discard-row">
+          <span class="discard-row__course">JavaScript Moderno</span>
+          <span class="discard-reason">Ya lo dominas</span>
+        </div>
+        <div class="discard-row">
+          <span class="discard-row__course">GIT+GitHub: Control de versiones</span>
+          <span class="discard-reason">Ya lo dominas</span>
+        </div>
+        <div class="discard-row">
+          <span class="discard-row__course">React PRO</span>
+          <span class="discard-reason">No cabía en tu plazo (recomendado)</span>
+        </div>
+        <div class="discard-row">
+          <span class="discard-row__course">Docker — Guía práctica</span>
+          <span class="discard-reason">No cabía en tu plazo (recomendado)</span>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+</main>
+
+<!-- Panel de la maqueta: solo para elegir qué estado de la pantalla 2 se ve. No es UI de la app real. -->
+<div class="mock-controls" id="mock-controls" hidden>
+  <span class="mock-controls__label">Vista de la maqueta</span>
+  <div class="mock-controls__options">
+    <button type="button" data-route-view="cargando">Cargando</button>
+    <button type="button" data-route-view="con-ia" aria-pressed="true">Con IA</button>
+    <button type="button" data-route-view="sin-key">Sin key</button>
+  </div>
+</div>
+
+<script src="0001-motor-de-reglas-con-ia-encima.js"></script>
+</body>
+</html>

@@ -36,10 +36,10 @@ como marca de "esto lo generó la IA". Su `--r: 14px` coincide con el `--radius:
 
 ## Qué dijo el abogado del diablo
 
-No se corrió `/critica` sobre esta decisión: se discutió directamente con el usuario en modo plan,
+No se corrió `/critique` sobre esta decisión: se discutió directamente con el usuario en modo plan,
 incluyendo las alternativas de nombre de ruta, alcance y tratamiento del logo del equipo (ver
 `AskUserQuestion` en la sesión). Pendiente si en el futuro se quiere una revisión adicional con
-`devils-advocate`.
+`devils-advocate` (vía `/critique`).
 
 ## Decisión
 
