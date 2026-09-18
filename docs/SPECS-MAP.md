@@ -119,6 +119,8 @@ Las que siguen sin marcar en `docs/investigacion/ANALISIS-IA.md` §11 y en las c
 | Qué se hace cuando la ruta no cabe en el presupuesto (orden de recorte) | 04 |
 | Límite diario de personalizaciones por usuario (sugerido: 5) | 09 |
 | Mini-quiz de re-evaluación vs. "Recalcular mi ruta" (recomendado: recalcular) | 13 |
+| Ocultar un interés cuyo curso de respaldo ya está entre las tecnologías dominadas (ej. Vue + "ya domino Node" vs. chip "Backend con Node") | 04 |
+| Qué se muestra en el paso de intereses cuando el programa solo tiene 1 curso opcional real (7 de 18 combinaciones de stack de la maqueta: `php`, `go`, `vue`, `java`, `csharp`, `python`, `dotnet-blazor`) | 05 |
 | Vencimiento de los créditos de OpenAI y dueño de la key | Ninguno — es gestión, no spec |
 
 ## 5. Qué NO pasa por SDD

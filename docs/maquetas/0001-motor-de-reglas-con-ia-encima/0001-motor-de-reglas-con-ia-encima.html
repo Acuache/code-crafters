@@ -17,8 +17,10 @@
 <!--
   Maqueta puramente visual del ADR 0001 (docs/decisiones/0001-motor-de-reglas-con-ia-encima.md).
   No hay lógica de negocio: los números de horas, los cursos y las razones son texto fijo en este
-  HTML. El único JS (ver el .js) cambia qué bloque se ve — pasos del cuestionario, estado de la ruta,
-  acordeón de descartes — nunca calcula nada.
+  HTML. El JS (ver el .js) cambia qué bloque se ve — pasos del cuestionario, estado de la ruta,
+  acordeón de descartes — y además rellena el select de stack y los chips de "ya dominas" / intereses
+  desde tablas fijas (mismo espíritu que docs/investigacion/opcion-c.html). Nunca calcula horas, rutas
+  ni llama a ninguna IA: eso sigue siendo texto de ejemplo o trabajo del motor real.
 -->
 
 <nav class="top-tabs" aria-label="Pantallas de la maqueta">
@@ -43,16 +45,16 @@
       <p class="eyebrow">Cuestionario</p>
       <h1>Cuéntanos hacia dónde vas</h1>
       <p>
-        Cuatro preguntas. Con esto el motor por reglas arma tu ruta sobre los programas oficiales de
+        Seis preguntas. Con esto el motor por reglas arma tu ruta sobre los 13 programas oficiales de
         DevTalles — sin esperar a ninguna IA.
       </p>
     </div>
 
     <div class="card">
       <div class="steps-indicator">
-        <span class="steps-indicator__label" id="step-label">Paso 1 de 4 — Meta</span>
+        <span class="steps-indicator__label" id="step-label">Paso 1 de 6 — Meta</span>
         <div class="steps-indicator__track">
-          <div class="steps-indicator__fill" id="step-fill" style="width: 25%"></div>
+          <div class="steps-indicator__fill" id="step-fill" style="width: 16.66%"></div>
         </div>
       </div>
 
@@ -60,79 +62,107 @@
       <div class="step" data-step="1" data-active="true">
         <div>
           <h2>¿Cuál es tu meta profesional?</h2>
-          <p class="step-hint">Elegimos el o los programas oficiales según tu respuesta.</p>
+          <p class="step-hint">Elegimos el área; en el siguiente paso afinamos el stack.</p>
         </div>
         <div class="option-grid" role="radiogroup" aria-label="Meta profesional">
-          <button class="option-card" type="button" role="radio" aria-checked="false">
-            Frontend con React
-            <span>React, TypeScript, Next.js</span>
+          <button class="option-card" type="button" role="radio" aria-checked="true" data-meta="frontend">
+            Frontend
+            <span>React, Vue, Angular (el backend se decide aparte)</span>
           </button>
-          <button class="option-card" type="button" role="radio" aria-checked="false">
-            Backend con Node / Nest
-            <span>Node, Nest, bases de datos</span>
+          <button class="option-card" type="button" role="radio" aria-checked="false" data-meta="backend">
+            Backend
+            <span>Node, Java, .NET, Python, PHP, Go</span>
           </button>
-          <button class="option-card" type="button" role="radio" aria-checked="true">
-            Fullstack (React + Nest)
-            <span>Combina dos programas oficiales</span>
+          <button class="option-card" type="button" role="radio" aria-checked="false" data-meta="fullstack">
+            Fullstack
+            <span>Combina front y back en un solo programa</span>
           </button>
-          <button class="option-card" type="button" role="radio" aria-checked="false">
-            Datos e Inteligencia Artificial
-            <span>Python, IA aplicada</span>
+          <button class="option-card" type="button" role="radio" aria-checked="false" data-meta="movil">
+            Desarrollo móvil
+            <span>Flutter, Dart, React Native</span>
           </button>
+          <button class="option-card" type="button" role="radio" aria-checked="false" data-meta="ia">
+            IA y automatizaciones
+            <span>Agentes, prompts, IA aplicada</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Paso 2: stack preferido (depende de la meta) + meta en texto libre -->
+      <div class="step" data-step="2">
+        <div>
+          <h2>¿Qué stack prefieres?</h2>
+          <p class="step-hint">Elegimos el programa oficial de DevTalles según tu stack.</p>
+        </div>
+        <div class="field">
+          <label for="stack-select">Stack preferido</label>
+          <select id="stack-select"></select>
         </div>
         <div class="field">
           <label for="meta-libre">Cuéntanos con tus palabras (opcional)</label>
           <textarea
             id="meta-libre"
-            placeholder="Ej: quiero hacer apps móviles que usen IA para mi emprendimiento"
+            placeholder="Ej: sé HTML y CSS pero nunca toqué backend; quiero trabajar como frontend en 6 meses"
           ></textarea>
           <p class="field-note">
-            La IA lee esto para sugerir ajustes al programa elegido arriba — nunca decide sola.
+            Si hay una IA disponible, la usamos para afinar la ruta con esto — sin ella, tu ruta se
+            arma igual con las reglas de arriba.
           </p>
         </div>
       </div>
 
-      <!-- Paso 2: nivel actual -->
-      <div class="step" data-step="2">
-        <div>
-          <h2>¿Qué tecnologías ya dominas?</h2>
-          <p class="step-hint">Esos cursos no van a aparecer en tu ruta.</p>
-        </div>
-        <div class="chip-grid" role="group" aria-label="Tecnologías que ya domina">
-          <button class="chip-toggle" type="button" aria-pressed="true">JavaScript</button>
-          <button class="chip-toggle" type="button" aria-pressed="true">Git</button>
-          <button class="chip-toggle" type="button" aria-pressed="false">HTML / CSS</button>
-          <button class="chip-toggle" type="button" aria-pressed="false">TypeScript</button>
-          <button class="chip-toggle" type="button" aria-pressed="false">React</button>
-          <button class="chip-toggle" type="button" aria-pressed="false">Node</button>
-          <button class="chip-toggle" type="button" aria-pressed="false">SQL</button>
-          <button class="chip-toggle" type="button" aria-pressed="false">Docker</button>
-          <button class="chip-toggle" type="button" aria-pressed="false">Python</button>
-          <button class="chip-toggle" type="button" aria-pressed="false">Java</button>
-          <button class="chip-toggle" type="button" aria-pressed="false">Dart</button>
-        </div>
-      </div>
-
-      <!-- Paso 3: intereses -->
+      <!-- Paso 3: nivel actual -->
       <div class="step" data-step="3">
         <div>
-          <h2>¿Algo que te interese en especial?</h2>
-          <p class="step-hint">Usamos esto para elegir entre los cursos opcionales de tu ruta.</p>
+          <h2>¿Cómo describirías tu nivel hoy?</h2>
+          <p class="step-hint">Con esto decidimos si anteponemos Fundamentos a tu ruta.</p>
         </div>
-        <div class="chip-grid" role="group" aria-label="Intereses">
-          <button class="chip-toggle" type="button" aria-pressed="false">Testing</button>
-          <button class="chip-toggle" type="button" aria-pressed="false">Gestión de estado</button>
-          <button class="chip-toggle" type="button" aria-pressed="false">Componentes UI</button>
-          <button class="chip-toggle" type="button" aria-pressed="false">Tiempo real / Sockets</button>
-          <button class="chip-toggle" type="button" aria-pressed="false">IA aplicada</button>
-          <button class="chip-toggle" type="button" aria-pressed="false">Reportes y PDFs</button>
-          <button class="chip-toggle" type="button" aria-pressed="false">Microservicios</button>
-          <button class="chip-toggle" type="button" aria-pressed="false">GraphQL</button>
+        <div class="option-grid" role="radiogroup" aria-label="Nivel actual">
+          <button class="option-card" type="button" role="radio" aria-checked="false">
+            Empiezo de cero
+            <span>Nunca programé o recién empiezo</span>
+          </button>
+          <button class="option-card" type="button" role="radio" aria-checked="true">
+            Tengo bases
+            <span>Sé lo básico, quiero estructurarlo</span>
+          </button>
+          <button class="option-card" type="button" role="radio" aria-checked="false">
+            Intermedio
+            <span>Ya trabajo con esto, quiero profundizar</span>
+          </button>
         </div>
       </div>
 
-      <!-- Paso 4: tiempo disponible -->
+      <!-- Paso 4: tecnologías que ya domina (chips según el stack elegido) -->
       <div class="step" data-step="4">
+        <div>
+          <h2>¿Qué tecnologías ya dominas?</h2>
+          <p class="step-hint">
+            Ajustamos el orden y saltamos lo opcional — los cursos base de tu programa se mantienen
+            igual aunque ya los domines.
+          </p>
+        </div>
+        <div class="chip-grid" id="skills-chip-grid" role="group" aria-label="Tecnologías que ya domina"></div>
+      </div>
+
+      <!-- Paso 5: intereses (chips según los cursos opcionales del stack elegido) -->
+      <div class="step" data-step="5">
+        <div>
+          <h2>¿Algo que te interese en especial?</h2>
+          <p class="step-hint">
+            Usamos esto para elegir entre los cursos opcionales de tu ruta. Puedes no marcar ninguno:
+            los opcionales solo entran si te interesan.
+          </p>
+        </div>
+        <div class="chip-grid" id="interests-chip-grid" role="group" aria-label="Intereses"></div>
+        <p class="field-note" id="interests-empty" hidden>
+          La ruta oficial de este stack no tiene cursos opcionales — este paso no aplica, todos sus
+          cursos son requeridos.
+        </p>
+      </div>
+
+      <!-- Paso 6: tiempo disponible -->
+      <div class="step" data-step="6">
         <div>
           <h2>¿Cuánto tiempo tienes?</h2>
           <p class="step-hint">Con esto calculamos si tu ruta cabe en tu plazo — y qué recortar si no.</p>
@@ -140,7 +170,7 @@
         <div class="field-row">
           <div class="field">
             <label for="horas-semana">Horas por semana</label>
-            <input id="horas-semana" type="number" value="10" min="1" max="40" />
+            <input id="horas-semana" type="number" value="10" min="3" max="40" />
           </div>
           <div class="field">
             <label for="plazo">¿En cuánto tiempo quieres lograrlo?</label>
@@ -152,6 +182,9 @@
             </select>
           </div>
         </div>
+        <p class="field-note">
+          Ejemplo: 10h/semana durante 5 meses ≈ 200h disponibles para tu ruta.
+        </p>
       </div>
 
       <div class="step-nav">

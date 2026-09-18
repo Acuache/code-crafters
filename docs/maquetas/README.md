@@ -10,4 +10,4 @@ de ejemplo, fijos en el HTML.
 
 | Carpeta | Qué ilustra | ADR |
 |---|---|---|
-| [`0001-motor-de-reglas-con-ia-encima/`](0001-motor-de-reglas-con-ia-encima/0001-motor-de-reglas-con-ia-encima.html) | El cuestionario (con el campo de plazo nuevo) y la pantalla de ruta generada, con sus tres estados: cargando, personalizada con IA y sin `OPENAI_API_KEY`. | [0001](../decisiones/0001-motor-de-reglas-con-ia-encima.md) |
+| [`0001-motor-de-reglas-con-ia-encima/`](0001-motor-de-reglas-con-ia-encima/0001-motor-de-reglas-con-ia-encima.html) | El cuestionario de 6 pasos (meta → stack dependiente → nivel → ya domina → intereses → tiempo, cubriendo los 13 programas oficiales) y la pantalla de ruta generada, con sus tres estados: cargando, personalizada con IA y sin `OPENAI_API_KEY`. | [0001](../decisiones/0001-motor-de-reglas-con-ia-encima.md) |
