@@ -52,6 +52,7 @@
   --color-level-optional-foreground: var(--level-optional-foreground);
   --color-ai: var(--ai);
   --color-ai-foreground: var(--ai-foreground);
+  --color-logo-backdrop: var(--logo-backdrop);
   --shadow-brand: var(--brand-shadow);
   --shadow-brand-glow: var(--brand-glow);
   --radius-sm: calc(var(--radius) * 0.6);
@@ -137,6 +138,14 @@
     oklch(1 0 0 / 80%) 60%,
     oklch(0.4089 0.2003 284.53 / 8%) 100%
   );
+  /*
+   * El wordmark de public/logo.webp lleva "Dev" en blanco: sobre este
+   * fondo claro se pierde. --logo-backdrop es el --background del tema
+   * oscuro fijado a mano (no redefinido en .dark), así que en tema oscuro
+   * coincide con la página y se vuelve invisible, y en tema claro le da al
+   * logo el fondo oscuro que necesita para leerse. No usar dark: aquí.
+   */
+  --logo-backdrop: oklch(0.1954 0.0456 295.93);
 }
 
 .dark {

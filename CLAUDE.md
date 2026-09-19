@@ -8,7 +8,9 @@ Este archivo da contexto a Claude Code (claude.ai/code) para trabajar en este re
 
 ## Estado del proyecto
 
-Este repo ya salió del scaffold de `create-next-app` en lo visual, pero la aplicación real — **Code Quest**, un generador de rutas de aprendizaje sobre el catálogo de cursos de DevTalles — todavía no está construida. Lo que ya existe es el sistema de diseño (`app/globals.css`, `app/layout.tsx`, ~22 componentes en `components/ui/`, documentados en la ruta `/sistema-diseno`; ver `docs/decisiones/0002-sistema-de-diseno-devtalles.md`) y los utils de cliente de Supabase (`lib/supabase/{client,server}.ts`, `proxy.ts`) — ver **Notas de arquitectura** para el detalle de ambos. La planificación, los requisitos y la investigación viven en `docs/` y `data/` (contexto de proyecto real, no un scratchpad descartable):
+Tres nombres, tres cosas distintas — no confundirlos: **DevPathlles** es el producto (este repo), **Code Crafters** es el equipo que lo construye, y **Code Quest** es el concurso de DevTalles para el que se construye (`docs/ENUNCIADO.md`).
+
+Este repo ya salió del scaffold de `create-next-app` en lo visual, pero la aplicación real — **DevPathlles**, un generador de rutas de aprendizaje sobre el catálogo de cursos de DevTalles — todavía no está construida. Lo que ya existe es el sistema de diseño (`app/globals.css`, `app/layout.tsx`, ~22 componentes en `components/ui/`, documentados en la ruta `/sistema-diseno`; ver `docs/decisiones/0002-sistema-de-diseno-devtalles.md`) y los utils de cliente de Supabase (`lib/supabase/{client,server}.ts`, `proxy.ts`) — ver **Notas de arquitectura** para el detalle de ambos. La planificación, los requisitos y la investigación viven en `docs/` y `data/` (contexto de proyecto real, no un scratchpad descartable):
 
 - `docs/ENUNCIADO.md` — los requisitos oficiales del concurso. Cualquier feature debe cumplirlos.
 - `docs/ROADMAP.md` — el plan MVP detallado: modelo de datos, estructura de carpetas (`app` con route groups, `lib/{supabase,ai,paths,gamification}`, en la raíz del repo — ver **Notas de arquitectura**), cronograma día a día y el stack elegido (Next.js 16 App Router, Tailwind v4 + shadcn/ui, Supabase para auth/DB con Discord OAuth, Vercel AI SDK, React Flow para el mapa de la ruta).
@@ -91,3 +93,22 @@ Todo código que toque una librería o framework externo — Next.js 16, React 1
 - Tailwind v4 vía `@tailwindcss/postcss` (sin `tailwind.config` separado; ver `postcss.config.mjs`).
 - `shadcn/ui` inicializado (`components.json`): estilo `base-vega`, `baseColor` neutral, íconos con `@phosphor-icons/react`, RSC habilitado. El tema (`app/globals.css`) usa la paleta de DevTalles en variables OKLCH (violeta, lavanda, lima; ver `docs/decisiones/0002-sistema-de-diseno-devtalles.md`), con tema claro y oscuro vía `next-themes` (`defaultTheme="dark"`) más `tw-animate-css`; `app/layout.tsx` combina las fuentes Space Grotesk (`--font-heading`) y DM Sans (`--font-sans`) — las mismas que usa cursos.devtalles.com — con Geist Mono (`--font-mono`) vía `next/font/google`, unidas con el helper `cn` (`lib/utils.ts`). La galería completa de tokens, tipografía y ~22 componentes vive en la ruta `/sistema-diseno` (`app/sistema-diseno/`).
 - Clientes de Supabase (`@supabase/ssr` 0.12.7) siguiendo el patrón oficial `getAll`/`setAll` (los métodos `get`/`set`/`remove` están deprecados): `lib/supabase/client.ts` para Client Components (`createBrowserClient`, cookies vía `document.cookie` automático) y `lib/supabase/server.ts` para Server Components/Actions (`createServerClient` + `cookies()` de `next/headers`, con el `setAll` envuelto en `try/catch` porque los Server Components no pueden escribir cookies). `proxy.ts` en la raíz (no `middleware.ts`, ver nota de arriba) hace el refresh de sesión en cada request con `supabase.auth.getClaims()` — método recomendado actualmente por sobre `getSession()`/`getUser()` porque valida el JWT contra las claves de firma en vez de confiar ciegamente en la cookie. Variables de entorno en `.env.example`: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` (la publishable key reemplaza a la legacy `anon` key) y `SUPABASE_DB_PASSWORD` (CLI). Estos tres archivos se quedan en `lib/supabase/` (no `src/lib/supabase/`): `ROADMAP.md` ya refleja esa ubicación, no hay migración a `src/` planeada.
+
+## Marca y assets
+
+Los assets de marca de DevPathlles viven en `public/` (y `app/` para los iconos), ya optimizados a WebP/PNG comprimido. Un feature nueva usa el asset que le toca de esta tabla en vez de generar o pedir uno nuevo:
+
+| Asset | Qué es | Dónde se usa |
+|---|---|---|
+| `public/logo.webp` | Lockup completo: mascota + wordmark "DevPathlles" | Cabeceras, hero de la landing (spec 05 `landing`), README, tarjeta OG al compartir (spec 14 `path-sharing`) |
+| `public/astronauta.webp` | La mascota sola, recorte cuadrado | Avatares, estados vacíos, ilustraciones pequeñas, pantalla de "generando ruta" (spec 07 `path-generation`) |
+| `app/icon.png`, `app/apple-icon.png` | Icono de la app | Los engancha Next por convención de archivo — no se referencian a mano ni van en `metadata.icons` |
+| `public/streak/celebration-{1,2,3,4}.webp` | Cuatro poses de celebración de la mascota | Spec 13 `gamification`: paso completado, ruta completada, subida de nivel, insignia nueva |
+| `public/streak/reminder.webp` | La mascota con la llama de la racha | Spec 13 `gamification`: racha activa / recordatorio de volver |
+
+Reglas:
+
+- El wordmark de `logo.webp` es blanco y se pierde sobre fondo claro: siempre va envuelto en un contenedor con la clase `bg-logo-backdrop` (token definido en `app/globals.css`, fijo en los dos temas — no usar `dark:` para esto).
+- Todo `<Image>` lleva `alt` descriptivo, salvo cuando la imagen es puramente decorativa y el texto equivalente ya está al lado (`alt=""`).
+- No se vuelve a meter un PNG sin optimizar en `public/`: mismo patrón que se usó para estos (`sharp`, `trim` del margen transparente, redimensionar al tamaño real de uso, `webp` calidad ~82 salvo iconos que van en PNG con paleta).
+- `isotipo.png` y `logotipo.png` (la marca del equipo Code Crafters, no la del producto) ya no están en el repo — no se reintroducen en la app.

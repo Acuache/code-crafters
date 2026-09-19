@@ -234,8 +234,8 @@ function AvatarTooltipDemo() {
   return (
     <div className="flex items-center gap-4">
       <Avatar>
-        <AvatarImage src="/isotipo.png" alt="" />
-        <AvatarFallback>CQ</AvatarFallback>
+        <AvatarImage src="/astronauta.webp" alt="" />
+        <AvatarFallback>DP</AvatarFallback>
       </Avatar>
       <Separator orientation="vertical" className="h-8" />
       <Tooltip>

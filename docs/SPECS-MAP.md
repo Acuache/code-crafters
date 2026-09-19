@@ -1,6 +1,6 @@
 # Mapa de specs (SDD)
 
-Orden acordado de los specs de Code Quest para el flujo `/spec` / `/spec-impl` (ver la sección
+Orden acordado de los specs de DevPathlles para el flujo `/spec` / `/spec-impl` (ver la sección
 "Metodología: Spec-Driven Development (SDD)" de `CLAUDE.md`). **Este documento no crea specs** — los
 specs los crea el usuario con `/spec`; este archivo solo fija el orden, las dependencias y qué decisión
 pendiente cierra cada uno, para que la numeración y las referencias `**Depende de:**` queden
@@ -193,6 +193,10 @@ convencional.
   spec 04.
 - `related` en `data/courses.json` (221 aristas entre los 74 cursos, 70 cruzan de programa) — tagging
   ya publicado por DevTalles, hoy sin uso ni spec dueño. Insumo disponible, no asignado.
+- `public/logo.webp`, `public/astronauta.webp`, `public/streak/*.webp` — assets de marca ya
+  optimizados, catalogados en `CLAUDE.md` §"Marca y assets". El logo es entrada de 05 (hero de la
+  landing) y 14 (tarjeta OG); la mascota sola, de 07 (pantalla de "generando ruta"); las 5 imágenes de
+  `streak/` (cuatro celebraciones + recordatorio de racha), del 13.
 
 ## 7. Qué construye cada spec
 
@@ -250,7 +254,7 @@ horas que pueden sumar los intereses y cuándo el motor descarta un interés por
 
 ### 05 · `landing`
 
-La página pública `app/(marketing)/page.tsx`: presenta Code Quest a alguien que todavía no inició
+La página pública `app/(marketing)/page.tsx`: presenta DevPathlles a alguien que todavía no inició
 sesión, con el botón de entrar con Discord. Se apoya enteramente en el sistema de diseño ya construido
 (`components/ui/*`, `components/brand/*`, documentados en `/sistema-diseno` y el ADR 0002) — no crea
 componentes de UI nuevos, los compone. No depende de ningún otro spec: puede escribirse el día 1 en

@@ -12,7 +12,7 @@ const spaceGrotesk = Space_Grotesk({ subsets: ["latin"], variable: "--font-headi
 const geistMono = Geist_Mono({ subsets: ["latin"], variable: "--font-mono" });
 
 export const metadata: Metadata = {
-  title: "Code Quest",
+  title: "DevPathlles",
   description:
     "Generador de rutas de aprendizaje sobre el catálogo de cursos de DevTalles.",
 };

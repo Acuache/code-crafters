@@ -1,6 +1,6 @@
 # Historial de decisiones
 
-Registro de las decisiones importantes de "Code Quest", formato ADR (una por archivo, numeradas). Antes de proponer un cambio de arquitectura o de alcance, revisar si ya se debatió aquí.
+Registro de las decisiones importantes de "DevPathlles", formato ADR (una por archivo, numeradas). Antes de proponer un cambio de arquitectura o de alcance, revisar si ya se debatió aquí.
 
 Para debatir una decisión nueva antes de cerrarla, usar `/critique <idea>` (agente `devils-advocate`, solo lectura). El registro se escribe a mano después de decidir, copiando `0000-plantilla.md`.
 

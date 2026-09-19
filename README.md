@@ -1,4 +1,4 @@
-# Code Quest
+# DevPathlles
 
 Generador de rutas de aprendizaje sobre el catálogo real de cursos de [DevTalles](https://cursos.devtalles.com), hecho para el concurso **Code Quest**.
 

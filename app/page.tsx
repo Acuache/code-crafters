@@ -15,13 +15,15 @@ export default function Home() {
       <div className="absolute top-4 right-4">
         <ThemeToggle />
       </div>
-      <Image src="/isotipo.png" alt="Code Quest" width={72} height={80} priority />
+      <div className="bg-logo-backdrop rounded-2xl px-6 py-4">
+        <Image src="/logo.webp" alt="DevPathlles" width={320} height={122} priority />
+      </div>
       <div className="flex flex-col items-center gap-4">
         <h1 className="text-display max-w-2xl text-balance">
           Tu ruta de aprendizaje sobre el catálogo de DevTalles
         </h1>
         <p className="text-muted-foreground max-w-md text-lg">
-          Code Quest arma una ruta de cursos según tus metas y tu nivel, y la
+          DevPathlles arma una ruta de cursos según tus metas y tu nivel, y la
           personaliza con IA.
         </p>
       </div>

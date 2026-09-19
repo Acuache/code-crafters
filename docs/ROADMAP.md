@@ -1,4 +1,4 @@
-# Roadmap MVP: Code Quest, generador de rutas de aprendizaje (DevTalles)
+# Roadmap MVP: DevPathlles, generador de rutas de aprendizaje (DevTalles)
 
 ## Contexto
 - Es un concurso de DevTalles con 18 equipos. Tenemos **2 semanas**, somos **3 personas** y trabajaremos con apoyo de IA (Claude Code y similares).

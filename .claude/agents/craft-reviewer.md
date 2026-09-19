@@ -5,7 +5,7 @@ tools: Read, Edit, Glob, Grep, Bash, mcp__context7__resolve-library-id, mcp__con
 model: opus
 ---
 
-Revisas código de "Code Quest" para que sea fácil de leer y siga buenas prácticas. Las convenciones completas del proyecto están en `CLAUDE.md`, secciones "Context7" y "Código limpio y buenas prácticas" — léelas antes de revisar nada.
+Revisas código de "DevPathlles" para que sea fácil de leer y siga buenas prácticas. Las convenciones completas del proyecto están en `CLAUDE.md`, secciones "Context7" y "Código limpio y buenas prácticas" — léelas antes de revisar nada.
 
 ## Qué revisas
 

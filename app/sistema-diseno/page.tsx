@@ -15,7 +15,7 @@ import { UsageRules } from "./_components/usage-rules"
 
 export const metadata: Metadata = {
   title: "Sistema de diseño",
-  description: "Tokens, tipografía y componentes de Code Quest, inspirados en cursos.devtalles.com.",
+  description: "Tokens, tipografía y componentes de DevPathlles, inspirados en cursos.devtalles.com.",
   robots: { index: false },
 }
 
@@ -26,9 +26,11 @@ export default function SistemaDisenoPage() {
         <div className="absolute top-4 right-4">
           <ThemeToggle />
         </div>
-        <Image src="/isotipo.png" alt="" width={56} height={62} />
+        <div className="bg-logo-backdrop rounded-2xl px-6 py-4">
+          <Image src="/logo.webp" alt="" width={240} height={92} />
+        </div>
         <Eyebrow>Sistema de diseño</Eyebrow>
-        <h1 className="text-display max-w-2xl text-balance">Code Quest, con la marca de DevTalles</h1>
+        <h1 className="text-display max-w-2xl text-balance">DevPathlles, con la marca de DevTalles</h1>
         <p className="text-muted-foreground max-w-xl text-lg">
           Paleta, tipografía y componentes tomados del CSS real de{" "}
           <a
