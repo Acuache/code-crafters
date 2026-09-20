@@ -78,6 +78,26 @@ Todo código que toque una librería o framework externo — Next.js 16, React 1
 - Descomponer expresiones largas en pasos con nombre.
 - `tsconfig.json` tiene `"strict": true`: nada de `any` sin comentar por qué hizo falta.
 
+## UI: componer, no crear
+
+Toda pantalla nueva (specs 03, 05, 06, 08, 09, 10, 12) se arma reusando `components/ui/*`,
+`components/brand/*` y los assets ya catalogados — si algo parece faltar, primero se busca en
+`/sistema-diseno` antes de maquetarlo a mano. Motivo: el concurso se evalúa navegando la app
+desplegada (`ENUNCIADO.md`, criterio 4, "UI agradable y entendible") y leyendo el repo público
+(criterio 5, "código limpio"); una pantalla que improvisa sus propios botones o colores pierde en
+las dos vías a la vez.
+
+- Un componente visual nuevo solo se crea si ningún componente existente sirve, y el spec que lo
+  crea lo justifica en su sección de Decisiones.
+- Iconos siempre desde `@phosphor-icons/react` con sufijo `Icon` (`DiscordLogoIcon`, no
+  `DiscordLogo`, que está deprecado); desde el submódulo `@phosphor-icons/react/ssr` cuando el
+  componente es un Server Component (precedente: `components/brand/ai-badge.tsx`).
+- No importar desde el `_components/` privado de otra ruta (p. ej. `app/sistema-diseno/_components/`)
+  — es implementación interna de esa página, no una API pública.
+- Esto no contradice "tres líneas repetidas son mejores que una abstracción prematura" (abajo): es
+  sobre *qué piezas visuales existen*, no sobre extraer una abstracción de código por repetirse tres
+  veces.
+
 ## Comandos
 
 - `npm run dev` — levanta el servidor de desarrollo de Next.js (también regenera el bloque de reglas para agentes en `AGENTS.md` en cada corrida — ver la nota de arriba).

@@ -124,10 +124,16 @@ cualquiera de los anteriores (no depende de nada); y 11, 12, 13, 14 entre sí un
    `Decisiones`, `Riesgos`, `Qué NO entra`). El **spec 01 fija la convención**: `/spec` lee los dos
    specs más recientes para copiar el formato, así que lo que quede ahí se propaga solo.
 5. **Cada archivo pertenece a un solo spec.** Dos specs no editan el mismo archivo en ramas distintas.
-   El 04 es dueño de `lib/paths/*` (incluye `interests.ts`, la tabla de intereses transversales al
-   catálogo — no vive en `data/` ni en `components/quiz/*`), el 05 de `app/(marketing)/*`, el 06 de
-   `components/quiz/*`, el 08 de `app/(app)/paths/[id]/*`, el 10 de `app/(admin)/*` y
-   `components/admin/*`, etc. Cada spec declara en su alcance los archivos que toca.
+   El 03 es dueño de `app/login/*`, `app/auth/callback/route.ts`, `lib/supabase/{actions,guards}.ts` y,
+   **temporalmente**, de `app/dashboard/page.tsx` (placeholder plano, sin route group); el 04 es dueño
+   de `lib/paths/*` (incluye `interests.ts`, la tabla de intereses transversales al catálogo — no vive
+   en `data/` ni en `components/quiz/*`), el 05 de `app/(marketing)/*`, el 06 de `components/quiz/*`,
+   el 08 de `app/(app)/paths/[id]/*`, el 10 de `app/(admin)/*` y `components/admin/*`, etc. Cada spec
+   declara en su alcance los archivos que toca. **Excepción explícita a la propiedad temporal:** el
+   spec 09 (`paths-dashboard`), al construir el dashboard real, debe mover o borrar el
+   `app/dashboard/page.tsx` del spec 03 como parte de su propio plan — si crea
+   `app/(app)/dashboard/page.tsx` sin resolver el placeholder anterior, dos rutas resuelven `/dashboard`
+   y el build de Next.js falla.
 6. **Migraciones nuevas solo en 02, 11, 13 y 14**, y esos cuatro no se implementan en paralelo entre sí:
    el orden de los archivos de migración depende del orden de merge, y ramas simultáneas lo rompen. El
    02 crea el esquema base —incluye `profiles.role` y las tablas `programs`/`program_courses`—; 11, 13
@@ -137,6 +143,9 @@ cualquiera de los anteriores (no depende de nada); y 11, 12, 13, 14 entre sí un
    skill se detiene si `git status` no está vacío.
 8. **Lo que aparezca fuera de alcance durante un `/spec-impl` va al spec que le toca según el mapa**, no
    a la rama actual. Si no le toca a ninguno, es un spec nuevo al final de la numeración.
+9. **Toda pantalla nueva compone el sistema de diseño ya construido, no crea piezas visuales nuevas.**
+   La regla completa vive en `CLAUDE.md` §"UI: componer, no crear" (specs 03, 05, 06, 08, 09, 10, 12);
+   no se duplica acá.
 
 ## 4. Decisiones abiertas, asignadas al spec que las cierra
 
@@ -178,8 +187,9 @@ convencional.
   vez sembrado, `build-path.ts` (04) recibe los programas por parámetro y quien lo invoca decide si
   vienen de este JSON o de una consulta a Supabase.
 - `components/ui/*` (22 componentes shadcn), `components/brand/*` y `components/theme-*` — sistema de
-  diseño ya construido, documentado en `/sistema-diseno` y en el ADR 0002. Entrada de 05, 06, 08, 09, 10
-  y 12.
+  diseño ya construido, documentado en `/sistema-diseno` y en el ADR 0002. Entrada de 03, 05, 06, 08,
+  09, 10 y 12. La regla general ("componer, no crear") vive en `CLAUDE.md` §"UI: componer, no crear";
+  no se repite acá.
 - `components/gamification/xp-bar.tsx` — **ya existe**; el spec 13 lo conecta, no lo crea.
 - `lib/supabase/{client,server}.ts` y `proxy.ts` — clientes SSR ya escritos con `getAll`/`setAll` y
   refresh con `getClaims()`. Entrada del 03; el 03 añade login/callback y el rol en sesión, no reescribe
@@ -245,13 +255,18 @@ mostrar qué se sacó de la ruta oficial y por qué — ver
 
 ### 03 · `discord-auth`
 
-El login real: página `/login` con el botón de Discord, el route handler `app/auth/callback/route.ts`
-con `exchangeCodeForSession`, el logout y la protección de las rutas privadas. Incluye el helper que
-exige rol `admin` para las rutas que construirá el spec 10 — el rol viaja en la sesión desde que el 02 lo
-agrega a `profiles`. **Reusa** los clientes `lib/supabase/{client,server}.ts` y el refresco de sesión de
-`proxy.ts`, que ya están escritos — este spec les añade el flujo de entrada, no los reescribe. Incluye el
-primer deploy en Vercel y los dominios de redirect en Supabase, porque el OAuth no se puede dar por
-cerrado solo en local.
+El login real: página `/login` (única pantalla de login del proyecto — el botón de la landing del
+spec 05 es un link a ella, no una copia) con los tres botones que ya soporta el trigger del 02
+(Discord, Google, GitHub), el route handler `app/auth/callback/route.ts` con
+`exchangeCodeForSession`, el logout y los helpers `requireUser()`/`requireAdmin()` — este último exige
+rol `admin` para las rutas que construirá el spec 10, leyendo `profiles.role` (no el `role` del JWT,
+que es el de Postgres). Compone enteramente el sistema de diseño ya construido, sin crear componentes
+de UI nuevos salvo un wrapper mínimo de estado de carga (ver `CLAUDE.md` §"UI: componer, no crear").
+Deja un placeholder temporal en `app/dashboard/page.tsx` que el spec 09 debe resolver (ver regla 5).
+**Reusa** los clientes `lib/supabase/{client,server}.ts` y el refresco de sesión de `proxy.ts`, que ya
+están escritos — este spec les añade el flujo de entrada, no los reescribe. Incluye el primer deploy en
+Vercel y los dominios de redirect en Supabase, porque el OAuth no se puede dar por cerrado solo en
+local.
 
 ### 04 · `path-engine`
 
@@ -272,7 +287,8 @@ horas que pueden sumar los intereses y cuándo el motor descarta un interés por
 ### 05 · `landing`
 
 La página pública `app/(marketing)/page.tsx`: presenta DevPathlles a alguien que todavía no inició
-sesión, con el botón de entrar con Discord. Se apoya enteramente en el sistema de diseño ya construido
+sesión, con un botón/link a `/login` (del spec 03) — no repite ahí el formulario de OAuth. Se apoya
+enteramente en el sistema de diseño ya construido
 (`components/ui/*`, `components/brand/*`, documentados en `/sistema-diseno` y el ADR 0002) — no crea
 componentes de UI nuevos, los compone. No depende de ningún otro spec: puede escribirse el día 1 en
 paralelo con todo lo demás, tal como ya lo asigna `ROADMAP.md` a P3.
@@ -306,10 +322,13 @@ ninguno de esos repite esta vista, todos la extienden o la referencian.
 ### 09 · `paths-dashboard`
 
 El dashboard con todas las rutas del usuario, el progreso de cada una y el acceso para crear otra desde
-cero. Cierra el **Hito 1**: con este spec mergeado a `master`, los cinco requisitos obligatorios del
-`ENUNCIADO.md` (cuestionario, rutas dinámicas con cursos reales, guardar varias rutas y marcar progreso,
-login con Discord, tecnologías de DevTalles) ya están cumplidos — sin necesitar `OPENAI_API_KEY`, que
-recién entra en el 11, ni el rol `admin`, que recién se usa en el 10.
+cero. **Primer paso obligatorio de su plan:** mover o borrar el placeholder `app/dashboard/page.tsx`
+que dejó el spec 03 (ver regla 5 de concordancia) — si este spec agrega `app/(app)/dashboard/page.tsx`
+sin resolver el anterior, dos rutas resuelven `/dashboard` y el build falla. Cierra el **Hito 1**: con
+este spec mergeado a `master`, los cinco requisitos obligatorios del `ENUNCIADO.md` (cuestionario,
+rutas dinámicas con cursos reales, guardar varias rutas y marcar progreso, login con Discord,
+tecnologías de DevTalles) ya están cumplidos — sin necesitar `OPENAI_API_KEY`, que recién entra en el
+11, ni el rol `admin`, que recién se usa en el 10.
 
 ### 10 · `admin-catalog`
 
