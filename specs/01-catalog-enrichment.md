@@ -1,6 +1,6 @@
 # SPEC 01 — Enriquecimiento del catálogo: dificultad y frase de resultado
 
-> **Estado:** Aprobado
+> **Estado:** Implementado
 > **Depende de:** —
 > **Fecha:** 2026-09-19
 > **Objetivo:** Dejar en el repo `data/courses.enriched.json` con los dos campos que el scraping no
@@ -110,18 +110,18 @@ aparece en la etapa 1 de algún programa no se marca `avanzado`.
 
 ## Criterios de aceptación
 
-- [ ] `data/courses.enriched.json` existe y tiene exactamente 74 entradas.
-- [ ] El conjunto de `slug` del archivo es idéntico al de `data/courses.json`: ninguno nuevo, ninguno
+- [x] `data/courses.enriched.json` existe y tiene exactamente 74 entradas.
+- [x] El conjunto de `slug` del archivo es idéntico al de `data/courses.json`: ninguno nuevo, ninguno
       faltante.
-- [ ] Cada `title` coincide literalmente con el de `data/courses.json`.
-- [ ] Los 74 `difficulty` son uno de los tres valores exactos en español.
-- [ ] Los 74 `outcome` tienen 120 caracteres o menos y una sola frase (un solo punto).
-- [ ] Ningún `outcome` contiene la palabra "curso" ni el título del curso.
-- [ ] Los 36 cursos que hoy no tienen `outcomes` en `courses.json` tienen su `outcome` escrito.
-- [ ] Ningún curso que aparezca en la etapa 1 de algún programa quedó marcado `avanzado`.
-- [ ] `data/SUMMARY.md` documenta los dos campos nuevos.
-- [ ] `docs/ROADMAP.md` ya no define `courses` con `level (beginner/intermediate/advanced)`.
-- [ ] El usuario revisó las 74 filas y sus correcciones están aplicadas.
+- [x] Cada `title` coincide literalmente con el de `data/courses.json`.
+- [x] Los 74 `difficulty` son uno de los tres valores exactos en español.
+- [x] Los 74 `outcome` tienen 120 caracteres o menos y una sola frase (un solo punto).
+- [x] Ningún `outcome` contiene la palabra "curso" ni el título del curso.
+- [x] Los 36 cursos que hoy no tienen `outcomes` en `courses.json` tienen su `outcome` escrito.
+- [x] Ningún curso que aparezca en la etapa 1 de algún programa quedó marcado `avanzado`.
+- [x] `data/SUMMARY.md` documenta los dos campos nuevos.
+- [x] `docs/ROADMAP.md` ya no define `courses` con `level (beginner/intermediate/advanced)`.
+- [x] El usuario revisó las 74 filas y sus correcciones están aplicadas.
 
 Los ocho primeros criterios se verifican con este comando:
 

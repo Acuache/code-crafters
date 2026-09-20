@@ -40,7 +40,7 @@ Decisiones de base para todo el mapa:
 
 | NN | Slug (archivo `specs/NN-slug.md`) | Objetivo en una frase | Depende de | Hito |
 |---|---|---|---|---|
-| 01 | `catalog-enrichment` | Script que añade `level` y `outcome` a los 74 cursos y deja `data/courses.enriched.json` revisado a mano en el repo | — | Semana 1 |
+| 01 | `catalog-enrichment` | El agente añade `difficulty` y `outcome` a los 74 cursos, leyendo el catálogo, y deja `data/courses.enriched.json` revisado a mano en el repo | — | Semana 1 |
 | 02 | `supabase-schema` | Migraciones, RLS, trigger de `profiles` (con `role`), tablas `programs`/`program_courses`, un lugar en `path_steps`/`learning_paths` para el curso que el motor o el usuario descartan (con motivo), y seed del catálogo enriquecido | 01 (solo el paso de seed) | Semana 1 |
 | 03 | `discord-auth` | Login y logout con Discord de punta a punta, rol en sesión, sesión refrescada en `proxy.ts` y deploy en Vercel | 02 | Semana 1 |
 | 04 | `path-engine` | `lib/paths/build-path.ts` + `lib/paths/interests.ts`: función pura que arma la ruta con presupuesto de horas, intereses transversales al catálogo y procedencia por paso, recibiendo catálogo y programas por parámetro | 01 | Semana 1 |
@@ -207,14 +207,15 @@ y esto pasa a ser un resumen.
 
 ### 01 · `catalog-enrichment`
 
-Un script de un solo uso (`scripts/enrich-courses.ts`) que recorre los 74 cursos de `data/courses.json`
-y les agrega con IA los dos campos que el scraping no pudo sacar de Thinkific: `level`
-(beginner/intermediate/advanced) y `outcome` (una frase de qué logra el alumno al terminarlo). Deja
-`data/courses.enriched.json` revisado a mano y commiteado. Corre **offline, una sola vez** — el catálogo
-enriquecido viaja en el repo, así que ni la app ni el evaluador gastan créditos de OpenAI por esto. No
-toca base de datos ni UI. Además es el spec que **fija el formato de todos los siguientes**: `/spec`
-copia el estilo de los dos specs más recientes, así que las secciones e idioma que queden aquí se
-propagan solos.
+El agente recorre los 74 cursos de `data/courses.json` y les agrega, leyendo `prerequisites`, `summary`,
+`topics`, `chapters` y su posición en `data/programs.json`, los dos campos que el scraping no pudo sacar
+de Thinkific: `difficulty` (`principiante`/`intermedio`/`avanzado`) y `outcome` (una frase de qué logra
+el alumno al terminarlo). No hay script ni dependencia de IA en `package.json`: el enriquecimiento se
+escribe durante `/spec-impl` y viaja commiteado. Deja `data/courses.enriched.json` revisado a mano por
+el usuario antes de mergear. No gasta créditos de OpenAI, que quedan reservados para la Capa 2 del spec
+11. No toca base de datos ni UI. Además es el spec que **fija el formato de todos los siguientes**:
+`/spec` copia el estilo de los dos specs más recientes, así que las secciones e idioma que queden aquí
+se propagan solos.
 
 ### 02 · `supabase-schema`
 

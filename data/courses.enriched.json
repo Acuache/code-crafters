@@ -1,0 +1,446 @@
+[
+  {
+    "slug": "git-github-control-versiones-desde-cero",
+    "title": "GIT+GitHub: Control de versiones desde Cero",
+    "difficulty": "principiante",
+    "outcome": "Controlas el historial de tus proyectos con Git y colaboras en equipo usando GitHub."
+  },
+  {
+    "slug": "golang-backend-profesional",
+    "title": "Golang: Backend Profesional",
+    "difficulty": "avanzado",
+    "outcome": "Construyes APIs backend profesionales en Go con Clean Architecture, PostgreSQL, Redis y JWT."
+  },
+  {
+    "slug": "laravel-ai",
+    "title": "Laravel 13: AI, REST, JWT, Repository Pattern",
+    "difficulty": "intermedio",
+    "outcome": "Construyes una API REST en Laravel con JWT, Repository Pattern, caché y despliegue en Railway."
+  },
+  {
+    "slug": "spring-AI",
+    "title": "Spring AI: LLMs, Tools, RAG, Agentes y Deploy en AWS",
+    "difficulty": "avanzado",
+    "outcome": "Integras modelos de IA en Spring con Tool Calling, RAG, agentes y despliegue en AWS."
+  },
+  {
+    "slug": "open-code-guia-completa",
+    "title": "OpenCode: Guía completa para desarrolladores de software",
+    "difficulty": "principiante",
+    "outcome": "Integras OpenCode en tu flujo de trabajo diario con agentes, MCPs y Spec-Driven Development."
+  },
+  {
+    "slug": "claude-code-guia-completa",
+    "title": "Claude Code: Guía completa para desarrolladores de software",
+    "difficulty": "principiante",
+    "outcome": "Instalas y usas Claude Code en tu día a día: bugs, features, MCPs, hooks y despliegue a producción."
+  },
+  {
+    "slug": "ia-para-developers",
+    "title": "IA para Developers: Claude API, RAG y Agentes con Node",
+    "difficulty": "intermedio",
+    "outcome": "Construyes un agente de IA con la API de Claude, function calling y RAG, sin frameworks de por medio."
+  },
+  {
+    "slug": "python-ia-aplicada",
+    "title": "Python: Inteligencia artificial aplicada",
+    "difficulty": "intermedio",
+    "outcome": "Construyes agentes de IA en Python con RAG, LangChain y LangGraph, y memoria persistente."
+  },
+  {
+    "slug": "spring-boot-patrones-arquitectura",
+    "title": "Spring Boot 4: Patrones de arquitectura",
+    "difficulty": "avanzado",
+    "outcome": "Aplicas arquitectura hexagonal, DDD y patrones GoF sobre un proyecto real en Spring Boot."
+  },
+  {
+    "slug": "Ingeniería-de-prompts",
+    "title": "Ingeniería de prompts: Para la vida real",
+    "difficulty": "principiante",
+    "outcome": "Escribes mejores prompts y obtienes resultados más útiles de ChatGPT, Claude y otras IAs."
+  },
+  {
+    "slug": "vibe-coding",
+    "title": "Vibe Coding: De forma responsable",
+    "difficulty": "principiante",
+    "outcome": "Construyes una aplicación real con IA, Git, Supabase, autenticación y despliegue en Vercel."
+  },
+  {
+    "slug": "golang-fundamentos-lenguaje",
+    "title": "GoLang: Fundamentos del lenguaje",
+    "difficulty": "principiante",
+    "outcome": "Programas en Go con tipado estático, structs, interfaces, manejo de errores y concurrencia nativa."
+  },
+  {
+    "slug": "PHP-moderno",
+    "title": "PHP moderno: Empieza tu camino en el lenguaje",
+    "difficulty": "principiante",
+    "outcome": "Programas en PHP moderno con POO y Composer, y despliegas tu primera API REST en producción."
+  },
+  {
+    "slug": "spring-boot-microservicios",
+    "title": "Spring Boot 4: Arquitectura de Microservicios",
+    "difficulty": "avanzado",
+    "outcome": "Diseñas microservicios en Spring Boot con Docker, Kubernetes, OAuth2 y observabilidad completa."
+  },
+  {
+    "slug": "Angular_socket_bun",
+    "title": "Angular + Sockets: Aplicaciones en tiempo real con Bun",
+    "difficulty": "intermedio",
+    "outcome": "Sincronizas datos en tiempo real con WebSockets sobre Angular: mapas, colas y chat en vivo."
+  },
+  {
+    "slug": "react-sockets",
+    "title": "React+Sockets: Aplicaciones en tiempo real con Bun",
+    "difficulty": "intermedio",
+    "outcome": "Sincronizas datos en tiempo real con WebSockets sobre React: mapas, colas y chat en vivo."
+  },
+  {
+    "slug": "tailwindcss-para-desarrolladores",
+    "title": "TailwindCSS: Para desarrolladores de software",
+    "difficulty": "intermedio",
+    "outcome": "Maquetas interfaces responsivas con Tailwind CSS usando Flexbox y Grid, sin escribir CSS personalizado."
+  },
+  {
+    "slug": "python-n8n-automatiza-rutinas",
+    "title": "Python + n8n: Automatiza rutinas cotidianas",
+    "difficulty": "intermedio",
+    "outcome": "Automatizas rutinas con Python y n8n: archivos, correos y flujos de trabajo reutilizables."
+  },
+  {
+    "slug": "springboot-mvc-hexagonal",
+    "title": "Spring Boot: De MVC a Hexagonal",
+    "difficulty": "avanzado",
+    "outcome": "Migras un backend Spring Boot de MVC a arquitectura hexagonal, con puertos, adaptadores y NoSQL."
+  },
+  {
+    "slug": "net-pruebascompletas",
+    "title": ".NET: Pruebas completas para minimal API",
+    "difficulty": "intermedio",
+    "outcome": "Escribes pruebas unitarias y de integración para una Minimal API en NET con xUnit y Moq."
+  },
+  {
+    "slug": "nuxt",
+    "title": "Nuxt: El marco de trabajo web progresivo (Nuxt 4+)",
+    "difficulty": "intermedio",
+    "outcome": "Construyes una aplicación Nuxt con SSR, Prisma, autenticación y despliegue en Vercel."
+  },
+  {
+    "slug": "netfullstack",
+    "title": "Blazor: Desde cero con arquitectura limpia",
+    "difficulty": "avanzado",
+    "outcome": "Construyes una aplicación fullstack en Blazor con CQRS, Entity Framework Core y despliegue en AWS."
+  },
+  {
+    "slug": "fastapi",
+    "title": "FastAPI: Crea APIs eficientes con Python",
+    "difficulty": "intermedio",
+    "outcome": "Construyes APIs eficientes con FastAPI: Pydantic, SQLAlchemy, JWT y despliegue en Render."
+  },
+  {
+    "slug": "spring-boot",
+    "title": "Java: Spring Boot - Guía definitiva",
+    "difficulty": "avanzado",
+    "outcome": "Construyes un backend en Spring Boot con seguridad JWT, testing, Docker y despliegue en la nube."
+  },
+  {
+    "slug": "n8n-mcp",
+    "title": "n8n + MCP: Automatización y agentes de IA inteligentes",
+    "difficulty": "principiante",
+    "outcome": "Automatizas flujos de trabajo con n8n y construyes agentes de IA conectados por MCP."
+  },
+  {
+    "slug": "react-de-cero",
+    "title": "React: de cero a experto",
+    "difficulty": "intermedio",
+    "outcome": "Construyes aplicaciones full stack con React, Zustand, autenticación JWT y testing automatizado."
+  },
+  {
+    "slug": "expo-gemini",
+    "title": "Expo + Gemini: Aplicaciones con inteligencia artificial",
+    "difficulty": "intermedio",
+    "outcome": "Integras Gemini en una app React Native: streaming, imágenes y contexto conversacional."
+  },
+  {
+    "slug": "java-avanzado",
+    "title": "Java avanzado: reactividad, concurrencia y patrones",
+    "difficulty": "avanzado",
+    "outcome": "Dominas concurrencia, programación reactiva, patrones GoF y JDBC en Java más allá de lo básico."
+  },
+  {
+    "slug": "NET-Backend",
+    "title": ".NET Backend: .NET Core, SQL Server y seguridad JWT",
+    "difficulty": "intermedio",
+    "outcome": "Construyes una API REST en NET con SQL Server, JWT, roles, caché y despliegue en Azure."
+  },
+  {
+    "slug": "django",
+    "title": "Django: Crea aplicaciones web robustas con Python",
+    "difficulty": "intermedio",
+    "outcome": "Construyes aplicaciones web con Django: modelos, ORM, autenticación, admin panel y despliegue."
+  },
+  {
+    "slug": "Flutter-Gemini",
+    "title": "Flutter + Gemini: Aplicaciones con inteligencia artificial",
+    "difficulty": "intermedio",
+    "outcome": "Integras Gemini en una app Flutter con Riverpod: streaming, imágenes y contexto conversacional."
+  },
+  {
+    "slug": "react-router",
+    "title": "React Router: Navegación declarativa y framework",
+    "difficulty": "intermedio",
+    "outcome": "Enrutas aplicaciones React con Server Actions, Loaders, sesiones seguras y despliegue en Docker."
+  },
+  {
+    "slug": "python",
+    "title": "Python: Fundamentos hasta los detalles",
+    "difficulty": "principiante",
+    "outcome": "Programas en Python con variables, funciones, POO y manejo de errores desde cero."
+  },
+  {
+    "slug": "csharp",
+    "title": "C#: Empieza tu camino en el lenguaje",
+    "difficulty": "principiante",
+    "outcome": "Programas en C# con POO, LINQ y manejo de excepciones, y construyes tu primera API web."
+  },
+  {
+    "slug": "Java",
+    "title": "Java: Explora el lenguaje desde cero",
+    "difficulty": "principiante",
+    "outcome": "Programas en Java con POO, colecciones y el patrón MVC desde los fundamentos del lenguaje."
+  },
+  {
+    "slug": "NestJS-Testing",
+    "title": "NestJS + Testing: Pruebas unitarias y end to end (e2e)",
+    "difficulty": "avanzado",
+    "outcome": "Escribes pruebas unitarias y E2E para APIs NestJS con Jest, mocks y cobertura del 100%."
+  },
+  {
+    "slug": "angular-moderno",
+    "title": "Angular: De cero a experto",
+    "difficulty": "intermedio",
+    "outcome": "Construyes aplicaciones con Angular moderno: Signals, rutas, formularios reactivos y despliegue."
+  },
+  {
+    "slug": "patrones-diseno",
+    "title": "Patrones de Diseño: Soluciones prácticas y eficientes",
+    "difficulty": "intermedio",
+    "outcome": "Aplicas 24 patrones de diseño creacionales, estructurales y de comportamiento en tu código."
+  },
+  {
+    "slug": "react-native-expo",
+    "title": "React Native Expo: Aplicaciones nativas para IOS y Android",
+    "difficulty": "intermedio",
+    "outcome": "Construyes apps móviles nativas con React Native y Expo, y las publicas en Play Store y App Store."
+  },
+  {
+    "slug": "angular-pro",
+    "title": "Angular Pro: Lleva tus bases al siguiente nivel",
+    "difficulty": "avanzado",
+    "outcome": "Llevas Angular a producción con Signals, SSR, SSG, testing E2E y paquetes NPM propios."
+  },
+  {
+    "slug": "Astro",
+    "title": "Astro: El framework para sitios web orientados al contenido",
+    "difficulty": "intermedio",
+    "outcome": "Construyes sitios con Astro: renderizado híbrido, Astro DB, autenticación y despliegue a producción."
+  },
+  {
+    "slug": "nestjs-reportes",
+    "title": "NestJs + Reportes: Genera PDFs desde Node",
+    "difficulty": "intermedio",
+    "outcome": "Generas reportes PDF desde NestJS con tablas, gráficos, códigos QR y conexión a PostgreSQL."
+  },
+  {
+    "slug": "shadcn-ui",
+    "title": "Shadcn/ui: Componentes accesibles y personalizables",
+    "difficulty": "intermedio",
+    "outcome": "Construyes un dashboard con Shadcn/ui: tablas dinámicas, formularios y temas personalizados."
+  },
+  {
+    "slug": "vue-cero-a-experto",
+    "title": "Vue.js - de Cero a Experto: Composition Api",
+    "difficulty": "intermedio",
+    "outcome": "Construyes aplicaciones con Vue 3, Composition API, Pinia, autenticación y despliegue a producción."
+  },
+  {
+    "slug": "nestjs-microservicios",
+    "title": "NestJS + Microservicios: Aplicaciones escalables y modulares",
+    "difficulty": "avanzado",
+    "outcome": "Construyes microservicios con NestJS, Docker, Kubernetes y despliegue en Google Cloud."
+  },
+  {
+    "slug": "openai-angular-nestjs",
+    "title": "OpenAI: Ejercicios y asistentes con Angular + NestJS",
+    "difficulty": "intermedio",
+    "outcome": "Integras la API de OpenAI en una app Angular + NestJS: audio, imágenes y asistentes personalizados."
+  },
+  {
+    "slug": "openai",
+    "title": "OpenAI: Ejercicios prácticos y asistentes con React + NestJS",
+    "difficulty": "intermedio",
+    "outcome": "Integras la API de OpenAI en una app React + NestJS: audio, imágenes y asistentes personalizados."
+  },
+  {
+    "slug": "zustand-gestor-de-estado-para-react",
+    "title": "Zustand: Gestor de estado para React",
+    "difficulty": "intermedio",
+    "outcome": "Manejas estado en React con Zustand: middlewares, persistencia y organización por slices."
+  },
+  {
+    "slug": "node-clean-architecture",
+    "title": "Node - Autenticación Rest con Clean Architecture",
+    "difficulty": "intermedio",
+    "outcome": "Estructuras una API en Node con Clean Architecture, Repository Pattern, JWT y MongoDB."
+  },
+  {
+    "slug": "flutter-bloc",
+    "title": "Flutter BLoC",
+    "difficulty": "avanzado",
+    "outcome": "Manejas estado en Flutter con Bloc y Cubit, arquitecturas escalables y comunicación entre Blocs."
+  },
+  {
+    "slug": "nodejs-de-cero-a-experto",
+    "title": "Node.Js: De cero a experto",
+    "difficulty": "intermedio",
+    "outcome": "Construyes backends con Node y TypeScript: Clean Architecture, WebSockets, testing y despliegue."
+  },
+  {
+    "slug": "riverpod-con-anotaciones",
+    "title": "Riverpod providers con anotaciones",
+    "difficulty": "avanzado",
+    "outcome": "Generas providers de Riverpod con anotaciones y código automático para manejar estado en Flutter."
+  },
+  {
+    "slug": "sql-con-postgres",
+    "title": "SQL de cero: Tu guía práctica con PostgreSQL",
+    "difficulty": "principiante",
+    "outcome": "Diseñas bases de datos relacionales en PostgreSQL: consultas, triggers, procedimientos y optimización."
+  },
+  {
+    "slug": "nextjs",
+    "title": "Next.js: El framework de React para producción",
+    "difficulty": "avanzado",
+    "outcome": "Construyes aplicaciones de producción con Next: renderizado híbrido, autenticación, pagos y despliegue."
+  },
+  {
+    "slug": "qwik-introduccion",
+    "title": "Qwik: Introducción al Framework",
+    "difficulty": "intermedio",
+    "outcome": "Construyes aplicaciones completas con Qwik, manejando rutas, estado con signals y despliegues."
+  },
+  {
+    "slug": "flutter-movil-intermedio",
+    "title": "Flutter Móvil: Recursos Nativos - Nivel Intermedio",
+    "difficulty": "avanzado",
+    "outcome": "Usas recursos nativos en Flutter: sensores, biometría, mapas en tiempo real y Deep Linking."
+  },
+  {
+    "slug": "flutter-movil-cero-a-experto",
+    "title": "Flutter - Móvil: De cero a experto",
+    "difficulty": "intermedio",
+    "outcome": "Construyes aplicaciones móviles completas en Flutter y Dart, listas para publicar en Google Play y App Store."
+  },
+  {
+    "slug": "angular",
+    "title": "Angular clásico: con Módulos",
+    "difficulty": "intermedio",
+    "outcome": "Construyes aplicaciones con Angular clásico y módulos: rutas, formularios reactivos y despliegue."
+  },
+  {
+    "slug": "docker-guia-practica",
+    "title": "Docker - Guía práctica de uso para desarrolladores",
+    "difficulty": "principiante",
+    "outcome": "Creas, administras y despliegas contenedores con Docker, Compose y GitHub Actions."
+  },
+  {
+    "slug": "nest-graphql",
+    "title": "Nest + GraphQL: Evoluciona tus APIs.",
+    "difficulty": "avanzado",
+    "outcome": "Evolucionas tus APIs NestJS a GraphQL: queries, mutations, autenticación y despliegue con Docker."
+  },
+  {
+    "slug": "programacion-para-principiantes",
+    "title": "Programación para principiantes - Primeros pasos",
+    "difficulty": "principiante",
+    "outcome": "Escribes tus primeros programas, aplicas lógica de programación y construyes un pequeño juego web."
+  },
+  {
+    "slug": "nest",
+    "title": "Nest: Desarrollo backend escalable con Node",
+    "difficulty": "intermedio",
+    "outcome": "Construyes backends escalables con NestJS: autenticación, bases de datos y despliegue en producción."
+  },
+  {
+    "slug": "tanstack-query",
+    "title": "TanStack Query: Un poderoso gestor de estado asíncrono",
+    "difficulty": "intermedio",
+    "outcome": "Gestionas datos asíncronos en React con TanStack Query: caché, mutaciones y scroll infinito."
+  },
+  {
+    "slug": "visual-studio-code",
+    "title": "Visual Studio Code: Mejora tu velocidad para codificar",
+    "difficulty": "principiante",
+    "outcome": "Editas código más rápido en Visual Studio Code dominando atajos y funciones clave del editor."
+  },
+  {
+    "slug": "dart-cero-hasta-detalles",
+    "title": "Dart: De cero hasta los detalles",
+    "difficulty": "principiante",
+    "outcome": "Programas en Dart con clases, herencia y paquetes, la base para trabajar con Flutter."
+  },
+  {
+    "slug": "javascript-moderno",
+    "title": "JavaScript Moderno: Guía para dominar el lenguaje",
+    "difficulty": "principiante",
+    "outcome": "Programas en JavaScript moderno: DOM, Fetch, clases y ES Next, sin frameworks de por medio."
+  },
+  {
+    "slug": "typescript-guia-completa",
+    "title": "TypeScript: Tu completa guía y manual de mano.",
+    "difficulty": "intermedio",
+    "outcome": "Tipas tu código con TypeScript: interfaces, genéricos, decoradores y namespaces."
+  },
+  {
+    "slug": "react-pro",
+    "title": "React PRO: Lleva tus bases al siguiente nivel",
+    "difficulty": "avanzado",
+    "outcome": "Llevas React a nivel profesional: patrones de componentes, Storybook, PWAs y publicación en NPM."
+  },
+  {
+    "slug": "solid-clean-code",
+    "title": "Principios SOLID y Clean Code",
+    "difficulty": "intermedio",
+    "outcome": "Aplicas los principios SOLID y Clean Code para escribir software más mantenible."
+  },
+  {
+    "slug": "codex",
+    "title": "Codex: agentes, skills, MCP y Spec-Driven Development",
+    "difficulty": "principiante",
+    "outcome": "Desarrollas una aplicación de eventos con check-in por QR usando Codex CLI y flujos de trabajo con agentes."
+  },
+  {
+    "slug": "go-microservicios",
+    "title": "Go: aplicado a microservicios",
+    "difficulty": "avanzado",
+    "outcome": "Transformas un monolito en microservicios con Go: gRPC, API Gateway y arquitectura orientada a eventos."
+  },
+  {
+    "slug": "kafka-springboot-event-driven",
+    "title": "Kafka y SpringBoot: Arquitectura Event-Driven",
+    "difficulty": "avanzado",
+    "outcome": "Diseñas arquitectura orientada a eventos con Kafka y Spring Boot, desde el primer evento real."
+  },
+  {
+    "slug": "patrones-diseno-agentico",
+    "title": "Patrones de diseño agéntico: Respuestas efectivas a desafíos",
+    "difficulty": "principiante",
+    "outcome": "Aplicas patrones de diseño agéntico como ReAct, Planning y Tool Use para resolver tareas con IA."
+  },
+  {
+    "slug": "Vue-intermedio",
+    "title": "Vue.js - Intermedio: Lleva tus bases al siguiente nivel",
+    "difficulty": "avanzado",
+    "outcome": "Llevas Vue a nivel profesional: Composition API, Pinia, Vue Query y componentes reutilizables."
+  }
+]

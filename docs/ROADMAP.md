@@ -54,7 +54,7 @@
 ## Arquitectura
 
 ### Modelo de datos (Supabase, todas las tablas con RLS)
-- `courses`: slug, title, description, url, image_url, hours, lessons, category, level (beginner/intermediate/advanced), tags text[], prerequisites text[] (slugs). Solo cursos activos: los Legacy no se cargan.
+- `courses`: slug, title, description, url, image_url, hours, lessons, category, difficulty (principiante/intermedio/avanzado), outcome, tags text[], prerequisites text[] (slugs). Solo cursos activos: los Legacy no se cargan.
 - `profiles`: id (= auth.users.id), username, avatar_url, xp, level, streak, last_activity_at. Se crea con un trigger al registrarse, usando los datos de Discord.
 - `assessments`: user_id, answers jsonb, created_at.
 - `learning_paths`: user_id, assessment_id, title, goal, summary, is_public, share_slug, created_at.
@@ -115,7 +115,7 @@ lib/ai/{schemas,prompts,generate-path}.ts
 lib/paths/build-path.ts
 lib/gamification/{xp,achievements}.ts
 proxy.ts                        refresco de sesión Supabase (Next 16)
-scripts/{scrape-courses,enrich-courses}.ts
+scripts/scrape-courses.ts
 data/courses.json               catálogo versionado en el repo
 supabase/migrations/*.sql, supabase/seed.sql
 CLAUDE.md                       convenciones para que la IA de los 3 escriba igual

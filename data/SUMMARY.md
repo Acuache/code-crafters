@@ -23,6 +23,16 @@ Extraído el 2026-09-15 desde https://cursos.devtalles.com con `scrape-devtalles
 | `chapters` | Títulos de capítulos (sin "Sección N:", introducción/cierre ni capítulos archivados) |
 | `related` | Slugs de "Cursos que podrían interesarte" |
 
+## courses.enriched.json
+
+Complementa a `courses.json` con los dos campos que el scraping no pudo obtener — `difficulty` y `outcome` —, escritos y revisados a mano (spec 01, `docs/SPECS-MAP.md`). 74 entradas, mismo orden y mismos `slug` que `courses.json`; el catálogo está congelado y un curso nuevo entra con sus dos campos desde el panel de administración (spec 10).
+
+| Campo | Qué es |
+|---|---|
+| `slug`, `title` | Copiados literalmente de `courses.json`; `slug` es la clave para cruzar los dos archivos al sembrar la tabla `courses` (spec 02), `title` es solo para reconocer el curso al revisar |
+| `difficulty` | Para quién es el curso: `principiante`, `intermedio` o `avanzado`, según sus `prerequisites` y su posición en `programs.json` |
+| `outcome` | Una sola frase en español de qué logra el estudiante, pensada para la tarjeta de un paso de la ruta — no la frase de venta de `courses.json` |
+
 ## programs.json
 
 Rutas que publica DevTalles. Cada paso tiene `stage` (orden de arriba hacia abajo; varios pasos pueden compartir etapa), `level` (`requerido` / `recomendado` / `opcional`), `note` (texto de la celda, por ejemplo "EN CUALQUIER MOMENTO") y `courses` (slugs; más de uno = cursos alternativos o complementarios del mismo paso).

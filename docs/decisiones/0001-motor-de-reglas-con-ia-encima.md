@@ -35,7 +35,7 @@ primera: cambió qué construye la app, no solo dónde interviene el modelo.
    el catálogo completo; reglas solo como plan B.
 2. **B — Sin IA**: cuestionario → reglas → rutas oficiales filtradas, razones por plantilla.
 3. **C — Híbrido, tal como lo describía `ANALISIS-IA.md`**: motor por reglas siempre + IA que en la
-   Capa 0 enriquece offline 4 campos (`level`, `skills`, `prerequisite_slugs`, `outcome`) y en la
+   Capa 0 enriquece offline 4 campos (`difficulty`, `skills`, `prerequisite_slugs`, `outcome`) y en la
    Capa 2 puede quitar cursos opcionales y agregar hasta 2, dentro de límites.
 4. **C recortada** (la que se adopta): igual columna vertebral, pero la IA enriquece offline solo 2
    campos, no quita ni agrega cursos, y el texto libre del usuario sí puede influir en qué programas
@@ -120,7 +120,7 @@ registra como limitación conocida.
 
 | | `ANALISIS-IA.md` (original) | Se adopta |
 |---|---|---|
-| Campos que la IA rellena offline (Capa 0) | 4: `level`, `skills`, `prerequisite_slugs`, `outcome` | **2**: `level`, `outcome` |
+| Campos que la IA rellena offline (Capa 0) | 4: `level`, `skills`, `prerequisite_slugs`, `outcome` | **2**: `difficulty`, `outcome` |
 | `skills` | generado por IA | tabla `TECH_TO_SLUGS` escrita a mano, 11 entradas (las del cuestionario) |
 | `prerequisite_slugs` | generado por IA para los 74 cursos | tabla a mano solo entre programas (para metas fullstack); dentro de un programa manda el `stage` oficial |
 | La IA quita cursos opcionales / agrega hasta 2 | sí, con límites (`skip`, `add`) | **no** — se elimina `skip`/`add` por completo |
@@ -150,7 +150,7 @@ Qué haría revisar esto:
 - Que llegando al día 9-10 el buffer de los días 6-7 ya esté gastado y "compartir" (que el usuario
   decidió mantener) no quepa sin tocar el freeze del día 12 — en ese caso, es el primer candidato a
   recortar de nuevo, antes que el mapa visual o la gamificación.
-- Que el enriquecimiento manual de `level` + `outcome` para 74 cursos resulte más lento de lo
+- Que el enriquecimiento manual de `difficulty` + `outcome` para 74 cursos resulte más lento de lo
   estimado, o que el equipo decida que el riesgo de la Capa 0 original (4 campos) vale la pena por
   diferenciarse más.
 - Que los créditos de OpenAI tengan fecha de vencimiento anterior a la evaluación (pendiente de
