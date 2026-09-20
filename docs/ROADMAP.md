@@ -55,10 +55,12 @@
 
 ### Modelo de datos (Supabase, todas las tablas con RLS)
 - `courses`: slug, title, description, url, image_url, hours, lessons, category, difficulty (principiante/intermedio/avanzado), outcome, tags text[], prerequisites text[] (slugs). Solo cursos activos: los Legacy no se cargan.
-- `profiles`: id (= auth.users.id), username, avatar_url, xp, level, streak, last_activity_at. Se crea con un trigger al registrarse, usando los datos de Discord.
+- `profiles`: id (= auth.users.id), username, avatar_url, role (`user`/`admin`, `user` por defecto), xp, level, streak, last_activity_at. Se crea con un trigger al registrarse, leyendo los metadatos del proveedor OAuth (Discord, Google o GitHub).
+- `programs`: slug, source_slug (agrupación oficial de DevTalles: `react` agrupa las rutas `react` y `react-native`), name, position. 15 filas — una por ruta oficial, no una por programa agrupado (ver spec 02).
+- `program_courses`: program_id, course_id, stage, level (requerido/recomendado/opcional), position, note. El vínculo curso↔programa que arma el motor.
 - `assessments`: user_id, answers jsonb, created_at.
 - `learning_paths`: user_id, assessment_id, title, goal, summary, is_public, share_slug, created_at.
-- `path_steps`: path_id, course_id, stage, position, reason (por qué el motor eligió ese curso; la IA la reescribe si hay key), depends_on, status (pending/in_progress/done), completed_at.
+- `path_steps`: path_id, course_id, source_program_id, stage, position, origin (por qué entró: requerido, interés, etc.), reason (redactada por el motor; la IA la reescribe si hay key), depends_on, status (pending/in_progress/done/discarded), discard_reason (motivo si se descarta), completed_at.
 - `achievements` y `user_achievements`: insignias.
 - (Stretch) `checkpoints`: step_id, questions jsonb, score.
 

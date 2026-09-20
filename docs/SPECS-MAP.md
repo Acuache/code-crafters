@@ -30,9 +30,10 @@ Decisiones de base para todo el mapa:
   requisito interpretado de la descripción de la quest, no uno de los 5 numerados en `ENUNCIADO.md`; el
   camino crítico (login → cuestionario → ruta → guardar → progreso) manda primero.
 
-> ⚠️ `docs/ROADMAP.md` todavía no refleja estos cuatro puntos: sigue listando el panel de
-> administración en WON'T y su modelo de datos no tiene `role` ni `programs`/`program_courses`. Para el
-> alcance y el orden de los specs manda este archivo; reconciliar `ROADMAP.md` queda pendiente.
+> ⚠️ `docs/ROADMAP.md` todavía no refleja que el panel de administración se agenda después del Hito 1
+> en vez de quedar fuera del MVP: sigue listándolo en WON'T. Su modelo de datos ya incluye `role` y
+> `programs`/`program_courses` desde el spec 02. Para el alcance y el orden de los specs manda este
+> archivo.
 
 ---
 
@@ -41,7 +42,7 @@ Decisiones de base para todo el mapa:
 | NN | Slug (archivo `specs/NN-slug.md`) | Objetivo en una frase | Depende de | Hito |
 |---|---|---|---|---|
 | 01 | `catalog-enrichment` | El agente añade `difficulty` y `outcome` a los 74 cursos, leyendo el catálogo, y deja `data/courses.enriched.json` revisado a mano en el repo | — | Semana 1 |
-| 02 | `supabase-schema` | Migraciones, RLS, trigger de `profiles` (con `role`), tablas `programs`/`program_courses`, un lugar en `path_steps`/`learning_paths` para el curso que el motor o el usuario descartan (con motivo), y seed del catálogo enriquecido | 01 (solo el paso de seed) | Semana 1 |
+| 02 | `supabase-schema` | Migraciones, RLS, trigger de `profiles` (con `role`), tablas `programs`/`program_courses` (15 rutas oficiales), un lugar en `path_steps` para el curso que el motor o el usuario descartan (con motivo), y seed del catálogo enriquecido | 01 (solo el paso de seed) | Semana 1 |
 | 03 | `discord-auth` | Login y logout con Discord de punta a punta, rol en sesión, sesión refrescada en `proxy.ts` y deploy en Vercel | 02 | Semana 1 |
 | 04 | `path-engine` | `lib/paths/build-path.ts` + `lib/paths/interests.ts`: función pura que arma la ruta con presupuesto de horas, intereses transversales al catálogo y procedencia por paso, recibiendo catálogo y programas por parámetro | 01 | Semana 1 |
 | 05 | `landing` | Página pública `app/(marketing)/page.tsx` sobre el sistema de diseño ya construido | — | Semana 1 |
@@ -145,8 +146,9 @@ Las que siguen sin marcar en `docs/investigacion/ANALISIS-IA.md` §11 y en las c
 | Decisión pendiente | La cierra |
 |---|---|
 | Quién revisa el enriquecimiento de los 74 cursos y cuándo | 01 |
-| Cómo se bootstrapea el primer usuario `admin` (SQL a mano tras el primer login vs. seed con un Discord ID fijo) | 02 |
-| Cómo se persiste un curso descartado por el motor (o por el usuario) y su motivo — estado extra en `path_steps` vs. `excluded_steps jsonb` en `learning_paths`; ver [ADR 0004](decisiones/0004-donde-vive-la-personalizacion.md) | 02 |
+| ~~Cómo se bootstrapea el primer usuario `admin`~~ — **cerrada por el spec 02**: ninguna de las dos opciones originales. Todos los perfiles nacen `role = 'user'`; el primer admin se promueve a mano desde el panel de Supabase después de loguearse, sin credenciales ni IDs sembrados en el repo público | — |
+| ~~Cómo se persiste un curso descartado por el motor (o por el usuario) y su motivo~~ — **cerrada por el spec 02**: fila de `path_steps` con `status = 'discarded'` + `discard_reason`, no `excluded_steps jsonb` en `learning_paths`; ver [ADR 0004](decisiones/0004-donde-vive-la-personalizacion.md) | — |
+| ~~Qué es una fila de `programs`: un programa agrupado (13) o una ruta oficial (15)~~ — **cerrada por el spec 02**: 15 filas, una por ruta oficial. React aporta "React" y "React Native"; Dart aporta "Dart móvil" y "Dart Web" | — |
 | Qué preguntas tiene el cuestionario (máx. 6–8, una sola de texto libre) | 06, con el contrato definido en 04 |
 | Tabla `meta → programas` para metas fullstack, **y tabla `interests.ts`** (~12 intereses transversales al catálogo completo → 1-3 slugs cada uno, cruzando programas) — las dos tablas a mano que define el 04; ver [`docs/decisiones/0003-intereses-transversales-al-catalogo.md`](decisiones/0003-intereses-transversales-al-catalogo.md) | 04 |
 | Cómo se resuelven los 9 cursos que cambian de `level` según el programa (ADR 0001) | 04 |
@@ -170,7 +172,8 @@ convencional.
 
 - `data/courses.json`, `data/SUMMARY.md` — catálogo ya extraído (74 cursos). Entrada de los specs 01, 02
   y 04.
-- `data/programs.json` — las 13 rutas oficiales de DevTalles (`stage`/`level`/`note`/`courses`). Es
+- `data/programs.json` — las 15 rutas oficiales de DevTalles dentro de 13 programas (React y Dart
+  aportan 2 rutas cada uno; ver spec 02) (`stage`/`level`/`note`/`courses`). Es
   **insumo del seed** de `programs`/`program_courses` en el spec 02, no fuente de verdad en runtime: una
   vez sembrado, `build-path.ts` (04) recibe los programas por parámetro y quien lo invoca decide si
   vienen de este JSON o de una consulta a Supabase.
@@ -219,19 +222,25 @@ se propagan solos.
 
 ### 02 · `supabase-schema`
 
-Las migraciones SQL del modelo de datos completo (`courses`, `profiles` con columna `role` —`user` por
-defecto, `admin` a mano—, `programs`, `program_courses`, `assessments`, `learning_paths`, `path_steps`,
-`achievements`, `user_achievements`), sus políticas RLS —incluida la que restringe la escritura de
-`courses`/`programs`/`program_courses` al rol `admin`—, el trigger que crea la fila de
-`profiles` con los datos de Discord al registrarse, y el seed que carga el catálogo enriquecido y los 13
-programas oficiales desde `data/programs.json`. Es el único spec que crea el esquema base; 11, 13 y 14
-solo le añaden columnas o tablas encima, y 10 no crea ninguna. Todo salvo el último paso es independiente
-del 01, por eso puede arrancar el día 1 con el enriquecimiento todavía en curso.
+Las migraciones SQL de las 7 tablas del modelo base (`profiles` con columna `role` —`user` por
+defecto, `admin` a mano desde el panel de Supabase—, `courses`, `programs`, `program_courses`,
+`assessments`, `learning_paths`, `path_steps`), sus políticas RLS —lectura pública del catálogo,
+escritura solo para `role = 'admin'` vía la función `private.is_admin()`, datos de usuario solo por
+su dueño, y `profiles` sin ninguna política de escritura para `authenticated` (así nadie se
+auto-promueve a admin)—, el trigger que crea la fila de `profiles` leyendo los metadatos de
+cualquiera de los tres proveedores OAuth del spec 03 (Discord, Google, GitHub), y el seed que carga
+el catálogo enriquecido y las 15 rutas oficiales desde `data/programs.json`. `programs` tiene 15
+filas, una por ruta oficial, no una por programa agrupado: React y Dart aportan 2 rutas cada uno. Es
+el único spec que crea el esquema base; 11, 13 y 14 solo le añaden columnas o tablas encima
+(`achievements` y `user_achievements` los crea el 13, no el 02), y 10 no crea ninguna. Todo salvo el
+último paso es independiente del 01, por eso puede arrancar el día 1 con el enriquecimiento todavía
+en curso.
 
 Este spec también deja un lugar para el curso que el motor —o el usuario, desde el spec 08— descarta
-de una ruta, con su motivo (por ejemplo "no cabía en tu tiempo" o "lo quitaste vos"). Es la pieza que
-responde a la objeción "esto ya está hecho, es reinventar la rueda" del ADR 0001: sin un lugar donde
-guardarlo, el spec 08 no puede mostrar qué se sacó de la ruta oficial y por qué — ver
+de una ruta, con su motivo: una fila de `path_steps` con `status = 'discarded'` + `discard_reason`,
+no una columna aparte en `learning_paths`. Es la pieza que responde a la objeción "esto ya está
+hecho, es reinventar la rueda" del ADR 0001: sin un lugar donde guardarlo, el spec 08 no puede
+mostrar qué se sacó de la ruta oficial y por qué — ver
 [ADR 0004](decisiones/0004-donde-vive-la-personalizacion.md).
 
 ### 03 · `discord-auth`
