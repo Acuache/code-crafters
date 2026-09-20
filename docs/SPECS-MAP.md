@@ -41,20 +41,20 @@ Decisiones de base para todo el mapa:
 | NN | Slug (archivo `specs/NN-slug.md`) | Objetivo en una frase | Depende de | Hito |
 |---|---|---|---|---|
 | 01 | `catalog-enrichment` | Script que añade `level` y `outcome` a los 74 cursos y deja `data/courses.enriched.json` revisado a mano en el repo | — | Semana 1 |
-| 02 | `supabase-schema` | Migraciones, RLS, trigger de `profiles` (con `role`), tablas `programs`/`program_courses` y seed del catálogo enriquecido | 01 (solo el paso de seed) | Semana 1 |
+| 02 | `supabase-schema` | Migraciones, RLS, trigger de `profiles` (con `role`), tablas `programs`/`program_courses`, un lugar en `path_steps`/`learning_paths` para el curso que el motor o el usuario descartan (con motivo), y seed del catálogo enriquecido | 01 (solo el paso de seed) | Semana 1 |
 | 03 | `discord-auth` | Login y logout con Discord de punta a punta, rol en sesión, sesión refrescada en `proxy.ts` y deploy en Vercel | 02 | Semana 1 |
 | 04 | `path-engine` | `lib/paths/build-path.ts` + `lib/paths/interests.ts`: función pura que arma la ruta con presupuesto de horas, intereses transversales al catálogo y procedencia por paso, recibiendo catálogo y programas por parámetro | 01 | Semana 1 |
 | 05 | `landing` | Página pública `app/(marketing)/page.tsx` sobre el sistema de diseño ya construido | — | Semana 1 |
 | 06 | `assessment-quiz` | Cuestionario multi-step validado con zod que guarda el `assessment` | 02, 03, 04 | Semana 1 |
 | 07 | `path-generation` | Server action que corre el motor, persiste `learning_paths` + `path_steps` y redirige a `/paths/[id]` | 02, 04, 06 | Semana 1 |
-| 08 | `path-progress-view` | Vista de la ruta en lista con chips de procedencia y cambio de estado de cada paso | 07 | Semana 1 |
+| 08 | `path-progress-view` | Vista de la ruta en lista con chips de procedencia, acordeón "Qué quitamos y por qué", cambio de estado de cada paso y botón para descartar un paso pendiente (con deshacer) | 07 | Semana 1 |
 | 09 | `paths-dashboard` | Dashboard con todas mis rutas, su progreso y el acceso a crear otra | 08 | **Hito 1** |
 | 10 | `admin-catalog` | Panel `/admin`: CRUD de cursos y de su ubicación en programas, protegido por rol `admin` | 02, 03 | Semana 2 |
 | 11 | `ai-personalization` | Capa 2: título, resumen y razones escritas por IA sobre la ruta ya guardada, con límite diario | 07 | Semana 2 |
 | 12 | `visual-path-map` | Mapa de la ruta con React Flow + dagre y panel de detalle por nodo | 08 | Semana 2 |
 | 13 | `gamification` | XP por curso, niveles, insignias, racha y celebración al completar | 08 | Semana 2 |
 | 14 | `path-sharing` | Ruta pública en `/r/[slug]` con tarjeta OG para pegar en Discord | 08 | Semana 2 |
-| 15 | `path-recalculation` | Recalcular la ruta con el progreso actual (COULD, primero en recortarse) | 08, 11 | Semana 2 |
+| 15 | `path-recalculation` | Botón "Ajustar mi ruta": cuestionario prellenado con las respuestas anteriores; con IA, un texto libre se traduce a cambios de chips (nunca de cursos) antes de confirmar; sin IA, se editan los chips a mano. Genera una ruta nueva, no pisa la anterior (COULD, primero en recortarse) | 08, 11 | Semana 2 |
 
 Ramas resultantes: `spec-01-catalog-enrichment`, `spec-02-supabase-schema`, … (las deriva `/spec-impl`
 del nombre del archivo).
@@ -146,6 +146,7 @@ Las que siguen sin marcar en `docs/investigacion/ANALISIS-IA.md` §11 y en las c
 |---|---|
 | Quién revisa el enriquecimiento de los 74 cursos y cuándo | 01 |
 | Cómo se bootstrapea el primer usuario `admin` (SQL a mano tras el primer login vs. seed con un Discord ID fijo) | 02 |
+| Cómo se persiste un curso descartado por el motor (o por el usuario) y su motivo — estado extra en `path_steps` vs. `excluded_steps jsonb` en `learning_paths`; ver [ADR 0004](decisiones/0004-donde-vive-la-personalizacion.md) | 02 |
 | Qué preguntas tiene el cuestionario (máx. 6–8, una sola de texto libre) | 06, con el contrato definido en 04 |
 | Tabla `meta → programas` para metas fullstack, **y tabla `interests.ts`** (~12 intereses transversales al catálogo completo → 1-3 slugs cada uno, cruzando programas) — las dos tablas a mano que define el 04; ver [`docs/decisiones/0003-intereses-transversales-al-catalogo.md`](decisiones/0003-intereses-transversales-al-catalogo.md) | 04 |
 | Cómo se resuelven los 9 cursos que cambian de `level` según el programa (ADR 0001) | 04 |
@@ -154,7 +155,7 @@ Las que siguen sin marcar en `docs/investigacion/ANALISIS-IA.md` §11 y en las c
 | Qué campos de un curso son editables desde el panel (¿también `slug` y `url`, o solo los descriptivos?) | 10 |
 | Si el rol `admin` puede crear programas nuevos o solo asignar cursos a los 13 ya existentes | 10 |
 | Límite diario de personalizaciones por usuario (sugerido: 5) — no bloquea generar rutas nuevas, solo la reescritura con IA de una ya generada | 11 |
-| Mini-quiz de re-evaluación vs. "Recalcular mi ruta" (recomendado: recalcular) | 15 |
+| ~~Mini-quiz de re-evaluación vs. "Recalcular mi ruta"~~ — **cerrada por el [ADR 0004](decisiones/0004-donde-vive-la-personalizacion.md)**: ninguna de las dos. Es un cuestionario prellenado que la IA puede ajustar por chips a partir de texto libre (nunca cursos); sin IA, los chips se editan a mano. Genera una ruta nueva | — |
 | Cuándo el motor descarta un slug de interés porque coincide con una tecnología que el usuario ya domina (ej. marcó Node como dominado y el interés "Microservicios" sugiere `nestjs-microservicios`) — reformulada desde la versión por-stack de la maqueta: ver ADR 0003 | 04 |
 | ~~Qué se muestra en el paso de intereses cuando el programa solo tiene 1 curso opcional real (7 de 18 combinaciones de stack de la maqueta)~~ — **cerrada por el ADR 0003**: el paso de intereses dejó de depender del stack. Es una lista plana de ~12 intereses transversales al catálogo completo, igual para todos los perfiles; `STACK_INTERESTS` de la maqueta queda reemplazada, no se copia al app (ver `SPECS-MAP.md` §6) | — |
 | Vencimiento de los créditos de OpenAI y dueño de la key | Ninguno — es gestión, no spec |
@@ -226,6 +227,12 @@ programas oficiales desde `data/programs.json`. Es el único spec que crea el es
 solo le añaden columnas o tablas encima, y 10 no crea ninguna. Todo salvo el último paso es independiente
 del 01, por eso puede arrancar el día 1 con el enriquecimiento todavía en curso.
 
+Este spec también deja un lugar para el curso que el motor —o el usuario, desde el spec 08— descarta
+de una ruta, con su motivo (por ejemplo "no cabía en tu tiempo" o "lo quitaste vos"). Es la pieza que
+responde a la objeción "esto ya está hecho, es reinventar la rueda" del ADR 0001: sin un lugar donde
+guardarlo, el spec 08 no puede mostrar qué se sacó de la ruta oficial y por qué — ver
+[ADR 0004](decisiones/0004-donde-vive-la-personalizacion.md).
+
 ### 03 · `discord-auth`
 
 El login real: página `/login` con el botón de Discord, el route handler `app/auth/callback/route.ts`
@@ -280,9 +287,11 @@ completa de punta a punta.
 ### 08 · `path-progress-view`
 
 La vista en **lista** de la ruta guardada (el mapa visual es el 12, un spec aparte): chips de
-procedencia por paso (por qué entró ese curso) y el control para cambiar su estado
-(pending/in_progress/done). Dueña de `app/(app)/paths/[id]/*`. Es la base sobre la que cuelgan 09, 12,
-13, 14 y 15 — ninguno de esos repite esta vista, todos la extienden o la referencian.
+procedencia por paso (por qué entró ese curso), un acordeón "Qué quitamos y por qué" (por qué salió
+uno que la ruta oficial sí tenía), el control para cambiar el estado de cada paso
+(pending/in_progress/done) y un botón para descartar un paso todavía `pending`, con opción de
+deshacer. Dueña de `app/(app)/paths/[id]/*`. Es la base sobre la que cuelgan 09, 12, 13, 14 y 15 —
+ninguno de esos repite esta vista, todos la extienden o la referencian.
 
 ### 09 · `paths-dashboard`
 
@@ -338,7 +347,13 @@ el 08.
 
 ### 15 · `path-recalculation`
 
-El único spec **COULD** del mapa — el primero en recortarse si el tiempo aprieta. En vez del mini-quiz
-de re-evaluación adaptativa que planteaba `ROADMAP.md` originalmente, la versión mínima es un botón
-"Recalcular mi ruta" que vuelve a correr el motor del 04 con el progreso actual del usuario. Depende de
-08 (necesita la vista de progreso) y de 11 (reescribe título/resumen/razones si hay key).
+El único spec **COULD** del mapa — el primero en recortarse si el tiempo aprieta. Descartado tanto el
+mini-quiz de re-evaluación adaptativa de `ROADMAP.md` como que la IA decida cursos sobre la ruta ya
+armada (ver [ADR 0004](decisiones/0004-donde-vive-la-personalizacion.md)): la versión adoptada es un
+botón "Ajustar mi ruta" que abre el cuestionario del spec 06 **prellenado** con las respuestas
+anteriores, más un campo de texto libre. Si hay `OPENAI_API_KEY`, ese texto se traduce a cambios en
+los chips del cuestionario (meta, intereses, horas) — nunca a cursos sueltos, acotado con `z.enum` a
+las listas cerradas que ya existen — y el usuario confirma antes de aplicar nada. Sin key, el mismo
+formulario prellenado se edita a mano. Al confirmar, el motor del 04 genera una **ruta nueva**; la
+anterior no se toca, así que el progreso y el XP ya ganados no se pierden. Depende de 08 (necesita la
+vista de progreso) y de 11 (comparte el límite diario de personalizaciones).
