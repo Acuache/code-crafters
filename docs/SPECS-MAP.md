@@ -44,7 +44,7 @@ Decisiones de base para todo el mapa:
 | 01 | `catalog-enrichment` | El agente añade `difficulty` y `outcome` a los 74 cursos, leyendo el catálogo, y deja `data/courses.enriched.json` revisado a mano en el repo | — | Semana 1 |
 | 02 | `supabase-schema` | Migraciones, RLS, trigger de `profiles` (con `role`), tablas `programs`/`program_courses` (15 rutas oficiales), un lugar en `path_steps` para el curso que el motor o el usuario descartan (con motivo), y seed del catálogo enriquecido | 01 (solo el paso de seed) | Semana 1 |
 | 03 | `discord-auth` | Login y logout con Discord de punta a punta, rol en sesión, sesión refrescada en `proxy.ts` y deploy en Vercel | 02 | Semana 1 |
-| 04 | `path-engine` | `lib/paths/build-path.ts` + `lib/paths/interests.ts`: función pura que arma la ruta con presupuesto de horas, intereses transversales al catálogo y procedencia por paso, recibiendo catálogo y programas por parámetro | 01 | Semana 1 |
+| 04 | `path-engine` | `lib/paths/build-path.ts` + `lib/paths/interests.ts`: función pura que arma la ruta con presupuesto de horas, intereses transversales al catálogo y procedencia por paso, recibiendo catálogo y programas por parámetro | 02 | Semana 1 |
 | 05 | `landing` | Página pública `app/(marketing)/page.tsx` sobre el sistema de diseño ya construido | — | Semana 1 |
 | 06 | `assessment-quiz` | Cuestionario multi-step validado con zod que guarda el `assessment` | 02, 03, 04 | Semana 1 |
 | 07 | `path-generation` | Server action que corre el motor, persiste `learning_paths` + `path_steps` y redirige a `/paths/[id]` | 02, 04, 06 | Semana 1 |
@@ -64,22 +64,22 @@ del nombre del archivo).
 
 ```
 01 catalog-enrichment
- ├─► 02 supabase-schema ──► 03 discord-auth ──┐
- │                                            │
- └─► 04 path-engine ───────────┬──────────────┘
-                               │
-                               ▼
-                       06 assessment-quiz
-                               │
-                               ▼
-                       07 path-generation        (02 + 04 + 06)
-                               │
-                               ▼
-                       08 path-progress-view ──► 09 paths-dashboard   ◄── HITO 1
-                               │
-        ┌──────────────────────┼──────────────────────┐
-        ▼                      ▼                      ▼
- 12 visual-path-map     13 gamification        14 path-sharing
+ └─► 02 supabase-schema ──┬─► 03 discord-auth ───┐
+                          │                      │
+                          └─► 04 path-engine ────┤
+                                                 │
+                                                 ▼
+                                         06 assessment-quiz
+                                                 │
+                                                 ▼
+                                         07 path-generation        (02 + 04 + 06)
+                                                 │
+                                                 ▼
+                                         08 path-progress-view ──► 09 paths-dashboard   ◄── HITO 1
+                                                 │
+                ┌────────────────────────────────┼───────────────────────┐
+                ▼                                ▼                       ▼
+         12 visual-path-map              13 gamification        14 path-sharing
 
  05 landing             (sin dependencias)
  10 admin-catalog       (depende de 02 + 03; agendado después del Hito 1)
@@ -89,8 +89,9 @@ del nombre del archivo).
 
 **Camino crítico:** 01 → 02 → 03 → 06 → 07 → 08 → 09. Todo lo demás cuelga de ahí.
 
-**Qué corre en paralelo:** 04 con 02/03 (el motor es una función pura, no toca la DB); 05 con
-cualquiera de los anteriores (no depende de nada); y 11, 12, 13, 14 entre sí una vez cerrado el 08.
+**Qué corre en paralelo:** 04 con 03 (el motor es una función pura, no toca la DB; solo necesita el
+vocabulario de 15 `programs.slug` que fija el 02, no sus migraciones ni su RLS); 05 con cualquiera de
+los anteriores (no depende de nada); y 11, 12, 13, 14 entre sí una vez cerrado el 08.
 
 **Tres puntos de sincronización que hay que escribir dentro de los specs, no descubrirlos después:**
 
@@ -98,7 +99,7 @@ cualquiera de los anteriores (no depende de nada); y 11, 12, 13, 14 entre sí un
   catálogo enriquecido; el seed sí. El plan del 02 debe dejar el seed como paso final para que el 02
   pueda arrancar el día 1 sin esperar a que el 01 esté cerrado.
 - **06 depende de 04 solo por el contrato del perfil.** El primer paso del plan del 04 es definir
-  `lib/paths/types.ts` (el tipo de las respuestas del cuestionario, la lista cerrada de metas, las 11
+  `lib/paths/types.ts` (el tipo de las respuestas del cuestionario, la lista cerrada de metas, las 15
   tecnologías y la tabla `meta → programas`). En cuanto ese paso está commiteado, el 06 puede empezar
   sin esperar al presupuesto de horas. El contrato vive en el 04, no en el 06, porque las decisiones que
   lo forman son del motor (ADR 0001), no de la UI.
@@ -159,15 +160,15 @@ Las que siguen sin marcar en `docs/investigacion/ANALISIS-IA.md` §11 y en las c
 | ~~Cómo se persiste un curso descartado por el motor (o por el usuario) y su motivo~~ — **cerrada por el spec 02**: fila de `path_steps` con `status = 'discarded'` + `discard_reason`, no `excluded_steps jsonb` en `learning_paths`; ver [ADR 0004](decisiones/0004-donde-vive-la-personalizacion.md) | — |
 | ~~Qué es una fila de `programs`: un programa agrupado (13) o una ruta oficial (15)~~ — **cerrada por el spec 02**: 15 filas, una por ruta oficial. React aporta "React" y "React Native"; Dart aporta "Dart móvil" y "Dart Web" | — |
 | Qué preguntas tiene el cuestionario (máx. 6–8, una sola de texto libre) | 06, con el contrato definido en 04 |
-| Tabla `meta → programas` para metas fullstack, **y tabla `interests.ts`** (~12 intereses transversales al catálogo completo → 1-3 slugs cada uno, cruzando programas) — las dos tablas a mano que define el 04; ver [`docs/decisiones/0003-intereses-transversales-al-catalogo.md`](decisiones/0003-intereses-transversales-al-catalogo.md) | 04 |
-| Cómo se resuelven los 9 cursos que cambian de `level` según el programa (ADR 0001) | 04 |
-| Qué se hace cuando la ruta no cabe en el presupuesto (orden de recorte): primero los cursos que entraron por interés (ADR 0003), después los opcionales oficiales, después los recomendados | 04 |
-| Cuántas horas como máximo puede añadir el paso de intereses sobre la ruta oficial (hoy nada impide que 12 chips marcados dupliquen la ruta) | 04 |
+| ~~Tabla `meta → programas` para metas fullstack, **y tabla `interests.ts`** (~12 intereses transversales al catálogo completo → 1-3 slugs cada uno, cruzando programas)~~ — **cerrada por el spec 04**: `GOALS` (19 metas, no solo fullstack, en `lib/paths/goals.ts`) e `INTERESTS` (12 intereses, 20 slugs de curso, en `lib/paths/interests.ts`); ver [`docs/decisiones/0003-intereses-transversales-al-catalogo.md`](decisiones/0003-intereses-transversales-al-catalogo.md) | — |
+| ~~Cómo se resuelven los 9 cursos que cambian de `level` según el programa (ADR 0001)~~ — **cerrada por el spec 04**: cuando un mismo curso aparece con `level` distinto en dos programas fusionados, gana el más exigente (`requerido` > `recomendado` > `opcional`), resuelto dentro de `mergeOfficialSteps` | — |
+| ~~Qué se hace cuando la ruta no cabe en el presupuesto (orden de recorte): primero los cursos que entraron por interés (ADR 0003), después los opcionales oficiales, después los recomendados~~ — **cerrada por el spec 04**: `trimToBudget` recorta exactamente en ese orden (`interes` → `opcional` → `recomendado`) y nunca quita un `requerido`; si no alcanza, devuelve `fitsInBudget: false` + `overflowHours` | — |
+| ~~Cuántas horas como máximo puede añadir el paso de intereses sobre la ruta oficial (hoy nada impide que 12 chips marcados dupliquen la ruta)~~ — **cerrada por el spec 04**: `Math.max(0.25 * budgetHours, budgetHours - officialHours)` en `applyInterests` — nunca menos del 25% del presupuesto, pero tampoco menos que el espacio libre real sobre la ruta oficial ya armada | — |
 | Qué campos de un curso son editables desde el panel (¿también `slug` y `url`, o solo los descriptivos?) | 10 |
 | Si el rol `admin` puede crear programas nuevos o solo asignar cursos a los 13 ya existentes | 10 |
 | Límite diario de personalizaciones por usuario (sugerido: 5) — no bloquea generar rutas nuevas, solo la reescritura con IA de una ya generada | 11 |
 | ~~Mini-quiz de re-evaluación vs. "Recalcular mi ruta"~~ — **cerrada por el [ADR 0004](decisiones/0004-donde-vive-la-personalizacion.md)**: ninguna de las dos. Es un cuestionario prellenado que la IA puede ajustar por chips a partir de texto libre (nunca cursos); sin IA, los chips se editan a mano. Genera una ruta nueva | — |
-| Cuándo el motor descarta un slug de interés porque coincide con una tecnología que el usuario ya domina (ej. marcó Node como dominado y el interés "Microservicios" sugiere `nestjs-microservicios`) — reformulada desde la versión por-stack de la maqueta: ver ADR 0003 | 04 |
+| ~~Cuándo el motor descarta un slug de interés porque coincide con una tecnología que el usuario ya domina (ej. marcó Node como dominado y el interés "Microservicios" sugiere `nestjs-microservicios`)~~ — **cerrada por el spec 04**: `applyInterests` descarta solo el `courseSlug` puntual y prueba el siguiente del mismo interés; si ninguno queda libre, ese interés no aporta nada (no se pierde el interés completo por una coincidencia parcial) | — |
 | ~~Qué se muestra en el paso de intereses cuando el programa solo tiene 1 curso opcional real (7 de 18 combinaciones de stack de la maqueta)~~ — **cerrada por el ADR 0003**: el paso de intereses dejó de depender del stack. Es una lista plana de ~12 intereses transversales al catálogo completo, igual para todos los perfiles; `STACK_INTERESTS` de la maqueta queda reemplazada, no se copia al app (ver `SPECS-MAP.md` §6) | — |
 | Vencimiento de los créditos de OpenAI y dueño de la key | Ninguno — es gestión, no spec |
 
