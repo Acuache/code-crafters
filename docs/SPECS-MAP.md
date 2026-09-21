@@ -129,12 +129,18 @@ los anteriores (no depende de nada); y 11, 12, 13, 14 entre sí una vez cerrado 
    **temporalmente**, de `app/dashboard/page.tsx` (placeholder plano, sin route group); el 04 es dueño
    de `lib/paths/*` (incluye `interests.ts`, la tabla de intereses transversales al catálogo — no vive
    en `data/` ni en `components/quiz/*`), el 05 de `app/(marketing)/*`, el 06 de `components/quiz/*` y
-   `app/(app)/quiz/*`, el 08 de `app/(app)/paths/[id]/*`, el 10 de `app/(admin)/*` y
-   `components/admin/*`, etc. Cada spec declara en su alcance los archivos que toca. **Excepción
-   explícita a la propiedad temporal:** el spec 09 (`paths-dashboard`), al construir el dashboard real,
-   debe mover o borrar el `app/dashboard/page.tsx` del spec 03 como parte de su propio plan — si crea
-   `app/(app)/dashboard/page.tsx` sin resolver el placeholder anterior, dos rutas resuelven `/dashboard`
-   y el build de Next.js falla. **Excepción explícita al link del dashboard:** el spec 06 agrega el
+   `app/(app)/quiz/*`, el 07 de `lib/catalog/*` y de `app/(app)/paths/` en su raíz (`actions.ts`) y,
+   **temporalmente**, de `app/(app)/paths/[id]/*` (placeholder mínimo de sólo lectura: título, resumen y
+   la lista de cursos vigentes, sin chips de procedencia ni acordeón de descartes), el 10 de
+   `app/(admin)/*` y `components/admin/*`, etc. Cada spec declara en su alcance los archivos que toca.
+   **Excepción explícita a la propiedad temporal (dashboard):** el spec 09 (`paths-dashboard`), al
+   construir el dashboard real, debe mover o borrar el `app/dashboard/page.tsx` del spec 03 como parte
+   de su propio plan — si crea `app/(app)/dashboard/page.tsx` sin resolver el placeholder anterior, dos
+   rutas resuelven `/dashboard` y el build de Next.js falla. **Excepción explícita a la propiedad
+   temporal (`/paths/[id]`):** el spec 08 (`path-progress-view`), al construir la vista real (chips de
+   procedencia, acordeón "Qué quitamos y por qué", cambio de estado), reescribe entero el placeholder de
+   `app/(app)/paths/[id]/page.tsx` que dejó el spec 07 — mismo precedente que 03→09, no crea un archivo
+   al lado del anterior. **Excepción explícita al link del dashboard:** el spec 06 agrega el
    botón "Crear mi ruta" en el `app/dashboard/page.tsx` del spec 03 — si no, `/quiz` solo se puede
    probar tecleando la URL a mano, y el concurso evalúa navegando la app desplegada. Es barata porque
    el spec 09 reescribe ese archivo entero de todos modos.
@@ -188,8 +194,9 @@ convencional.
 - `data/programs.json` — las 15 rutas oficiales de DevTalles dentro de 13 programas (React y Dart
   aportan 2 rutas cada uno; ver spec 02) (`stage`/`level`/`note`/`courses`). Es
   **insumo del seed** de `programs`/`program_courses` en el spec 02, no fuente de verdad en runtime: una
-  vez sembrado, `build-path.ts` (04) recibe los programas por parámetro y quien lo invoca decide si
-  vienen de este JSON o de una consulta a Supabase.
+  vez sembrado, `build-path.ts` (04) recibe los programas por parámetro, y quien lo invoca en producción
+  (el spec 07, vía `lib/catalog/catalog.ts`) siempre los lee de Supabase — este JSON sólo se vuelve a
+  leer como fixture de `lib/paths/build-path.test.ts` (04), no como fuente de runtime.
 - `components/ui/*` (22 componentes shadcn), `components/brand/*` y `components/theme-*` — sistema de
   diseño ya construido, documentado en `/sistema-diseno` y en el ADR 0002. Entrada de 03, 05, 06, 08,
   09, 10 y 12. La regla general ("componer, no crear") vive en `CLAUDE.md` §"UI: componer, no crear";
@@ -277,8 +284,9 @@ local.
 `lib/paths/build-path.ts` y `lib/paths/interests.ts`: una función **pura** que arma la ruta sin tocar la
 base de datos ni la UI — por eso puede desarrollarse en paralelo con 02 y 03 en vez de esperarlos. Recibe
 el catálogo de cursos y los programas (con su `program_courses`) **como parámetros**, no importa
-`data/*.json` directamente: en la semana 1 quien la invoca le pasa los JSON versionados, y una vez que
-existe el panel de administración (10) puede pasarle una consulta a Supabase sin tocar el motor.
+`data/*.json` directamente: el spec 07 (semana 1) ya le pasa catálogo y programas leídos de Supabase vía
+`lib/catalog/catalog.ts`, nunca los JSON versionados — la única excepción es `build-path.test.ts`, que
+sigue leyendo `data/*.json` como fixture de prueba, no como fuente de runtime.
 Encadena seis pasos: mapear la meta a uno o más programas oficiales, tomar los pasos según nivel del
 usuario, quitar tecnologías ya dominadas, deduplicar cursos repetidos entre programas, sumar los
 intereses transversales de `interests.ts` y por último recortar contra el presupuesto de horas dejando
@@ -307,12 +315,15 @@ necesita usuario autenticado y tabla donde guardar, no por su contenido.
 
 ### 07 · `path-generation`
 
-El punto de unión: una server action que toma el `assessment` recién guardado, carga el catálogo y los
-programas (de `data/*.json` en la semana 1; de Supabase una vez exista el spec 10) y se los pasa a
-`build-path.ts` del 04, persiste el resultado en `learning_paths` + `path_steps`, y redirige a
-`/paths/[id]`. No añade lógica de negocio propia — combina la del 02, 04 y 06 — salvo la pantalla
-intermedia de "generando ruta" mientras corre. Es el primer spec en el que un usuario ve una ruta
-completa de punta a punta.
+El punto de unión: una server action (`app/(app)/paths/actions.ts`) que toma el `assessment` recién
+guardado, carga catálogo y programas desde Supabase vía `lib/catalog/catalog.ts` (dos queries: cursos
+activos; `program_courses` con el slug del programa y del curso embebidos — nunca `data/*.json`, ni
+siquiera en la semana 1: el split de 15 rutas sobre 13 programas sólo existe como filas separadas en la
+base real) y se los pasa a `build-path.ts` del 04, persiste el resultado en `learning_paths` +
+`path_steps`, y redirige a `/paths/[id]`. No añade lógica de negocio propia — combina la del 02, 04 y 06
+— salvo la pantalla intermedia de "generando ruta" mientras corre y un placeholder mínimo y transitorio
+en `/paths/[id]` que el spec 08 reescribe entero (ver regla 5). Es el primer spec en el que un usuario ve
+una ruta completa de punta a punta.
 
 ### 08 · `path-progress-view`
 
