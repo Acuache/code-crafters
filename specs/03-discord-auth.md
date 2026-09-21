@@ -1,6 +1,6 @@
 # SPEC 03 — Login y logout con Discord, Google y GitHub
 
-> **Estado:** Aprobado
+> **Estado:** Implementado
 > **Depende de:** SPEC 02
 > **Fecha:** 2026-09-20
 > **Objetivo:** Login y logout de punta a punta con Discord, Google y GitHub sobre el esquema de
