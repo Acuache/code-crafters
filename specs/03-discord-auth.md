@@ -201,30 +201,30 @@ provider)}>` con `provider-button.tsx`, lee `searchParams` (es una `Promise` en 
 
 ## Criterios de aceptación
 
-- [ ] `/login` sin sesión muestra los tres botones (Discord, Google, GitHub), todos con la misma
+- [x] `/login` sin sesión muestra los tres botones (Discord, Google, GitHub), todos con la misma
       variante visual.
-- [ ] `/login` con sesión activa redirige a `/dashboard` sin mostrar el formulario.
-- [ ] Completar el login con Discord en local termina en `/dashboard` con la sesión activa.
-- [ ] Completar el login con Google en local termina en `/dashboard` con la sesión activa.
-- [ ] Completar el login con GitHub en local termina en `/dashboard` con la sesión activa.
-- [ ] Con una cuenta que nunca inició sesión en el proyecto (o borrando su fila de `auth.users` a
+- [x] `/login` con sesión activa redirige a `/dashboard` sin mostrar el formulario.
+- [x] Completar el login con Discord en local termina en `/dashboard` con la sesión activa.
+- [x] Completar el login con Google en local termina en `/dashboard` con la sesión activa.
+- [x] Completar el login con GitHub en local termina en `/dashboard` con la sesión activa.
+- [x] Con una cuenta que nunca inició sesión en el proyecto (o borrando su fila de `auth.users` a
       mano en Supabase antes de probar), el primer login genera su fila en `profiles` con
       `role = 'user'` (trigger de la spec 02), visible en el `Badge` de `/dashboard`.
-- [ ] `/dashboard` sin sesión redirige a `/login`.
-- [ ] El botón "Cerrar sesión" de `/dashboard` termina la sesión y redirige a `/login`.
-- [ ] Cancelar el consent screen de un proveedor redirige a `/login?error=oauth_denied` con un
+- [x] `/dashboard` sin sesión redirige a `/login`.
+- [x] El botón "Cerrar sesión" de `/dashboard` termina la sesión y redirige a `/login`.
+- [x] Cancelar el consent screen de un proveedor redirige a `/login?error=oauth_denied` con un
       mensaje visible.
-- [ ] Un `code` inválido o expirado en `/auth/callback` redirige a
+- [x] Un `code` inválido o expirado en `/auth/callback` redirige a
       `/login?error=oauth_callback_failed` con un mensaje visible, sin pantalla en blanco ni error 500.
-- [ ] Promover un perfil a `admin` a mano en Supabase y volver a entrar cambia el `Badge` de
+- [x] Promover un perfil a `admin` a mano en Supabase y volver a entrar cambia el `Badge` de
       `/dashboard` de `user` a `admin` (verificación reproducible de que `requireUser()` lee
       `profiles.role`, no `claims.role`).
-- [ ] Los archivos nuevos de `/login` y `/dashboard` solo importan de `components/ui/*`,
+- [x] Los archivos nuevos de `/login` y `/dashboard` solo importan de `components/ui/*`,
       `components/brand/*`, `next/image` y `@phosphor-icons/react` — ningún estilo que redefina
       color, radio o sombra por fuera de los tokens del tema.
-- [ ] Las dos pantallas se ven correctas en tema claro y en tema oscuro.
-- [ ] `npm run build` y `npm run lint` pasan sin errores.
-- [ ] En la URL de producción de Vercel, login con Discord completa el ciclo de punta a punta
+- [x] Las dos pantallas se ven correctas en tema claro y en tema oscuro.
+- [x] `npm run build` y `npm run lint` pasan sin errores.
+- [x] En la URL de producción de Vercel, login con Discord completa el ciclo de punta a punta
       (verificación manual del usuario, no automatizable por el agente).
 
 ## Decisiones
