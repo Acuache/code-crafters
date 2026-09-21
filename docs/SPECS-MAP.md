@@ -128,13 +128,16 @@ los anteriores (no depende de nada); y 11, 12, 13, 14 entre sí una vez cerrado 
    El 03 es dueño de `app/login/*`, `app/auth/callback/route.ts`, `lib/supabase/{actions,guards}.ts` y,
    **temporalmente**, de `app/dashboard/page.tsx` (placeholder plano, sin route group); el 04 es dueño
    de `lib/paths/*` (incluye `interests.ts`, la tabla de intereses transversales al catálogo — no vive
-   en `data/` ni en `components/quiz/*`), el 05 de `app/(marketing)/*`, el 06 de `components/quiz/*`,
-   el 08 de `app/(app)/paths/[id]/*`, el 10 de `app/(admin)/*` y `components/admin/*`, etc. Cada spec
-   declara en su alcance los archivos que toca. **Excepción explícita a la propiedad temporal:** el
-   spec 09 (`paths-dashboard`), al construir el dashboard real, debe mover o borrar el
-   `app/dashboard/page.tsx` del spec 03 como parte de su propio plan — si crea
+   en `data/` ni en `components/quiz/*`), el 05 de `app/(marketing)/*`, el 06 de `components/quiz/*` y
+   `app/(app)/quiz/*`, el 08 de `app/(app)/paths/[id]/*`, el 10 de `app/(admin)/*` y
+   `components/admin/*`, etc. Cada spec declara en su alcance los archivos que toca. **Excepción
+   explícita a la propiedad temporal:** el spec 09 (`paths-dashboard`), al construir el dashboard real,
+   debe mover o borrar el `app/dashboard/page.tsx` del spec 03 como parte de su propio plan — si crea
    `app/(app)/dashboard/page.tsx` sin resolver el placeholder anterior, dos rutas resuelven `/dashboard`
-   y el build de Next.js falla.
+   y el build de Next.js falla. **Excepción explícita al link del dashboard:** el spec 06 agrega el
+   botón "Crear mi ruta" en el `app/dashboard/page.tsx` del spec 03 — si no, `/quiz` solo se puede
+   probar tecleando la URL a mano, y el concurso evalúa navegando la app desplegada. Es barata porque
+   el spec 09 reescribe ese archivo entero de todos modos.
 6. **Migraciones nuevas solo en 02, 11, 13 y 14**, y esos cuatro no se implementan en paralelo entre sí:
    el orden de los archivos de migración depende del orden de merge, y ramas simultáneas lo rompen. El
    02 crea el esquema base —incluye `profiles.role` y las tablas `programs`/`program_courses`—; 11, 13
@@ -159,7 +162,7 @@ Las que siguen sin marcar en `docs/investigacion/ANALISIS-IA.md` §11 y en las c
 | ~~Cómo se bootstrapea el primer usuario `admin`~~ — **cerrada por el spec 02**: ninguna de las dos opciones originales. Todos los perfiles nacen `role = 'user'`; el primer admin se promueve a mano desde el panel de Supabase después de loguearse, sin credenciales ni IDs sembrados en el repo público | — |
 | ~~Cómo se persiste un curso descartado por el motor (o por el usuario) y su motivo~~ — **cerrada por el spec 02**: fila de `path_steps` con `status = 'discarded'` + `discard_reason`, no `excluded_steps jsonb` en `learning_paths`; ver [ADR 0004](decisiones/0004-donde-vive-la-personalizacion.md) | — |
 | ~~Qué es una fila de `programs`: un programa agrupado (13) o una ruta oficial (15)~~ — **cerrada por el spec 02**: 15 filas, una por ruta oficial. React aporta "React" y "React Native"; Dart aporta "Dart móvil" y "Dart Web" | — |
-| Qué preguntas tiene el cuestionario (máx. 6–8, una sola de texto libre) | 06, con el contrato definido en 04 |
+| ~~Qué preguntas tiene el cuestionario (máx. 6–8, una sola de texto libre)~~ — **cerrada por el spec 06**: seis pasos (meta con área + meta, nivel, tecnologías dominadas, intereses, tiempo con horas + plazo, texto libre), una sola de texto libre. El plazo es una lista cerrada de 3/6/9/12 meses (no un input numérico libre, ni los 3/5/6/12 de la maqueta) | — |
 | ~~Tabla `meta → programas` para metas fullstack, **y tabla `interests.ts`** (~12 intereses transversales al catálogo completo → 1-3 slugs cada uno, cruzando programas)~~ — **cerrada por el spec 04**: `GOALS` (19 metas, no solo fullstack, en `lib/paths/goals.ts`) e `INTERESTS` (12 intereses, 20 slugs de curso, en `lib/paths/interests.ts`); ver [`docs/decisiones/0003-intereses-transversales-al-catalogo.md`](decisiones/0003-intereses-transversales-al-catalogo.md) | — |
 | ~~Cómo se resuelven los 9 cursos que cambian de `level` según el programa (ADR 0001)~~ — **cerrada por el spec 04**: cuando un mismo curso aparece con `level` distinto en dos programas fusionados, gana el más exigente (`requerido` > `recomendado` > `opcional`), resuelto dentro de `mergeOfficialSteps` | — |
 | ~~Qué se hace cuando la ruta no cabe en el presupuesto (orden de recorte): primero los cursos que entraron por interés (ADR 0003), después los opcionales oficiales, después los recomendados~~ — **cerrada por el spec 04**: `trimToBudget` recorta exactamente en ese orden (`interes` → `opcional` → `recomendado`) y nunca quita un `requerido`; si no alcanza, devuelve `fitsInBudget: false` + `overflowHours` | — |

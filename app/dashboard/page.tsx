@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -29,6 +31,14 @@ export default async function DashboardPage() {
         </CardHeader>
         <CardContent>
           <Badge variant="secondary">{user.role}</Badge>
+          <Button
+            variant="brand"
+            className="w-full"
+            render={<Link href="/quiz" />}
+            nativeButton={false}
+          >
+            Crear mi ruta
+          </Button>
           <form action={signOut}>
             <Button type="submit" variant="outline" className="w-full">
               Cerrar sesión
