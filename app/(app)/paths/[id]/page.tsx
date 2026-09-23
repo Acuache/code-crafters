@@ -1,8 +1,6 @@
 import { notFound } from "next/navigation";
-import { FireIcon, ListChecksIcon } from "@phosphor-icons/react/ssr";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Progress, ProgressLabel } from "@/components/ui/progress";
+import { PathExperience } from "@/components/paths/path-experience";
 import { buildPathView, type PathStepInput } from "@/lib/paths/path-view";
 import { requireUser } from "@/lib/supabase/guards";
 import { createClient } from "@/lib/supabase/server";
@@ -39,30 +37,5 @@ export default async function PathPage({ params }: PathPageProps) {
   const [{ id }, user] = await Promise.all([params, requireUser()]);
   const result = await loadPathView(id, user.userId);
   if (!result) notFound();
-  const { path, streak } = result;
-
-  return (
-    <div className="flex flex-1 flex-col items-center px-6 py-16">
-      <Card className="w-full max-w-3xl">
-        <CardHeader>
-          <CardTitle>{path.title}</CardTitle>
-          {path.summary ? <CardDescription>{path.summary}</CardDescription> : null}
-        </CardHeader>
-        <CardContent>
-          <Progress value={path.progressPercentage}>
-            <ProgressLabel>Progreso: {path.progressPercentage}%</ProgressLabel>
-          </Progress>
-          <p className="flex items-center gap-2 text-sm text-muted-foreground">
-            <ListChecksIcon /> {path.mainSteps.length} pasos · {path.totalHours} h de {path.budget_hours ?? 0} h
-          </p>
-          <p className="flex items-center gap-2 text-sm text-muted-foreground">
-            <FireIcon /> {streak.current} días · mejor racha: {streak.best}
-          </p>
-          <ol className="list-decimal space-y-2 pl-5">
-            {path.mainSteps.map((step) => <li key={step.id}>{step.course.title} · {step.uiStatus}</li>)}
-          </ol>
-        </CardContent>
-      </Card>
-    </div>
-  );
+  return <PathExperience path={result.path} streak={result.streak} />;
 }
