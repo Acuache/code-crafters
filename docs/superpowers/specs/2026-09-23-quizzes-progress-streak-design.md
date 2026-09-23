@@ -2,7 +2,7 @@
 
 **Fecha:** 2026-09-23
 
-**Estado:** Aprobado en conversación; pendiente de revisión del documento
+**Estado:** Aprobado
 
 **Producto:** DevPathlles (`code-crafters`)
 
