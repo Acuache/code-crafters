@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { PlusIcon, SignOutIcon } from "@phosphor-icons/react/ssr";
+import { PlusIcon, ShieldCheckIcon, SignOutIcon } from "@phosphor-icons/react/ssr";
 
 import { Eyebrow } from "@/components/brand/eyebrow";
 import { PathCard, type DashboardPath } from "@/components/dashboard/path-card";
@@ -89,6 +89,13 @@ export default async function DashboardPage() {
           <Eyebrow>Tu panel</Eyebrow>
           <h1 className="text-title truncate">Hola, {displayName}</h1>
         </div>
+        {/* Excepción a la regla 5 del mapa: el spec 10 agrega solo este link para el admin. */}
+        {user.role === "admin" ? (
+          <Button variant="outline" render={<Link href="/admin" />} nativeButton={false}>
+            <ShieldCheckIcon data-icon="inline-start" />
+            Panel de administración
+          </Button>
+        ) : null}
         <form action={signOut}>
           <Button type="submit" variant="outline">
             <SignOutIcon data-icon="inline-start" />
