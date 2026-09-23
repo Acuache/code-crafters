@@ -131,7 +131,11 @@ los anteriores (no depende de nada); y 11, 12, 13, 14 entre sí una vez cerrado 
    en `data/` ni en `components/quiz/*`), el 05 de `app/(marketing)/*`, el 06 de `components/quiz/*` y
    `app/(app)/quiz/*`, el 07 de `lib/catalog/*` y de `app/(app)/paths/` en su raíz (`actions.ts`) y,
    **temporalmente**, de `app/(app)/paths/[id]/*` (placeholder mínimo de sólo lectura: título, resumen y
-   la lista de cursos vigentes, sin chips de procedencia ni acordeón de descartes), el 10 de
+   la lista de cursos vigentes, sin chips de procedencia ni acordeón de descartes), el 08 de
+   `app/(app)/paths/[id]/*` (reescribe ese placeholder y agrega `actions.ts`), de `lib/progress/*`
+   (el cálculo de progreso por horas que reusa el 09) y de `components/paths/{path-steps-view,
+   budget-card,step-row,step-status-toggle,discarded-steps}.tsx` (`components/paths/generating-path.tsx`
+   sigue siendo del 07; `step-status-toggle.tsx` lo reusa el 12 sin reescribirlo), el 10 de
    `app/(admin)/*` y `components/admin/*`, etc. Cada spec declara en su alcance los archivos que toca.
    **Excepción explícita a la propiedad temporal (dashboard):** el spec 09 (`paths-dashboard`), al
    construir el dashboard real, debe mover o borrar el `app/dashboard/page.tsx` del spec 03 como parte
@@ -339,7 +343,9 @@ ninguno de esos repite esta vista, todos la extienden o la referencian.
 El dashboard con todas las rutas del usuario, el progreso de cada una y el acceso para crear otra desde
 cero. **Primer paso obligatorio de su plan:** mover o borrar el placeholder `app/dashboard/page.tsx`
 que dejó el spec 03 (ver regla 5 de concordancia) — si este spec agrega `app/(app)/dashboard/page.tsx`
-sin resolver el anterior, dos rutas resuelven `/dashboard` y el build falla. Cierra el **Hito 1**: con
+sin resolver el anterior, dos rutas resuelven `/dashboard` y el build falla. El progreso de cada ruta
+se calcula con `summarizePathProgress` de `lib/progress/path-progress.ts` (spec 08), por horas y sin
+contar los pasos descartados — no se reimplementa en el dashboard. Cierra el **Hito 1**: con
 este spec mergeado a `master`, los cinco requisitos obligatorios del `ENUNCIADO.md` (cuestionario,
 rutas dinámicas con cursos reales, guardar varias rutas y marcar progreso, login con Discord,
 tecnologías de DevTalles) ya están cumplidos — sin necesitar `OPENAI_API_KEY`, que recién entra en el
@@ -373,6 +379,11 @@ este límite.
 Una vista alternativa sobre los mismos datos del 08, no un modelo nuevo: el mapa de la ruta con React
 Flow y layout automático de dagre, nodos coloreados por estado, un panel (Sheet) de detalle al hacer
 clic en un nodo con link a DevTalles y cambio de estado, y un toggle para alternar entre mapa y lista.
+**Pendiente para su `/spec`:** durante el spec 08 el usuario pidió que el mapa sea un recorrido
+estilo Duolingo (camino en zigzag con nodos que se recorren). Como la ruta es lineal, conviene
+evaluar en la fase de preguntas si React Flow + dagre sigue haciendo falta o alcanza con CSS sobre
+los componentes existentes. El panel de detalle reusa `components/paths/step-status-toggle.tsx`
+(spec 08).
 
 ### 13 · `gamification`
 
