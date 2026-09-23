@@ -3,9 +3,17 @@
 import { cleanup, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it } from "vitest";
+import { vi } from "vitest";
 
 import type { PathStepView, PathView } from "@/lib/paths/path-view";
 import { PathExperience } from "./path-experience";
+
+vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh: vi.fn() }) }));
+vi.mock("@/app/(app)/paths/[id]/actions", () => ({
+  requestQuiz: vi.fn(),
+  checkQuizAnswer: vi.fn(),
+  submitQuizAttempt: vi.fn(),
+}));
 
 const step = (id: string, title: string, uiStatus: PathStepView["uiStatus"], origin: PathStepView["origin"] = "requerido"): PathStepView => ({
   id, stage: Number(id.replace(/\D/g, "")) || 1, position: 1, origin, reason: "Elegido para tu meta",
