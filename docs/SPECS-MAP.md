@@ -138,7 +138,8 @@ los anteriores (no depende de nada); y 11, 12, 13, 14 entre sí una vez cerrado 
    sigue siendo del 07; `step-status-toggle.tsx` lo reusa el 12 sin reescribirlo), el 09 de
    `app/(app)/dashboard/*`, `components/dashboard/*` y `lib/progress/next-step{,.test}.ts` (archivo
    propio dentro de la carpeta del 08: `findNextStep`, el "próximo curso" de una ruta), el 10 de
-   `app/(admin)/*` y `components/admin/*`, etc. Cada spec declara en su alcance los archivos que toca.
+   `app/(admin)/*`, `components/admin/*`, `lib/admin/*` y `components/ui/checkbox.tsx` (primitiva de
+   shadcn agregada por el 10), etc. Cada spec declara en su alcance los archivos que toca.
    **Excepción explícita a la propiedad temporal (dashboard), ya resuelta:** el spec 09
    (`paths-dashboard`) movió el placeholder `app/dashboard/page.tsx` del spec 03 a
    `app/(app)/dashboard/page.tsx` como primer paso de su plan y después lo reescribió; nunca
@@ -150,6 +151,9 @@ los anteriores (no depende de nada); y 11, 12, 13, 14 entre sí una vez cerrado 
    botón "Crear mi ruta" en el `app/dashboard/page.tsx` del spec 03 — si no, `/quiz` solo se puede
    probar tecleando la URL a mano, y el concurso evalúa navegando la app desplegada. Fue barata porque
    el spec 09 reescribió ese archivo entero (hoy el acceso es "Crear nueva ruta" en el dashboard).
+   **Excepción explícita al link del panel:** el spec 10 agrega en `app/(app)/dashboard/page.tsx`
+   (del 09) solo el botón "Panel de administración", visible para `role = 'admin'` — el 09 lo dejó
+   fuera de su alcance esperando al 10, y el jurado evalúa navegando la app, no tecleando `/admin`.
 6. **Migraciones nuevas solo en 02, 11, 13 y 14**, y esos cuatro no se implementan en paralelo entre sí:
    el orden de los archivos de migración depende del orden de merge, y ramas simultáneas lo rompen. El
    02 crea el esquema base —incluye `profiles.role` y las tablas `programs`/`program_courses`—; 11, 13
@@ -179,8 +183,8 @@ Las que siguen sin marcar en `docs/investigacion/ANALISIS-IA.md` §11 y en las c
 | ~~Cómo se resuelven los 9 cursos que cambian de `level` según el programa (ADR 0001)~~ — **cerrada por el spec 04**: cuando un mismo curso aparece con `level` distinto en dos programas fusionados, gana el más exigente (`requerido` > `recomendado` > `opcional`), resuelto dentro de `mergeOfficialSteps` | — |
 | ~~Qué se hace cuando la ruta no cabe en el presupuesto (orden de recorte): primero los cursos que entraron por interés (ADR 0003), después los opcionales oficiales, después los recomendados~~ — **cerrada por el spec 04**: `trimToBudget` recorta exactamente en ese orden (`interes` → `opcional` → `recomendado`) y nunca quita un `requerido`; si no alcanza, devuelve `fitsInBudget: false` + `overflowHours` | — |
 | ~~Cuántas horas como máximo puede añadir el paso de intereses sobre la ruta oficial (hoy nada impide que 12 chips marcados dupliquen la ruta)~~ — **cerrada por el spec 04**: `Math.max(0.25 * budgetHours, budgetHours - officialHours)` en `applyInterests` — nunca menos del 25% del presupuesto, pero tampoco menos que el espacio libre real sobre la ruta oficial ya armada | — |
-| Qué campos de un curso son editables desde el panel (¿también `slug` y `url`, o solo los descriptivos?) | 10 |
-| Si el rol `admin` puede crear programas nuevos o solo asignar cursos a los 13 ya existentes | 10 |
+| ~~Qué campos de un curso son editables desde el panel (¿también `slug` y `url`, o solo los descriptivos?)~~ — **cerrada por el spec 10**: todos, incluidos `url`, horas y flags; el `slug` se escribe al crear y queda fijo, porque `INTERESTS` y `TECH_TO_SLUGS` (spec 04) lo nombran en el código. "Borrar" un curso es desactivarlo, y se rechaza mientras esté en algún programa o lo use el motor | — |
+| ~~Si el rol `admin` puede crear programas nuevos o solo asignar cursos a los 13 ya existentes~~ — **cerrada por el spec 10**: puede crear programas y editar nombre y posición (no borrarlos), con un aviso visible cuando ninguna meta de `lib/paths/goals.ts` lo nombra: sumarlo al cuestionario sigue siendo un cambio de código | — |
 | Límite diario de personalizaciones por usuario (sugerido: 5) — no bloquea generar rutas nuevas, solo la reescritura con IA de una ya generada | 11 |
 | ~~Mini-quiz de re-evaluación vs. "Recalcular mi ruta"~~ — **cerrada por el [ADR 0004](decisiones/0004-donde-vive-la-personalizacion.md)**: ninguna de las dos. Es un cuestionario prellenado que la IA puede ajustar por chips a partir de texto libre (nunca cursos); sin IA, los chips se editan a mano. Genera una ruta nueva | — |
 | ~~Cuándo el motor descarta un slug de interés porque coincide con una tecnología que el usuario ya domina (ej. marcó Node como dominado y el interés "Microservicios" sugiere `nestjs-microservicios`)~~ — **cerrada por el spec 04**: `applyInterests` descarta solo el `courseSlug` puntual y prueba el siguiente del mismo interés; si ninguno queda libre, ese interés no aporta nada (no se pierde el interés completo por una coincidencia parcial) | — |
