@@ -125,8 +125,8 @@ los anteriores (no depende de nada); y 11, 12, 13, 14 entre sí una vez cerrado 
    `Decisiones`, `Riesgos`, `Qué NO entra`). El **spec 01 fija la convención**: `/spec` lee los dos
    specs más recientes para copiar el formato, así que lo que quede ahí se propaga solo.
 5. **Cada archivo pertenece a un solo spec.** Dos specs no editan el mismo archivo en ramas distintas.
-   El 03 es dueño de `app/login/*`, `app/auth/callback/route.ts`, `lib/supabase/{actions,guards}.ts` y,
-   **temporalmente**, de `app/dashboard/page.tsx` (placeholder plano, sin route group); el 04 es dueño
+   El 03 es dueño de `app/login/*`, `app/auth/callback/route.ts` y `lib/supabase/{actions,guards}.ts`
+   (su placeholder `app/dashboard/page.tsx` ya no existe: el 09 lo movió y lo reescribió); el 04 es dueño
    de `lib/paths/*` (incluye `interests.ts`, la tabla de intereses transversales al catálogo — no vive
    en `data/` ni en `components/quiz/*`), el 05 de `app/(marketing)/*`, el 06 de `components/quiz/*` y
    `app/(app)/quiz/*`, el 07 de `lib/catalog/*` y de `app/(app)/paths/` en su raíz (`actions.ts`) y,
@@ -135,19 +135,21 @@ los anteriores (no depende de nada); y 11, 12, 13, 14 entre sí una vez cerrado 
    `app/(app)/paths/[id]/*` (reescribe ese placeholder y agrega `actions.ts`), de `lib/progress/*`
    (el cálculo de progreso por horas que reusa el 09) y de `components/paths/{path-steps-view,
    budget-card,step-row,step-status-toggle,discarded-steps}.tsx` (`components/paths/generating-path.tsx`
-   sigue siendo del 07; `step-status-toggle.tsx` lo reusa el 12 sin reescribirlo), el 10 de
+   sigue siendo del 07; `step-status-toggle.tsx` lo reusa el 12 sin reescribirlo), el 09 de
+   `app/(app)/dashboard/*`, `components/dashboard/*` y `lib/progress/next-step{,.test}.ts` (archivo
+   propio dentro de la carpeta del 08: `findNextStep`, el "próximo curso" de una ruta), el 10 de
    `app/(admin)/*` y `components/admin/*`, etc. Cada spec declara en su alcance los archivos que toca.
-   **Excepción explícita a la propiedad temporal (dashboard):** el spec 09 (`paths-dashboard`), al
-   construir el dashboard real, debe mover o borrar el `app/dashboard/page.tsx` del spec 03 como parte
-   de su propio plan — si crea `app/(app)/dashboard/page.tsx` sin resolver el placeholder anterior, dos
-   rutas resuelven `/dashboard` y el build de Next.js falla. **Excepción explícita a la propiedad
+   **Excepción explícita a la propiedad temporal (dashboard), ya resuelta:** el spec 09
+   (`paths-dashboard`) movió el placeholder `app/dashboard/page.tsx` del spec 03 a
+   `app/(app)/dashboard/page.tsx` como primer paso de su plan y después lo reescribió; nunca
+   coexistieron dos archivos que resuelvan `/dashboard`. **Excepción explícita a la propiedad
    temporal (`/paths/[id]`):** el spec 08 (`path-progress-view`), al construir la vista real (chips de
    procedencia, acordeón "Qué quitamos y por qué", cambio de estado), reescribe entero el placeholder de
    `app/(app)/paths/[id]/page.tsx` que dejó el spec 07 — mismo precedente que 03→09, no crea un archivo
    al lado del anterior. **Excepción explícita al link del dashboard:** el spec 06 agrega el
    botón "Crear mi ruta" en el `app/dashboard/page.tsx` del spec 03 — si no, `/quiz` solo se puede
-   probar tecleando la URL a mano, y el concurso evalúa navegando la app desplegada. Es barata porque
-   el spec 09 reescribe ese archivo entero de todos modos.
+   probar tecleando la URL a mano, y el concurso evalúa navegando la app desplegada. Fue barata porque
+   el spec 09 reescribió ese archivo entero (hoy el acceso es "Crear nueva ruta" en el dashboard).
 6. **Migraciones nuevas solo en 02, 11, 13 y 14**, y esos cuatro no se implementan en paralelo entre sí:
    el orden de los archivos de migración depende del orden de merge, y ramas simultáneas lo rompen. El
    02 crea el esquema base —incluye `profiles.role` y las tablas `programs`/`program_courses`—; 11, 13
@@ -277,7 +279,7 @@ spec 05 es un link a ella, no una copia) con los tres botones que ya soporta el 
 rol `admin` para las rutas que construirá el spec 10, leyendo `profiles.role` (no el `role` del JWT,
 que es el de Postgres). Compone enteramente el sistema de diseño ya construido, sin crear componentes
 de UI nuevos salvo un wrapper mínimo de estado de carga (ver `CLAUDE.md` §"UI: componer, no crear").
-Deja un placeholder temporal en `app/dashboard/page.tsx` que el spec 09 debe resolver (ver regla 5).
+Dejó un placeholder temporal en `app/dashboard/page.tsx` que el spec 09 ya resolvió (ver regla 5).
 **Reusa** los clientes `lib/supabase/{client,server}.ts` y el refresco de sesión de `proxy.ts`, que ya
 están escritos — este spec les añade el flujo de entrada, no los reescribe. Incluye el primer deploy en
 Vercel y los dominios de redirect en Supabase, porque el OAuth no se puede dar por cerrado solo en
@@ -341,9 +343,9 @@ ninguno de esos repite esta vista, todos la extienden o la referencian.
 ### 09 · `paths-dashboard`
 
 El dashboard con todas las rutas del usuario, el progreso de cada una y el acceso para crear otra desde
-cero. **Primer paso obligatorio de su plan:** mover o borrar el placeholder `app/dashboard/page.tsx`
-que dejó el spec 03 (ver regla 5 de concordancia) — si este spec agrega `app/(app)/dashboard/page.tsx`
-sin resolver el anterior, dos rutas resuelven `/dashboard` y el build falla. El progreso de cada ruta
+cero. Su primer paso movió el placeholder `app/dashboard/page.tsx` que dejó el spec 03 a
+`app/(app)/dashboard/page.tsx` antes de reescribirlo (ver regla 5 de concordancia), para que nunca dos
+rutas resolvieran `/dashboard`. El progreso de cada ruta
 se calcula con `summarizePathProgress` de `lib/progress/path-progress.ts` (spec 08), por horas y sin
 contar los pasos descartados — no se reimplementa en el dashboard. Cierra el **Hito 1**: con
 este spec mergeado a `master`, los cinco requisitos obligatorios del `ENUNCIADO.md` (cuestionario,
