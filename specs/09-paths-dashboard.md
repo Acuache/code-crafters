@@ -202,10 +202,10 @@ por el `on delete cascade` del spec 02; la fila de `assessments` no se toca.
 - [x] `app/dashboard/page.tsx` no existe y `app/(app)/dashboard/page.tsx` sí; `/dashboard` responde y
       el login con OAuth sigue redirigiendo ahí.
 - [x] `/dashboard` sin sesión redirige a `/login`.
-- [ ] La cabecera muestra el avatar (o las iniciales si no hay `avatar_url`), "Hola, {username}" y un
-      botón "Cerrar sesión" que cierra la sesión y lleva a `/login`. *(pendiente de verificación manual en el navegador: la extensión de Chrome no estaba conectada)*
-- [ ] Un usuario sin rutas ve el estado vacío con la mascota y "Crear mi primera ruta", que lleva a
-      `/quiz`; no ve la grilla ni el botón "Crear nueva ruta". *(pendiente de verificación manual en el navegador: la extensión de Chrome no estaba conectada)*
+- [x] La cabecera muestra el avatar (o las iniciales si no hay `avatar_url`), "Hola, {username}" y un
+      botón "Cerrar sesión" que cierra la sesión y lleva a `/login`.
+- [x] Un usuario sin rutas ve el estado vacío con la mascota y "Crear mi primera ruta", que lleva a
+      `/quiz`; no ve la grilla ni el botón "Crear nueva ruta".
 - [x] Un usuario con rutas ve una tarjeta por cada una de **sus** rutas (ninguna ajena), la más nueva
       primero, y el botón "Crear nueva ruta" que lleva a `/quiz`.
 - [x] En cada tarjeta, el porcentaje, "N de M cursos hechos" y "X h de Y h" coinciden con
@@ -215,17 +215,17 @@ por el `on delete cascade` del spec 02; la fila de `assessments` no se toca.
       pasos `pending` ni `in_progress` muestra "Ruta completada" y el botón "Ver ruta". *("Ruta completada" no se ejercitó: ninguna ruta de la base está completa)*
 - [x] El botón de la tarjeta dice "Empezar" si ningún paso está `done` ni `in_progress`, y "Continuar"
       si alguno lo está; en todos los casos lleva a `/paths/{id}`.
-- [ ] Marcar un paso como hecho en `/paths/[id]` y volver con "Volver al dashboard" muestra la tarjeta
-      con el avance actualizado. *(pendiente de verificación manual en el navegador: la extensión de Chrome no estaba conectada)*
-- [ ] "Eliminar" abre un diálogo de confirmación; "Cancelar" lo cierra sin borrar nada. *(pendiente de verificación manual en el navegador: la extensión de Chrome no estaba conectada)*
+- [x] Marcar un paso como hecho en `/paths/[id]` y volver con "Volver al dashboard" muestra la tarjeta
+      con el avance actualizado.
+- [x] "Eliminar" abre un diálogo de confirmación; "Cancelar" lo cierra sin borrar nada.
 - [x] Confirmar el borrado cierra el diálogo, la tarjeta desaparece sin recargar a mano, y por SQL: la
       fila de `learning_paths` y sus `path_steps` no existen, la de `assessments` sí. Borrar la última
-      ruta muestra el estado vacío. *(borrado en cascada y `assessments` verificados por SQL bajo RLS; cierre del diálogo y desaparición de la tarjeta, pendientes en el navegador)*
+      ruta muestra el estado vacío.
 - [x] `deletePath` con el id de una ruta ajena, un uuid inexistente o un string que no es uuid
       devuelve `{ ok: false }` y no borra filas (verificado por SQL); si falla desde la UI, el diálogo
       queda abierto con un `Alert` de error.
 - [x] El botón de borrar tiene `aria-label` con el título de la ruta y el diálogo se puede operar con
-      teclado (Tab, Enter, Escape). *(`aria-label` verificado en el código; operación con teclado pendiente en el navegador)*
+      teclado (Tab, Enter, Escape).
 - [x] La página carga todas las rutas con una sola query a `learning_paths` (sin una query por
       tarjeta).
 - [x] `lib/progress/next-step.test.ts` cubre los siete casos del paso 2 del plan.
