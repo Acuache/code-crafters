@@ -57,7 +57,7 @@ obligatorios del enunciado quedan cumplidos sin `OPENAI_API_KEY` ni rol `admin`.
 - Borrar la fila de `assessments` que originó la ruta: se conserva (ver Decisiones).
 - Borrar una ruta desde `/paths/[id]`: sólo desde el dashboard.
 - Totales agregados arriba de la lista (rutas activas, horas hechas en total), XP, nivel, insignias
-  y racha: la barra `components/gamification/xp-bar.tsx` la conecta el spec 13, no este.
+  y racha: la barra `components/gamification/xp-bar.tsx` la conecta el spec 14, no este.
 - Un layout compartido `app/(app)/layout.tsx` con barra superior para dashboard, quiz y paths: la
   cabecera con avatar y "Cerrar sesión" vive sólo en el dashboard.
 - Link al panel `/admin` para usuarios `admin` (spec 10) y el badge del rol que mostraba el
@@ -253,7 +253,7 @@ por el `on delete cascade` del spec 02; la fila de `assessments` no se toca.
   siempre el mismo número.
 - **Sí:** `findNextStep` en `lib/progress/next-step.ts`, archivo nuevo de este spec. **No:** agregarla
   a `path-progress.ts` (archivo del spec 08; regla 5, un archivo pertenece a un solo spec) ni dejarla
-  inline en `page.tsx` (es lógica con casos borde que merece test, y el spec 13 puede querer el mismo
+  inline en `page.tsx` (es lógica con casos borde que merece test, y el spec 14 puede querer el mismo
   "próximo curso").
 - **Sí:** "próximo curso" = primer `in_progress`, y si no hay, primer `pending`. **No:** siempre el
   primer `pending`. Si el usuario ya está cursando algo, eso es lo que sigue, aunque haya un
@@ -263,7 +263,7 @@ por el `on delete cascade` del spec 02; la fila de `assessments` no se toca.
 'discarded'`); acá es un `delete` real con cascade y no hay forma de volver, así que la confirmación
   va antes.
 - **Sí:** al borrar una ruta se conserva su fila de `assessments`. **No:** borrarla también. Es un solo
-  `delete`, no hay que verificar si otra ruta la referencia, y el spec 15 ("Ajustar mi ruta") prellena
+  `delete`, no hay que verificar si otra ruta la referencia, y el spec 16 ("Ajustar mi ruta") prellena
   el cuestionario con respuestas anteriores. El usuario no ve la diferencia.
 - **Sí:** el error del borrado se muestra con un `Alert` dentro del diálogo. **No:** un toast. El
   `Toaster` sólo está montado dentro de la vista de `/paths/[id]` (decisión del spec 08) y moverlo a
@@ -279,7 +279,7 @@ por el `on delete cascade` del spec 02; la fila de `assessments` no se toca.
 - **Sí:** una sola query con `path_steps` embebidos. **No:** una query por ruta. Evita N+1 viajes a
   Supabase con muchas rutas.
 - **Sí:** sin totales agregados arriba de la lista ni la `xp-bar`. **No:** adelantar indicadores de
-  gamificación. XP, nivel y racha son del spec 13; unos totales sin XP serían una pieza que el 13
+  gamificación. XP, nivel y racha son del spec 14; unos totales sin XP serían una pieza que el 14
   tendría que rehacer.
 - **Sí:** se quita el badge del rol que mostraba el placeholder. **No:** conservarlo. Era un
   artefacto de depuración del spec 03; el acceso de un `admin` a su panel lo resuelve el spec 10.
@@ -299,7 +299,7 @@ por el `on delete cascade` del spec 02; la fila de `assessments` no se toca.
 
 - Borrar el `assessment` de una ruta borrada, borrar desde `/paths/[id]`, renombrar, duplicar,
   archivar, filtrar, buscar, paginar u ordenar por actividad.
-- Layout compartido de `(app)`, totales agregados, XP / nivel / racha (13), link a `/admin` (10).
+- Layout compartido de `(app)`, totales agregados, XP / nivel / racha (14), link a `/admin` (10).
 - Cualquier migración o columna nueva, y cualquier cambio a `lib/progress/path-progress.ts`,
   `app/(app)/paths/*`, `components/paths/*`, `components/quiz/*`, `lib/supabase/*` o
   `app/layout.tsx`.

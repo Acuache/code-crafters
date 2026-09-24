@@ -446,7 +446,7 @@ filtro de `.or()`.
   **No:** entrar solo tecleando `/admin`. El jurado evalúa navegando la app desplegada, y el spec 09
   ya dejó este link fuera de su alcance "para el 10".
 - **Sí:** las rutas ya generadas no se recalculan cuando cambia el catálogo. **No:** propagar
-  cambios. Los `path_steps` ya guardados son el plan del usuario; "Ajustar mi ruta" (spec 15)
+  cambios. Los `path_steps` ya guardados son el plan del usuario; "Ajustar mi ruta" (spec 16)
   genera una ruta nueva.
 
 ## Riesgos

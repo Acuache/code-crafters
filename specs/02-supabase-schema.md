@@ -52,9 +52,9 @@ y "Dart Web").
 - Cualquier UI: login (03), cuestionario (06), vista de ruta (08), panel (10).
 - `build-path.ts` y cualquier lógica del motor de reglas (04) — este spec solo deja las tablas.
 - Columnas de gamificación (`xp`, `level`, `streak` en `profiles`; `achievements`,
-  `user_achievements`): las añade el spec 13, en su propia migración, sobre el esquema base que
+  `user_achievements`): las añade el spec 14, en su propia migración, sobre el esquema base que
   deja este spec.
-- `is_public` / `share_slug` en `learning_paths`: los añade el spec 14.
+- `is_public` / `share_slug` en `learning_paths`: los añade el spec 15.
 - Columnas de personalización con IA en `learning_paths`: las añade el spec 11.
 - El botón de descartar un paso desde la UI y el acordeón "Qué quitamos y por qué": los construye
   el spec 08 sobre la columna que este spec deja lista.
@@ -229,14 +229,14 @@ verificado en Context7 de envolver `auth.uid()` en subconsulta e indexar la colu
 | `courses`, `programs`, `program_courses`      | pública (`anon` + `authenticated`)                                                   | solo `(select private.is_admin())`                                      |
 | `assessments`, `learning_paths`, `path_steps` | el propio dueño (`user_id = (select auth.uid())`, o vía `path_id` para `path_steps`) | el propio dueño                                                         |
 
-`profiles` no es de lectura pública: expondría el `role` de todos a `anon`. El spec 14, si necesita
+`profiles` no es de lectura pública: expondría el `role` de todos a `anon`. El spec 15, si necesita
 mostrar el autor de una ruta compartida, amplía esta política en su propia migración.
 
 `profiles` tampoco tiene política de escritura para `authenticated`, ni siquiera "el propio dueño":
 RLS filtra filas, no columnas, así que una política `update using (id = auth.uid())` deja que
 cualquiera se ponga `role = 'admin'` a sí mismo. El trigger `handle_new_user` escribe la fila al
 registrarse; el rol se cambia después desde el panel de Supabase, que corre como `postgres` y
-salta RLS. Cuando el spec 13 necesite que el propio usuario actualice `xp`/`level`/`streak`, debe
+salta RLS. Cuando el spec 14 necesite que el propio usuario actualice `xp`/`level`/`streak`, debe
 hacerlo por una función `security definer` que solo puede tocar esas tres columnas — no abriendo
 una política de `update` sobre toda la fila.
 
@@ -302,7 +302,7 @@ completo de promoción a admin repetido con éxito, y `get_advisors(security)` e
 - [x] Un usuario autenticado no puede cambiar su propio `role` (ni ningún otro campo de su fila en
       `profiles`) con un `update` desde el cliente: no existe política que lo permita.
 - [x] El catálogo (`courses`, `programs`, `program_courses`) se puede leer sin sesión, con la clave
-      pública y rol `anon` — lo que necesitan la landing (spec 05) y la ruta compartida (spec 14).
+      pública y rol `anon` — lo que necesitan la landing (spec 05) y la ruta compartida (spec 15).
 - [x] Cambiar a mano el `role` de un perfil a `admin` desde el SQL Editor de Supabase habilita el
       `insert`/`update` sobre el catálogo para ese usuario.
 - [x] El trigger `handle_new_user` crea la fila de `profiles` al registrarse, con `username` y
@@ -327,9 +327,9 @@ role = 'admin' where id = '...'`) después del primer login. **No:** ni credenci
 - **Sí:** el curso descartado es una fila de `path_steps` con `status = 'discarded'` +
   `discard_reason`. **No:** una columna `excluded_steps jsonb` en `learning_paths` ni una tabla
   aparte `path_discarded_steps`. Es una fila más de la misma tabla: se consulta, se indexa y se
-  deshace con un `update`, sin migración adicional para el spec 08 ni el 15.
+  deshace con un `update`, sin migración adicional para el spec 08 ni el 16.
 - **Sí:** este spec no crea nada de gamificación (`xp`, `level`, `streak`, `achievements`,
-  `user_achievements`). **No:** crearlas ya y dejarlas sin uso hasta el spec 13. La regla 6 del
+  `user_achievements`). **No:** crearlas ya y dejarlas sin uso hasta el spec 14. La regla 6 del
   mapa exige que cada spec de migración pueda recortarse sin dejar tablas muertas; crearlas aquí
   rompe esa garantía si la semana 2 no llega.
 - **Sí:** migraciones versionadas en `supabase/migrations/*.sql`, aplicadas durante `/spec-impl`
@@ -355,7 +355,7 @@ role = 'admin' where id = '...'`) después del primer login. **No:** ni credenci
   propio dueño puede editar su fila". **No:** `update using (id = auth.uid())`, que parece la
   política obvia para "cada uno edita su perfil". RLS filtra filas, no columnas: esa política deja
   que cualquier usuario se ponga `role = 'admin'` a sí mismo. El rol se cambia solo desde el panel
-  de Supabase (que salta RLS); cuando el spec 13 necesite que el usuario actualice su propio
+  de Supabase (que salta RLS); cuando el spec 14 necesite que el usuario actualice su propio
   `xp`/`level`/`streak`, lo hace por una función `security definer` acotada a esas columnas.
 - **Sí:** `profiles` es de lectura solo del propio dueño. **No:** lectura pública, como el
   catálogo. El catálogo no tiene datos personales; `profiles.role` sí revela quién es admin, y
@@ -366,7 +366,7 @@ role = 'admin' where id = '...'`) después del primer login. **No:** ni credenci
   que este spec no previó.
 - **Sí:** lectura pública (`anon` + `authenticated`) del catálogo (`courses`, `programs`,
   `program_courses`). **No:** catálogo visible solo con sesión. La landing del spec 05 y la ruta
-  pública del spec 14 (`/r/[slug]`) necesitan mostrar cursos sin que el visitante haya iniciado
+  pública del spec 15 (`/r/[slug]`) necesitan mostrar cursos sin que el visitante haya iniciado
   sesión.
 - **Sí:** `courses.is_active` para borrado lógico. **No:** `delete` real desde el panel del spec 10. `path_steps.course_id` es `on delete restrict`: un curso que ya está en una ruta guardada de
   algún usuario no puede borrarse sin romper esa ruta.
@@ -388,7 +388,7 @@ role = 'admin' where id = '...'`) después del primer login. **No:** ni credenci
 - El motor de reglas (`lib/paths/build-path.ts`, spec 04): este spec solo deja las tablas que el
   motor va a leer y escribir.
 - Columnas de gamificación, personalización con IA, o de compartir ruta pública: las suman los
-  specs 13, 11 y 14 respectivamente, cada uno en su propia migración.
+  specs 14, 11 y 15 respectivamente, cada uno en su propia migración.
 - Usuarios de email/contraseña o cualquier credencial sembrada para el primer admin.
 
 Cada uno de estos, si aterriza, va en su propio spec.

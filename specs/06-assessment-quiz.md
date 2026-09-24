@@ -21,7 +21,7 @@ página del cuestionario (el mapa sólo le asigna `components/quiz/*`), qué val
 enviar, dado que el 07 —quien genera y redirige— todavía no existe.
 
 Es el primer spec que escribe un formulario en el repo: instala `react-hook-form`, `zod` y
-`@hookform/resolvers`, que el `ROADMAP.md` §stack ya había elegido y que los specs 07, 11 y 15 van a
+`@hookform/resolvers`, que el `ROADMAP.md` §stack ya había elegido y que los specs 07, 11 y 16 van a
 reusar.
 
 **Dependencias, una por motivo distinto:**
@@ -62,7 +62,7 @@ reusar.
   `lib/paths/goals.ts` e `interests.ts`, no el catálogo ni las horas de cada curso.
 - Usar la respuesta de texto libre para algo: se guarda en `answers.freeText` y nadie la lee todavía;
   el spec 11 la consume para producir `programHints`.
-- Prellenar el cuestionario con las respuestas anteriores (spec 15): este formulario siempre arranca
+- Prellenar el cuestionario con las respuestas anteriores (spec 16): este formulario siempre arranca
   vacío e **inserta** una fila nueva, nunca actualiza una existente.
 - Persistir un borrador a medio completar (`localStorage`, autosave, volver donde quedaste): recargar
   la página vacía el formulario (ver Decisiones).
@@ -103,7 +103,7 @@ aceptada, no una abstracción pendiente (`CLAUDE.md` §"Código limpio").
 
 No hay tablas ni migraciones nuevas: la fila va a `assessments` tal como la creó el spec 02
 (`id`, `user_id`, `answers jsonb`, `created_at`). Lo que este spec fija es la **forma del jsonb**,
-porque los specs 07, 11 y 15 la leen.
+porque los specs 07, 11 y 16 la leen.
 
 ```ts
 // components/quiz/quiz-schema.ts
@@ -337,7 +337,7 @@ action desde `requireUser()`, nunca el cliente.
   archivos de 40 líneas.
 - **Sí:** los pasos 3 y 4 repiten el bloque de `ToggleGroup multiple`. **No:** extraer un
   `chip-group.tsx` compartido. Son ~12 líneas repetidas dos veces sobre `Record`s distintos: la regla
-  del proyecto prefiere eso a una abstracción prematura, y si el spec 15 necesita un tercer grupo de
+  del proyecto prefiere eso a una abstracción prematura, y si el spec 16 necesita un tercer grupo de
   chips, ahí habrá señal real para extraerlo.
 - **Sí:** recargar `/quiz` vacía el formulario. **No:** guardar un borrador en `localStorage` ni una
   fila parcial en `assessments`. Son seis pasos de una sentada; el autosave agrega estado que
@@ -345,7 +345,7 @@ action desde `requireUser()`, nunca el cliente.
   reportó todavía.
 - **Sí:** cada envío **inserta** una fila nueva en `assessments`. **No:** actualizar la última fila
   del usuario, ni impedir un segundo cuestionario. El spec 09 exige varias rutas por usuario, y cada
-  ruta nace de su propio assessment; además el historial de respuestas es lo que el spec 15 va a
+  ruta nace de su propio assessment; además el historial de respuestas es lo que el spec 16 va a
   prellenar.
 - **Sí:** `AssessmentAnswers` (siete claves) es un tipo propio de este spec, distinto de
   `LearnerProfile` (seis). **No:** extender `LearnerProfile` con `freeText` en `lib/paths/types.ts`.
@@ -380,7 +380,7 @@ action desde `requireUser()`, nunca el cliente.
 
 | Riesgo                                                                                                                                                               | Mitigación                                                                                                                                                                                                                       |
 | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `assessments.answers` es jsonb sin versión: si un spec futuro cambia las preguntas, las filas viejas quedan con otra forma y el spec 15 las leería mal               | Quien lea una fila vieja la pasa por `assessmentAnswersSchema.safeParse()` y descarta lo que no valide. Es más barato que un campo `version` que igual habría que interpretar, y el schema ya es la fuente de verdad de la forma |
+| `assessments.answers` es jsonb sin versión: si un spec futuro cambia las preguntas, las filas viejas quedan con otra forma y el spec 16 las leería mal               | Quien lea una fila vieja la pasa por `assessmentAnswersSchema.safeParse()` y descarta lo que no valide. Es más barato que un campo `version` que igual habría que interpretar, y el schema ya es la fuente de verdad de la forma |
 | Base UI devuelve `string[]` en `ToggleGroup` incluso en modo simple; un `Controller` mal adaptado guardaría `["empiezo_de_cero"]` en vez de `"empiezo_de_cero"`      | El paso 5 del plan fija la adaptación en ambos sentidos, y el criterio de aceptación sobre `safeParse` de la fila real lo detecta: un array donde el schema espera un enum falla                                                 |
 | `@hookform/resolvers` y `zod` tienen combinaciones de versiones incompatibles (el resolver de zod v3 no sirve para v4, que es justo lo que exige `z.enum(string[])`) | El paso 1 del plan compila un archivo real que importa `zodResolver` y llama `z.enum(Object.keys(...))` antes de escribir ninguna pantalla — un `npm run build` sin ese import no detecta la incompatibilidad (ver Decisiones)   |
 | El spec 09 reescribe `app/dashboard/page.tsx` y borra el botón "Crear mi ruta" sin querer                                                                            | El dashboard real del 09 tiene "crear otra ruta" como requisito propio (`docs/SPECS-MAP.md` §7), así que el botón no se pierde: cambia de dueño                                                                                  |
@@ -390,7 +390,7 @@ action desde `requireUser()`, nunca el cliente.
 
 - Generar la ruta, persistir `learning_paths`/`path_steps` y redirigir a `/paths/[id]` (spec 07).
 - Usar el texto libre para algo (spec 11).
-- Prellenar el cuestionario con respuestas anteriores (spec 15).
+- Prellenar el cuestionario con respuestas anteriores (spec 16).
 - Guardar un borrador a medio completar.
 - El `app/(app)/layout.tsx` y mover el placeholder `app/dashboard/page.tsx` (spec 09).
 - Documentar el `Textarea` nuevo en `/sistema-diseno` (trabajo de entrega, fuera de SDD).
