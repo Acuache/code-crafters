@@ -1,6 +1,6 @@
 # SPEC 12 — Mapa visual de la ruta: un camino en zigzag estilo Duolingo sobre los mismos pasos
 
-> **Estado:** Aprobado
+> **Estado:** Implementado
 > **Depende de:** SPEC 08, SPEC 09
 > **Fecha:** 2026-09-24
 > **Objetivo:** Agregar a `/paths/[id]` una vista "Mapa", la que se ve por defecto, que muestra la
