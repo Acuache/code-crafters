@@ -15,28 +15,11 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { isProgramReachable } from "@/lib/admin/engine-references";
+import { decodeSlugParam } from "@/lib/admin/route-params";
+import { PROGRAM_LEVEL_ORDER } from "@/lib/paths/levels";
+import { formatHours } from "@/lib/progress/path-progress";
 import { requireAdmin } from "@/lib/supabase/guards";
 import { createClient } from "@/lib/supabase/server";
-
-type ProgramCourseLevel = "requerido" | "recomendado" | "opcional";
-
-const LEVEL_RANK: Record<ProgramCourseLevel, number> = {
-  requerido: 0,
-  recomendado: 1,
-  opcional: 2,
-};
-
-function decodeSlugParam(slugParam: string): string {
-  try {
-    return decodeURIComponent(slugParam);
-  } catch {
-    return slugParam;
-  }
-}
-
-function formatHours(hours: number): string {
-  return `${hours.toLocaleString("es-ES")} h`;
-}
 
 export default async function EditProgramPage({ params }: { params: Promise<{ slug: string }> }) {
   await requireAdmin();
@@ -66,7 +49,7 @@ export default async function EditProgramPage({ params }: { params: Promise<{ sl
       return a.stage - b.stage;
     }
     if (a.level !== b.level) {
-      return LEVEL_RANK[a.level] - LEVEL_RANK[b.level];
+      return PROGRAM_LEVEL_ORDER[a.level] - PROGRAM_LEVEL_ORDER[b.level];
     }
     return a.position - b.position;
   });
@@ -127,7 +110,7 @@ export default async function EditProgramPage({ params }: { params: Promise<{ sl
                   <TableRow key={placement.id}>
                     <TableCell className="text-right tabular-nums">{placement.stage}</TableCell>
                     <TableCell>
-                      <LevelBadge nivel={placement.level} />
+                      <LevelBadge level={placement.level} />
                     </TableCell>
                     <TableCell>
                       <Link

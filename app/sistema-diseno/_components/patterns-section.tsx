@@ -14,9 +14,9 @@ function PatternsSection() {
         <CardContent className="flex flex-col gap-2">
           <span className="text-sm text-muted-foreground">LevelBadge</span>
           <div className="flex flex-wrap gap-2">
-            <LevelBadge nivel="requerido" />
-            <LevelBadge nivel="recomendado" />
-            <LevelBadge nivel="opcional" />
+            <LevelBadge level="requerido" />
+            <LevelBadge level="recomendado" />
+            <LevelBadge level="opcional" />
           </div>
         </CardContent>
       </Card>
@@ -29,7 +29,7 @@ function PatternsSection() {
       <Card>
         <CardContent className="flex flex-col gap-2">
           <span className="text-sm text-muted-foreground">XpBar</span>
-          <XpBar nivel={4} xpActual={320} xpSiguienteNivel={500} />
+          <XpBar level={4} currentXp={320} nextLevelXp={500} />
         </CardContent>
       </Card>
     </div>

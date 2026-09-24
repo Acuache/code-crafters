@@ -3,14 +3,13 @@
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
+import type { ActionFailure, ActionResult } from "@/lib/action-result";
 import { requireUser } from "@/lib/supabase/guards";
 import { createClient } from "@/lib/supabase/server";
 
-export type DeletePathResult = { ok: true } | { ok: false; message: string };
-
 const pathIdSchema = z.uuid();
 
-const PATH_NOT_FOUND: DeletePathResult = {
+const PATH_NOT_FOUND: ActionFailure = {
   ok: false,
   message: "No encontramos esa ruta. Recarga la página.",
 };
@@ -18,7 +17,7 @@ const PATH_NOT_FOUND: DeletePathResult = {
 // Endpoint público: RLS (`learning_paths` por dueño) ya descarta las rutas de otro usuario, así que
 // cero filas borradas cubre a la vez "ajena" e "inexistente". Los `path_steps` se van por el
 // `on delete cascade` del spec 02; la fila de `assessments` se conserva a propósito.
-export async function deletePath(pathId: unknown): Promise<DeletePathResult> {
+export async function deletePath(pathId: unknown): Promise<ActionResult> {
   const parsedId = pathIdSchema.safeParse(pathId);
 
   if (!parsedId.success) {

@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation";
 
 import { assessmentAnswersSchema } from "@/components/quiz/quiz-schema";
+import type { ActionFailure } from "@/lib/action-result";
 import { adjustProfileFromFreeText } from "@/lib/ai/personalize-path";
 import { loadCatalog } from "@/lib/catalog/catalog";
 import { buildPath } from "@/lib/paths/build-path";
@@ -10,13 +11,6 @@ import type { BuiltStep, DiscardedStep } from "@/lib/paths/types";
 import type { TablesInsert } from "@/lib/supabase/database.types";
 import { requireUser } from "@/lib/supabase/guards";
 import { createClient } from "@/lib/supabase/server";
-
-// El caso feliz no "devuelve" en el sentido normal: generatePath termina en
-// redirect(`/paths/${id}`), que lanza NEXT_REDIRECT y hace que el cliente navegue en vez de recibir
-// una resolución normal de la promesa (node_modules/next/dist/docs/.../functions/redirect.md). Este
-// tipo sólo documenta la forma del caso de error: quien llama (quiz-form.tsx) nunca comprueba un
-// `ok: true` porque ese camino nunca vuelve a su código.
-export type GeneratePathResult = { ok: false; message: string };
 
 const GENERIC_ERROR_MESSAGE = "No pudimos generar tu ruta. Prueba de nuevo.";
 
@@ -42,7 +36,8 @@ function toStepRow(
 // (filtradas por RLS al dueño) en vez de confiar en un payload ya tipado del cliente — mismo patrón
 // que ya usa saveAssessment (spec 06), y mitiga el riesgo de `assessments.answers` como jsonb sin
 // versión.
-export async function generatePath(assessmentId: string): Promise<GeneratePathResult> {
+// Solo devuelve cuando falla: con éxito termina en redirect(), que corta la action y navega.
+export async function generatePath(assessmentId: string): Promise<ActionFailure> {
   const user = await requireUser();
   const supabase = await createClient();
 

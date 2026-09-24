@@ -2,28 +2,21 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { z } from "zod";
 
+import type { ActionFailure, ActionResult } from "@/lib/action-result";
 import { describePostgresError } from "@/lib/admin/postgres-errors";
 import { programSchema } from "@/lib/admin/program-schema";
+import { databaseIdSchema, firstIssueMessage } from "@/lib/admin/validation";
 import { requireAdmin } from "@/lib/supabase/guards";
 import { createClient } from "@/lib/supabase/server";
-
-import type { AdminActionResult } from "../courses/actions";
-
-const idSchema = z.number().int().positive();
 
 // En la edición el slug no se valida ni se escribe: queda fijo una vez creado.
 const programUpdateSchema = programSchema.omit({ slug: true });
 
-const PROGRAM_NOT_FOUND: AdminActionResult = {
+const PROGRAM_NOT_FOUND: ActionFailure = {
   ok: false,
   message: "No encontramos ese programa. Recarga la página.",
 };
-
-function firstIssueMessage(error: z.ZodError): string {
-  return error.issues[0]?.message ?? "Revisa los datos del formulario.";
-}
 
 function revalidateProgramPages() {
   revalidatePath("/admin/programs", "page");
@@ -33,7 +26,7 @@ function revalidateProgramPages() {
 
 // Sin DELETE a propósito (ver Decisiones del spec 10): path_steps.source_program_id es
 // `on delete set null`, y borrar un programa desarmaría la agrupación de las rutas viejas.
-export async function createProgram(input: unknown): Promise<AdminActionResult> {
+export async function createProgram(input: unknown): Promise<ActionResult> {
   await requireAdmin();
 
   const parsedInput = programSchema.safeParse(input);
@@ -59,13 +52,10 @@ export async function createProgram(input: unknown): Promise<AdminActionResult> 
   redirect(`/admin/programs/${encodeURIComponent(parsedInput.data.slug)}`);
 }
 
-export async function updateProgram(
-  programId: unknown,
-  input: unknown,
-): Promise<AdminActionResult> {
+export async function updateProgram(programId: unknown, input: unknown): Promise<ActionResult> {
   await requireAdmin();
 
-  const parsedId = idSchema.safeParse(programId);
+  const parsedId = databaseIdSchema.safeParse(programId);
   if (!parsedId.success) {
     return PROGRAM_NOT_FOUND;
   }

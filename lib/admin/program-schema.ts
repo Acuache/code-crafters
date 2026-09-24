@@ -3,9 +3,9 @@
 
 import { z } from "zod";
 
-import { SLUG_PATTERN, blankToNull } from "./course-schema";
+import { PROGRAM_LEVELS } from "@/lib/paths/levels";
 
-export const PROGRAM_COURSE_LEVELS = ["requerido", "recomendado", "opcional"] as const;
+import { SLUG_PATTERN, blankToNull } from "./course-schema";
 
 export const programSchema = z.object({
   slug: z
@@ -27,7 +27,7 @@ export const placementSchema = z.object({
     .number({ error: "Indica la etapa." })
     .int({ error: "La etapa es un número entero." })
     .positive({ error: "La etapa empieza en 1." }),
-  level: z.enum(PROGRAM_COURSE_LEVELS, { error: "Elige un nivel." }),
+  level: z.enum(PROGRAM_LEVELS, { error: "Elige un nivel." }),
   note: z.preprocess(blankToNull, z.string().trim().nullable()),
 });
 

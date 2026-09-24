@@ -10,9 +10,9 @@ import {
   addPlacement,
   removePlacement,
   updatePlacement,
-  type AdminActionResult,
 } from "@/app/(admin)/admin/courses/actions";
 import { LevelBadge } from "@/components/brand/level-badge";
+import { ConfirmDialog } from "@/components/confirm-dialog";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import {
@@ -53,14 +53,14 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Textarea } from "@/components/ui/textarea";
+import type { ActionResult } from "@/lib/action-result";
 import {
-  PROGRAM_COURSE_LEVELS,
   placementSchema,
   type PlacementFormValues,
   type PlacementInput,
 } from "@/lib/admin/program-schema";
-
-type ProgramCourseLevel = (typeof PROGRAM_COURSE_LEVELS)[number];
+import { PROGRAM_LEVELS } from "@/lib/paths/levels";
+import type { ProgramLevel } from "@/lib/paths/types";
 
 export type PlacementRow = {
   id: number;
@@ -68,7 +68,7 @@ export type PlacementRow = {
   programSlug: string;
   programName: string;
   stage: number;
-  level: ProgramCourseLevel;
+  level: ProgramLevel;
   note: string | null;
 };
 
@@ -77,7 +77,7 @@ export type ProgramOption = {
   name: string;
 };
 
-const LEVEL_ITEMS = PROGRAM_COURSE_LEVELS.map((level) => ({ value: level, label: level }));
+const LEVEL_ITEMS = PROGRAM_LEVELS.map((level) => ({ value: level, label: level }));
 
 type PlacementDialogProps = {
   programs: ProgramOption[];
@@ -86,7 +86,7 @@ type PlacementDialogProps = {
   description: string;
   submitLabel: string;
   trigger: React.ReactElement;
-  onSave: (values: PlacementInput) => Promise<AdminActionResult>;
+  onSave: (values: PlacementInput) => Promise<ActionResult>;
 };
 
 // El mismo formulario sirve para agregar y para editar una ubicación; cambia la action y el texto.
@@ -267,70 +267,22 @@ function PlacementDialog({
 }
 
 function RemovePlacementButton({ placement }: { placement: PlacementRow }) {
-  const [isOpen, setIsOpen] = useState(false);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [isRemoving, startRemoving] = useTransition();
-
-  function handleOpenChange(nextOpen: boolean) {
-    if (isRemoving) {
-      return;
-    }
-    setErrorMessage(null);
-    setIsOpen(nextOpen);
-  }
-
-  function handleConfirmRemove() {
-    setErrorMessage(null);
-
-    startRemoving(async () => {
-      const result = await removePlacement(placement.id);
-      if (result.ok) {
-        setIsOpen(false);
-        return;
-      }
-      setErrorMessage(result.message);
-    });
-  }
-
   return (
-    <Dialog open={isOpen} onOpenChange={handleOpenChange}>
-      <DialogTrigger
-        render={
-          <Button
-            variant="ghost"
-            size="icon-sm"
-            aria-label={`Quitar del programa ${placement.programName}`}
-          />
-        }
-      >
-        <TrashIcon />
-      </DialogTrigger>
-      <DialogContent showCloseButton={false}>
-        <DialogHeader>
-          <DialogTitle>¿Quitar este curso de {placement.programName}?</DialogTitle>
-          <DialogDescription>
-            Deja de aparecer en las rutas nuevas de ese programa. Las rutas ya generadas no cambian.
-          </DialogDescription>
-        </DialogHeader>
-
-        {errorMessage ? (
-          <Alert variant="destructive">
-            <WarningIcon />
-            <AlertDescription>{errorMessage}</AlertDescription>
-          </Alert>
-        ) : null}
-
-        <DialogFooter>
-          <DialogClose render={<Button variant="outline" disabled={isRemoving} />}>
-            Cancelar
-          </DialogClose>
-          <Button variant="destructive" onClick={handleConfirmRemove} disabled={isRemoving}>
-            {isRemoving ? <Spinner data-icon="inline-start" /> : null}
-            Quitar
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+    <ConfirmDialog
+      trigger={
+        <Button
+          variant="ghost"
+          size="icon-sm"
+          aria-label={`Quitar del programa ${placement.programName}`}
+        >
+          <TrashIcon />
+        </Button>
+      }
+      title={`¿Quitar este curso de ${placement.programName}?`}
+      description="Deja de aparecer en las rutas nuevas de ese programa. Las rutas ya generadas no cambian."
+      confirmLabel="Quitar"
+      onConfirm={() => removePlacement(placement.id)}
+    />
   );
 }
 
@@ -417,7 +369,7 @@ export function CoursePlacements({
                   </TableCell>
                   <TableCell className="text-right tabular-nums">{placement.stage}</TableCell>
                   <TableCell>
-                    <LevelBadge nivel={placement.level} />
+                    <LevelBadge level={placement.level} />
                   </TableCell>
                   <TableCell className="max-w-64 whitespace-normal text-muted-foreground">
                     {placement.note ?? "—"}

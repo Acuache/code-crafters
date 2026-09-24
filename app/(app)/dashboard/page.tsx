@@ -35,8 +35,6 @@ type LoadedPathRow = {
 };
 
 function toDashboardPath(row: LoadedPathRow): DashboardPath {
-  // numeric en Postgres: PostgREST puede devolverlo como string, y sin Number() la suma de horas
-  // concatenaría en vez de sumar (mismo riesgo que en los specs 07 y 08).
   const budgetHours = row.budget_hours === null ? null : Number(row.budget_hours);
 
   const steps = row.path_steps.map((step) => ({
@@ -47,14 +45,15 @@ function toDashboardPath(row: LoadedPathRow): DashboardPath {
     hours: Number(step.courses.hours),
   }));
 
+  const nextStep = findNextStep(steps);
+
   return {
     id: row.id,
-    // Spec 11: el título de la IA si la ruta se personalizó, igual que en /paths/[id], para que la
-    // misma ruta no tenga dos nombres según la pantalla.
+    // El mismo título que muestra /paths/[id]: el de la IA si la ruta se personalizó.
     title: row.ai_title ?? row.title,
     createdAt: row.created_at,
     progress: summarizePathProgress(steps, budgetHours),
-    nextStep: findNextStep(steps),
+    nextStep: nextStep ? { courseTitle: nextStep.courseTitle, status: nextStep.status } : null,
   };
 }
 

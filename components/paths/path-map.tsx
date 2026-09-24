@@ -1,7 +1,6 @@
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 
-import { Eyebrow } from "@/components/brand/eyebrow";
 import { Progress } from "@/components/ui/progress";
 import { FOLLOW_DELAY_MS, TRAVEL_DURATION_MS } from "@/lib/path-map/motion";
 import {
@@ -12,38 +11,31 @@ import {
   trackHeight,
   type NodePosition,
 } from "@/lib/path-map/zigzag-layout";
-import { formatHours, summarizePathProgress } from "@/lib/progress/path-progress";
 import { findNextStep } from "@/lib/progress/next-step";
 
 import { PathMapNode } from "./path-map-node";
-import type { PathStepView, StepGroup } from "./path-steps-view";
+import { summarizeStepsProgress, type PathStepGroup, type PathStepView } from "./path-step";
+import { StepGroupHeading } from "./step-group-heading";
 
 type PathMapProps = {
-  // Los mismos grupos que la lista (groupByProgram de path-steps-view.tsx): el mapa no agrupa
-  // por su cuenta, así las dos vistas nunca cuentan una historia distinta.
-  groups: StepGroup[];
+  // Los mismos grupos que la lista, para que las dos vistas cuenten lo mismo.
+  groups: PathStepGroup[];
   stepNumbers: Map<string, number>;
   totalSteps: number;
   onOpenStep: (stepId: string, trigger: HTMLButtonElement) => void;
 };
 
-// Sin "use client" a propósito, mismo criterio que step-status-toggle.tsx: recibe callbacks y
-// solo se importa desde path-steps-view.tsx, que ya es cliente.
+// Sin "use client" a propósito: recibe callbacks y solo se importa desde path-steps-view.tsx.
 export function PathMap({ groups, stepNumbers, totalSteps, onOpenStep }: PathMapProps) {
   const nodeButtons = useRef(new Map<string, HTMLButtonElement>());
 
-  // El próximo paso es el mismo que el dashboard muestra para esta ruta (spec 09). findNextStep
-  // devuelve el título, no el id: se identifica por título, único dentro de una ruta porque el
-  // motor deduplica cursos (spec 04).
+  // El mismo próximo paso que muestra el dashboard para esta ruta.
   const activeSteps = groups.flatMap((group) => group.steps);
-  const nextStep = findNextStep(activeSteps);
-  const nextStepId =
-    activeSteps.find((step) => step.courseTitle === nextStep?.courseTitle)?.id ?? null;
+  const nextStepId = findNextStep(activeSteps)?.id ?? null;
 
-  // Cuando el próximo paso cambia (marcaste uno como hecho, lo quitaste o lo deshiciste), la
-  // página acompaña a la mascota hasta el nuevo. Se detecta comparando con el render anterior en
-  // vez de con un ref mutado dentro del efecto: en Strict Mode el efecto corre dos veces y el ref
-  // ya actualizado cancelaría el segundo scroll.
+  // Cuando cambia el próximo paso, la página acompaña a la mascota hasta el nuevo. Se compara con
+  // el render anterior y no con un ref mutado en el efecto: en Strict Mode el efecto corre dos
+  // veces y el ref ya actualizado cancelaría el segundo scroll.
   const [followedStepId, setFollowedStepId] = useState(nextStepId);
   const [stepToFollow, setStepToFollow] = useState<string | null>(null);
   if (nextStepId !== followedStepId) {
@@ -125,24 +117,12 @@ export function PathMap({ groups, stepNumbers, totalSteps, onOpenStep }: PathMap
   );
 }
 
-function UnitBanner({ group }: { group: StepGroup }) {
-  const groupProgress = summarizePathProgress(
-    group.steps.map((step) => ({ status: step.status, hours: step.courseHours })),
-    null,
-  );
+function UnitBanner({ group }: { group: PathStepGroup }) {
+  const groupProgress = summarizeStepsProgress(group.steps, null);
 
   return (
     <div className="flex flex-col gap-3 rounded-3xl border brand-gradient-soft p-5 shadow-brand">
-      <div className="flex flex-wrap items-end justify-between gap-2">
-        <div className="flex flex-col gap-1">
-          <Eyebrow>{group.isInterestGroup ? "Extra" : "Programa oficial"}</Eyebrow>
-          <h2 className="font-heading text-xl font-semibold text-balance">{group.title}</h2>
-        </div>
-        <span className="text-sm text-muted-foreground tabular-nums">
-          {groupProgress.doneCount} de {groupProgress.activeCount} hechos ·{" "}
-          {formatHours(groupProgress.activeHours)}
-        </span>
-      </div>
+      <StepGroupHeading group={group} progress={groupProgress} />
       <Progress
         value={groupProgress.percentDone}
         aria-label={`Avance en ${group.title}: ${groupProgress.percentDone} %`}

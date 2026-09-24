@@ -2,7 +2,7 @@
 // se importa desde path-steps-view.tsx, que ya es cliente.
 import { useEffect, useRef, useState } from "react";
 
-import type { AttemptResult, QuizActionResult } from "@/app/(app)/paths/[id]/actions";
+import type { AttemptResult } from "@/app/(app)/paths/[id]/actions";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/dialog";
 import { Progress } from "@/components/ui/progress";
 import { Spinner } from "@/components/ui/spinner";
+import type { ActionResultWithData } from "@/lib/action-result";
 import { browserTimeZone } from "@/lib/gamification/streak";
 import type { QuizKind, SafeQuiz } from "@/lib/quizzes/schema";
 
@@ -27,8 +28,8 @@ export type QuizTarget = {
   chapterTitle: string | null;
 };
 
-type RequestQuizAction = (target: QuizTarget) => Promise<QuizActionResult<SafeQuiz>>;
-type SubmitAttemptAction = (input: unknown) => Promise<QuizActionResult<AttemptResult>>;
+type RequestQuizAction = (target: QuizTarget) => Promise<ActionResultWithData<SafeQuiz>>;
+type SubmitAttemptAction = (input: unknown) => Promise<ActionResultWithData<AttemptResult>>;
 
 type QuizDialogProps = {
   // null = cerrado. El padre le pone una `key` nueva en cada apertura, así el estado arranca
@@ -84,7 +85,7 @@ export function QuizDialog({
     setPhase("error");
   }
 
-  function applyQuizResponse(response: QuizActionResult<SafeQuiz>) {
+  function applyQuizResponse(response: ActionResultWithData<SafeQuiz>) {
     if (!response.ok) {
       showError(response.message);
       return;

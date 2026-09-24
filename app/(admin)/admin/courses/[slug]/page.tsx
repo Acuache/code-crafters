@@ -8,24 +8,10 @@ import {
 } from "@/components/admin/course-placements";
 import { CourseStatusCard } from "@/components/admin/course-status-card";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { decodeSlugParam } from "@/lib/admin/route-params";
+import { PROGRAM_LEVEL_ORDER } from "@/lib/paths/levels";
 import { requireAdmin } from "@/lib/supabase/guards";
 import { createClient } from "@/lib/supabase/server";
-
-const LEVEL_RANK: Record<PlacementRow["level"], number> = {
-  requerido: 0,
-  recomendado: 1,
-  opcional: 2,
-};
-
-// Hay slugs con tildes (p. ej. "Ingeniería-de-prompts"). Decodificar un valor ya decodificado no
-// lo cambia (los slugs no tienen "%"), así que funciona llegue como llegue el parámetro.
-function decodeSlugParam(slugParam: string): string {
-  try {
-    return decodeURIComponent(slugParam);
-  } catch {
-    return slugParam;
-  }
-}
 
 function joinLines(values: string[]): string {
   return values.join("\n");
@@ -91,7 +77,7 @@ export default async function EditCoursePage({ params }: { params: Promise<{ slu
     if (a.stage !== b.stage) {
       return a.stage - b.stage;
     }
-    return LEVEL_RANK[a.level] - LEVEL_RANK[b.level];
+    return PROGRAM_LEVEL_ORDER[a.level] - PROGRAM_LEVEL_ORDER[b.level];
   });
 
   const placements: PlacementRow[] = sortedPlacements.map((placement) => ({

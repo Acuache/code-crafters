@@ -14,15 +14,14 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Progress, ProgressLabel, ProgressValue } from "@/components/ui/progress";
-import type { NextStep } from "@/lib/progress/next-step";
-import { formatHours, type PathProgress } from "@/lib/progress/path-progress";
+import { formatHours, type PathProgress, type PathStepStatus } from "@/lib/progress/path-progress";
 
 export type DashboardPath = {
   id: string;
   title: string;
   createdAt: string;
   progress: PathProgress;
-  nextStep: NextStep | null;
+  nextStep: { courseTitle: string; status: PathStepStatus } | null;
 };
 
 type PathCardProps = {

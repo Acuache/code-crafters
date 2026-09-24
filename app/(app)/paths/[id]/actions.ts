@@ -4,6 +4,7 @@ import { createHash } from "node:crypto";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
+import type { ActionFailure, ActionResult, ActionResultWithData } from "@/lib/action-result";
 import { PERSONALIZATION_MODEL } from "@/lib/ai/personalize-path";
 import { USER_DISCARD_REASON } from "@/lib/progress/path-progress";
 import { quizTargetSchema, validateAttemptInput } from "@/lib/quizzes/action-validation";
@@ -14,15 +15,13 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { requireUser } from "@/lib/supabase/guards";
 import { createClient } from "@/lib/supabase/server";
 
-export type StepActionResult = { ok: true } | { ok: false; message: string };
-
 // `discarded` no es un estado válido acá: se entra a él sólo por discardStep, que exige `pending`.
 const stepIdSchema = z.uuid();
 const selectableStatusSchema = z.enum(["pending", "in_progress", "done"]);
 // Postgres valida la zona y cae a UTC si no existe.
 const timeZoneSchema = z.string().min(1).max(64);
 
-const INVALID_INPUT: StepActionResult = { ok: false, message: "El paso no es válido." };
+const INVALID_INPUT: ActionFailure = { ok: false, message: "El paso no es válido." };
 
 // Las tres actions son endpoints públicos: las reglas de transición viven en los filtros del
 // `update`, no en qué botones muestra la UI. RLS (`path_steps_owner_all`) ya descarta los pasos de
@@ -32,7 +31,7 @@ async function finishStepUpdate(
   updatedRows: { path_id: string }[] | null,
   hasError: boolean,
   rejectionMessage: string,
-): Promise<StepActionResult> {
+): Promise<ActionResult> {
   if (hasError) {
     return { ok: false, message: "No se pudo guardar el cambio. Prueba de nuevo." };
   }
@@ -50,7 +49,7 @@ export async function setStepStatus(
   stepId: unknown,
   status: unknown,
   timeZone: unknown,
-): Promise<StepActionResult> {
+): Promise<ActionResult> {
   const parsedId = stepIdSchema.safeParse(stepId);
   const parsedStatus = selectableStatusSchema.safeParse(status);
   const parsedTimeZone = timeZoneSchema.safeParse(timeZone);
@@ -98,7 +97,7 @@ async function recordStreakDay(
   }
 }
 
-export async function discardStep(stepId: unknown): Promise<StepActionResult> {
+export async function discardStep(stepId: unknown): Promise<ActionResult> {
   const parsedId = stepIdSchema.safeParse(stepId);
 
   if (!parsedId.success) {
@@ -118,7 +117,7 @@ export async function discardStep(stepId: unknown): Promise<StepActionResult> {
   return finishStepUpdate(data, Boolean(error), "Solo puedes quitar pasos pendientes.");
 }
 
-export async function restoreStep(stepId: unknown): Promise<StepActionResult> {
+export async function restoreStep(stepId: unknown): Promise<ActionResult> {
   const parsedId = stepIdSchema.safeParse(stepId);
 
   if (!parsedId.success) {
@@ -141,13 +140,11 @@ export async function restoreStep(stepId: unknown): Promise<StepActionResult> {
   return finishStepUpdate(data, Boolean(error), "Solo puedes restaurar los pasos que quitaste tú.");
 }
 
-export type QuizActionResult<T> = { ok: true; data: T } | { ok: false; message: string };
-
 const QUIZ_UNAVAILABLE = "No pudimos preparar el quiz. Prueba de nuevo en un rato.";
 
 // Pide el quiz compartido del curso o del capítulo, o lo genera si todavía no existe. Nunca lanza:
 // cualquier falla (sin key, OpenAI caído, paso ajeno) vuelve como mensaje.
-export async function requestQuiz(target: unknown): Promise<QuizActionResult<SafeQuiz>> {
+export async function requestQuiz(target: unknown): Promise<ActionResultWithData<SafeQuiz>> {
   const parsedTarget = quizTargetSchema.safeParse(target);
   if (!parsedTarget.success || !isQuizConfigured()) {
     return { ok: false, message: QUIZ_UNAVAILABLE };
@@ -233,7 +230,9 @@ export type AttemptResult = z.infer<typeof attemptResultSchema>;
 
 // Corrige en Postgres, guarda el intento, suma la racha si aprobó y, si es el quiz del curso,
 // marca el paso como hecho. La corrección por pregunta llega recién acá, nunca antes.
-export async function submitQuizAttempt(input: unknown): Promise<QuizActionResult<AttemptResult>> {
+export async function submitQuizAttempt(
+  input: unknown,
+): Promise<ActionResultWithData<AttemptResult>> {
   const parsed = validateAttemptInput(input);
   if (!parsed.success) {
     return { ok: false, message: "Las respuestas no son válidas." };

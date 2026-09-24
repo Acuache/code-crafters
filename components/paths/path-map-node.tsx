@@ -5,7 +5,8 @@ import { ARRIVAL_DELAY_MS } from "@/lib/path-map/motion";
 import { LABEL_WIDTH, NODE_SIZE, type NodePosition } from "@/lib/path-map/zigzag-layout";
 import { cn } from "@/lib/utils";
 
-import type { PathStepView } from "./path-steps-view";
+import type { PathStepView } from "./path-step";
+import { stepNodeClassName } from "./step-node-style";
 
 const STATUS_LABELS: Record<PathStepView["status"], string> = {
   pending: "pendiente",
@@ -20,12 +21,10 @@ const MAX_ENTRANCE_DELAY_MS = 600;
 
 type PathMapNodeProps = {
   step: PathStepView;
-  // Número del paso dentro de toda la ruta (1..N sobre los vigentes), el mismo de la lista.
   stepNumber: number;
   totalSteps: number;
   position: NodePosition;
-  // El próximo paso de la ruta (findNextStep, spec 09): lleva halo y globo. La mascota la dibuja
-  // path-map.tsx, porque viaja de un nodo a otro.
+  // Lleva halo y globo. La mascota la dibuja path-map.tsx, porque viaja de un nodo a otro.
   isNext: boolean;
   // Posición en el orden de aparición del mapa completo, para la entrada escalonada.
   entranceIndex: number;
@@ -33,8 +32,7 @@ type PathMapNodeProps = {
   buttonRef: (element: HTMLButtonElement | null) => void;
 };
 
-// Sin "use client" a propósito, mismo criterio que step-status-toggle.tsx: recibe callbacks y
-// solo se importa desde path-map.tsx, que cuelga de path-steps-view.tsx (cliente).
+// Sin "use client" a propósito: recibe callbacks y solo se importa desde path-map.tsx.
 export function PathMapNode({
   step,
   stepNumber,
@@ -45,9 +43,8 @@ export function PathMapNode({
   onOpen,
   buttonRef,
 }: PathMapNodeProps) {
-  // El "pop" solo corre cuando el paso cambia a hecho durante la sesión, no al cargar un paso que
-  // ya estaba hecho: se compara con el estado del render anterior (patrón de React "guardar
-  // información de renders previos"), no con el del montaje.
+  // El "pop" corre solo si el paso pasa a hecho durante la sesión, no si ya estaba hecho al cargar:
+  // se compara con el estado del render anterior.
   const [previousStatus, setPreviousStatus] = useState(step.status);
   const [shouldPop, setShouldPop] = useState(false);
   if (step.status !== previousStatus) {
@@ -95,9 +92,7 @@ export function PathMapNode({
           onClick={(event) => onOpen(event.currentTarget)}
           className={cn(
             "relative flex size-16 items-center justify-center rounded-full border-2 font-heading text-xl font-bold tabular-nums shadow-md transition-[transform,box-shadow] duration-150 outline-none hover:scale-105 focus-visible:ring-4 focus-visible:ring-ring/60 active:scale-95",
-            isDone && "border-primary-bright bg-primary-bright text-primary-bright-foreground",
-            isInProgress && "border-primary bg-primary text-primary-foreground shadow-brand-glow",
-            !isDone && !isInProgress && "border-border bg-card text-muted-foreground",
+            stepNodeClassName(step.status),
             shouldPop && "motion-safe:animate-step-pop",
           )}
         >

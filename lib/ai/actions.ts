@@ -6,6 +6,7 @@ import { z } from "zod";
 import { assessmentAnswersSchema } from "@/components/quiz/quiz-schema";
 import { GOALS } from "@/lib/paths/goals";
 import { INTERESTS, TECHNOLOGIES } from "@/lib/paths/interests";
+import { isStepOrigin } from "@/lib/paths/levels";
 import type { StepOrigin } from "@/lib/paths/types";
 import { requireUser } from "@/lib/supabase/guards";
 import { createClient } from "@/lib/supabase/server";
@@ -24,12 +25,10 @@ export type PersonalizePathResult =
 
 const pathIdSchema = z.uuid();
 
-const STEP_ORIGINS: readonly StepOrigin[] = ["requerido", "recomendado", "opcional", "interes"];
-
 // `path_steps.origin` es `text` (spec 02). Un valor desconocido no rompe la personalización: el
 // paso se trata como opcional, porque acá solo sirve de contexto para redactar.
 function toStepOrigin(value: string): StepOrigin {
-  return STEP_ORIGINS.find((knownOrigin) => knownOrigin === value) ?? "opcional";
+  return isStepOrigin(value) ? value : "opcional";
 }
 
 // Las respuestas guardadas usan slugs; la IA recibe los nombres que ve el usuario. Si un slug ya

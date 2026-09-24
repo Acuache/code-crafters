@@ -115,9 +115,9 @@ function BadgesDemo() {
       <Badge variant="secondary">secondary</Badge>
       <Badge variant="outline">outline</Badge>
       <Badge variant="destructive">destructive</Badge>
-      <LevelBadge nivel="requerido" />
-      <LevelBadge nivel="recomendado" />
-      <LevelBadge nivel="opcional" />
+      <LevelBadge level="requerido" />
+      <LevelBadge level="recomendado" />
+      <LevelBadge level="opcional" />
       <AiBadge />
     </div>
   );

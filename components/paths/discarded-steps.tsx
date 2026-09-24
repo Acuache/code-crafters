@@ -1,5 +1,4 @@
-import Image from "next/image";
-import { ArrowCounterClockwiseIcon, BookOpenTextIcon, ProhibitIcon } from "@phosphor-icons/react";
+import { ArrowCounterClockwiseIcon, ProhibitIcon } from "@phosphor-icons/react";
 
 import {
   Accordion,
@@ -10,9 +9,11 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { formatHours, isUserDiscarded } from "@/lib/progress/path-progress";
+import { isUserDiscarded } from "@/lib/progress/path-progress";
 
-import type { PathStepView } from "./path-steps-view";
+import { CourseCover } from "./course-cover";
+import type { PathStepView } from "./path-step";
+import { CourseDuration } from "./step-meta";
 
 type DiscardedStepsProps = {
   steps: PathStepView[];
@@ -42,33 +43,21 @@ export function DiscardedSteps({ steps, onRestore }: DiscardedStepsProps) {
                     key={step.id}
                     className="flex flex-wrap items-center gap-3 rounded-xl border border-dashed p-2"
                   >
-                    <div className="relative aspect-[760/420] w-24 shrink-0 overflow-hidden rounded-lg bg-muted">
-                      {step.courseImageUrl ? (
-                        // Decorativa: el título del curso ya está al lado.
-                        <Image
-                          src={step.courseImageUrl}
-                          alt=""
-                          fill
-                          sizes="96px"
-                          className="object-cover opacity-60 grayscale"
-                        />
-                      ) : (
-                        <div className="flex size-full items-center justify-center text-muted-foreground">
-                          <BookOpenTextIcon aria-hidden="true" />
-                        </div>
-                      )}
-                    </div>
+                    <CourseCover
+                      imageUrl={step.courseImageUrl}
+                      alt=""
+                      sizes="96px"
+                      isDimmed
+                      className="w-24 overflow-hidden rounded-lg"
+                    />
                     <div className="flex min-w-0 flex-1 flex-col gap-1">
                       <span className="text-sm font-medium text-pretty">{step.courseTitle}</span>
                       <div className="flex flex-wrap items-center gap-2">
                         <Badge variant="secondary">{step.discardReason}</Badge>
-                        <span className="text-xs text-muted-foreground">
-                          {formatHours(step.courseHours)}
-                        </span>
+                        <CourseDuration hours={step.courseHours} />
                       </div>
                     </div>
-                    {/* Solo lo que quitó el usuario se restaura: devolver un descarte del motor
-                        rompería el presupuesto de horas o contradiría "ya lo dominas". */}
+                    {/* Un descarte del motor no se restaura: rompería el presupuesto de horas. */}
                     {isUserDiscarded(step) ? (
                       <Button variant="outline" size="sm" onClick={() => onRestore(step.id)}>
                         <ArrowCounterClockwiseIcon data-icon="inline-start" />

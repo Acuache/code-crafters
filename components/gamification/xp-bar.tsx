@@ -1,34 +1,24 @@
 import { Progress, ProgressLabel } from "@/components/ui/progress";
 
 type XpBarProps = {
-  nivel: number;
-  xpActual: number;
-  xpSiguienteNivel: number;
+  level: number;
+  currentXp: number;
+  nextLevelXp: number;
 };
 
-/**
- * Barra de progreso de XP para el dashboard (docs/ROADMAP.md: "mis rutas +
- * XP + insignias"). El porcentaje se calcula sobre el umbral del
- * siguiente nivel, no sobre un máximo fijo.
- *
- * XpBar es un Server Component. Progress ya es "use client" (Base UI), pero
- * el valor se muestra con un <span> propio en vez del render-prop de
- * ProgressValue: una función no se puede pasar como children de un Server a
- * un Client Component.
- */
-function XpBar({ nivel, xpActual, xpSiguienteNivel }: XpBarProps) {
-  const progressPercentage = Math.min(100, Math.round((xpActual / xpSiguienteNivel) * 100));
+// El valor va en un <span> propio y no con el render-prop de ProgressValue: una función no se puede
+// pasar como children de un Server Component a uno cliente.
+export function XpBar({ level, currentXp, nextLevelXp }: XpBarProps) {
+  const progressPercentage = Math.min(100, Math.round((currentXp / nextLevelXp) * 100));
 
   return (
     <Progress value={progressPercentage} className="flex-col items-stretch gap-1.5">
       <div className="flex items-center justify-between">
-        <ProgressLabel>Nivel {nivel}</ProgressLabel>
+        <ProgressLabel>Nivel {level}</ProgressLabel>
         <span className="ml-auto text-sm text-muted-foreground tabular-nums">
-          {xpActual} / {xpSiguienteNivel} XP
+          {currentXp} / {nextLevelXp} XP
         </span>
       </div>
     </Progress>
   );
 }
-
-export { XpBar };

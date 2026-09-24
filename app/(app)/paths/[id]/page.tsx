@@ -8,11 +8,8 @@ import { ProfileAdjustmentsNote } from "@/components/ai/profile-adjustments-note
 import { AiBadge } from "@/components/brand/ai-badge";
 import { Eyebrow } from "@/components/brand/eyebrow";
 import { StreakCard } from "@/components/gamification/streak-card";
-import {
-  PathStepsView,
-  type PathStepView,
-  type PathView,
-} from "@/components/paths/path-steps-view";
+import type { PathStepView, PathView } from "@/components/paths/path-step";
+import { PathStepsView } from "@/components/paths/path-steps-view";
 import { Button } from "@/components/ui/button";
 import { assessmentAnswersSchema } from "@/components/quiz/quiz-schema";
 import { remainingPersonalizations } from "@/lib/ai/daily-limit";
@@ -22,6 +19,7 @@ import {
   isAiConfigured,
 } from "@/lib/ai/personalize-path";
 import { computeStreak, todayInTimeZone } from "@/lib/gamification/streak";
+import { isStepOrigin } from "@/lib/paths/levels";
 import type { StepOrigin } from "@/lib/paths/types";
 import { isQuizConfigured } from "@/lib/quizzes/generate";
 import { requireUser } from "@/lib/supabase/guards";
@@ -32,18 +30,14 @@ type PathPageProps = {
   searchParams: Promise<{ vista?: string | string[] }>;
 };
 
-const STEP_ORIGINS: readonly StepOrigin[] = ["requerido", "recomendado", "opcional", "interes"];
-
-// `path_steps.origin` es `text` en Postgres (spec 02), no un enum: el tipo generado es `string`.
-// Solo lo escribe el motor del spec 04 con estos cuatro valores; si aparece otro es un dato roto,
-// y es mejor que falle ruidosamente que mostrar un badge inventado.
+// Solo el motor escribe `origin`: otro valor es un dato roto, y es mejor fallar que mostrar un
+// badge inventado.
 function toStepOrigin(value: string): StepOrigin {
-  const origin = STEP_ORIGINS.find((knownOrigin) => knownOrigin === value);
-  if (!origin) {
+  if (!isStepOrigin(value)) {
     throw new Error(`path_steps.origin desconocido: ${value}`);
   }
 
-  return origin;
+  return value;
 }
 
 type AutoPersonalizeContext = {

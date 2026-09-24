@@ -9,31 +9,25 @@ import {
   courseUpdateSchema,
   type CourseUpdateInput,
 } from "@/lib/admin/course-schema";
+import type { ActionFailure, ActionResult } from "@/lib/action-result";
 import { findEngineReferences, type EngineReference } from "@/lib/admin/engine-references";
 import { GENERIC_SAVE_ERROR, describePostgresError } from "@/lib/admin/postgres-errors";
 import { placementSchema, type PlacementInput } from "@/lib/admin/program-schema";
+import { databaseIdSchema, firstIssueMessage } from "@/lib/admin/validation";
 import { requireAdmin } from "@/lib/supabase/guards";
 import { createClient } from "@/lib/supabase/server";
 
-export type AdminActionResult = { ok: true } | { ok: false; message: string };
-
 type Supabase = Awaited<ReturnType<typeof createClient>>;
 
-const idSchema = z.number().int().positive();
-
-const COURSE_NOT_FOUND: AdminActionResult = {
+const COURSE_NOT_FOUND: ActionFailure = {
   ok: false,
   message: "No encontramos ese curso. Recarga la página.",
 };
 
-const PLACEMENT_NOT_FOUND: AdminActionResult = {
+const PLACEMENT_NOT_FOUND: ActionFailure = {
   ok: false,
   message: "No encontramos esa ubicación. Recarga la página.",
 };
-
-function firstIssueMessage(error: z.ZodError): string {
-  return error.issues[0]?.message ?? "Revisa los datos del formulario.";
-}
 
 // Las páginas del panel usan el slug en la URL, y hay slugs con tildes o mayúsculas: se revalida
 // el patrón de la ruta (todas las páginas de cursos / programas) en vez de armar cada URL literal.
@@ -71,7 +65,7 @@ function toCourseColumns(input: CourseUpdateInput) {
   };
 }
 
-export async function createCourse(input: unknown): Promise<AdminActionResult> {
+export async function createCourse(input: unknown): Promise<ActionResult> {
   await requireAdmin();
 
   const parsedInput = courseSchema.safeParse(input);
@@ -95,10 +89,10 @@ export async function createCourse(input: unknown): Promise<AdminActionResult> {
   redirect(`/admin/courses/${encodeURIComponent(parsedInput.data.slug)}`);
 }
 
-export async function updateCourse(courseId: unknown, input: unknown): Promise<AdminActionResult> {
+export async function updateCourse(courseId: unknown, input: unknown): Promise<ActionResult> {
   await requireAdmin();
 
-  const parsedId = idSchema.safeParse(courseId);
+  const parsedId = databaseIdSchema.safeParse(courseId);
   if (!parsedId.success) {
     return COURSE_NOT_FOUND;
   }
@@ -162,13 +156,10 @@ function describeDeactivationBlockers(
   return `No se puede desactivar. ${blockers.join(" ")}`;
 }
 
-export async function setCourseActive(
-  courseId: unknown,
-  isActive: unknown,
-): Promise<AdminActionResult> {
+export async function setCourseActive(courseId: unknown, isActive: unknown): Promise<ActionResult> {
   await requireAdmin();
 
-  const parsedId = idSchema.safeParse(courseId);
+  const parsedId = databaseIdSchema.safeParse(courseId);
   const parsedIsActive = z.boolean().safeParse(isActive);
   if (!parsedId.success || !parsedIsActive.success) {
     return COURSE_NOT_FOUND;
@@ -236,10 +227,10 @@ async function findNextPosition(
   return (lastPlacement?.position ?? 0) + 1;
 }
 
-export async function addPlacement(courseId: unknown, input: unknown): Promise<AdminActionResult> {
+export async function addPlacement(courseId: unknown, input: unknown): Promise<ActionResult> {
   await requireAdmin();
 
-  const parsedId = idSchema.safeParse(courseId);
+  const parsedId = databaseIdSchema.safeParse(courseId);
   if (!parsedId.success) {
     return COURSE_NOT_FOUND;
   }
@@ -290,13 +281,10 @@ export async function addPlacement(courseId: unknown, input: unknown): Promise<A
   return { ok: true };
 }
 
-export async function updatePlacement(
-  placementId: unknown,
-  input: unknown,
-): Promise<AdminActionResult> {
+export async function updatePlacement(placementId: unknown, input: unknown): Promise<ActionResult> {
   await requireAdmin();
 
-  const parsedId = idSchema.safeParse(placementId);
+  const parsedId = databaseIdSchema.safeParse(placementId);
   if (!parsedId.success) {
     return PLACEMENT_NOT_FOUND;
   }
@@ -362,10 +350,10 @@ export async function updatePlacement(
 
 // Deja un hueco en las posiciones del grupo: groupProgramCourseRows (spec 07) ordena por
 // `position` sin exigir que sean contiguas.
-export async function removePlacement(placementId: unknown): Promise<AdminActionResult> {
+export async function removePlacement(placementId: unknown): Promise<ActionResult> {
   await requireAdmin();
 
-  const parsedId = idSchema.safeParse(placementId);
+  const parsedId = databaseIdSchema.safeParse(placementId);
   if (!parsedId.success) {
     return PLACEMENT_NOT_FOUND;
   }

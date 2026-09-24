@@ -1,32 +1,25 @@
-import Image from "next/image";
-import {
-  ArrowSquareOutIcon,
-  BookOpenTextIcon,
-  CheckIcon,
-  ClockIcon,
-  TrashIcon,
-} from "@phosphor-icons/react";
+import { ArrowSquareOutIcon, CheckIcon, TrashIcon } from "@phosphor-icons/react";
 
-import { LevelBadge } from "@/components/brand/level-badge";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { formatHours } from "@/lib/progress/path-progress";
 import { cn } from "@/lib/utils";
 
-import type { PathStepView } from "./path-steps-view";
+import { CourseCover } from "./course-cover";
+import type { PathStepView } from "./path-step";
+import { CourseDuration, StepOriginBadge } from "./step-meta";
+import { stepNodeClassName } from "./step-node-style";
 import { StepStatusToggle, type SelectableStepStatus } from "./step-status-toggle";
 
 type StepRowProps = {
   step: PathStepView;
-  // Número del paso dentro de toda la ruta (1..N sobre los vigentes), no dentro del grupo.
+  // Número dentro de toda la ruta, no dentro del grupo.
   stepNumber: number;
   onStatusChange: (status: SelectableStepStatus) => void;
   onDiscard: () => void;
 };
 
 export function StepRow({ step, stepNumber, onStatusChange, onDiscard }: StepRowProps) {
-  // Un paso descartado nunca llega acá (vive en el acordeón), pero el tipo lo admite: sin este
-  // guard, el toggle recibiría un estado que no tiene opción para mostrar.
+  // Un descartado nunca llega acá, pero el tipo lo admite y el toggle no tiene opción para él.
   if (step.status === "discarded") {
     return null;
   }
@@ -37,14 +30,11 @@ export function StepRow({ step, stepNumber, onStatusChange, onDiscard }: StepRow
 
   return (
     <li className="group/step flex gap-4">
-      {/* Línea de tiempo: el nodo muestra el número del paso, o un check si ya está hecho. */}
       <div className="flex flex-col items-center">
         <span
           className={cn(
             "flex size-9 shrink-0 items-center justify-center rounded-full border-2 font-heading text-sm font-semibold tabular-nums transition-colors",
-            isDone && "border-primary-bright bg-primary-bright text-primary-bright-foreground",
-            isInProgress && "border-primary bg-primary text-primary-foreground shadow-brand-glow",
-            !isDone && !isInProgress && "border-border bg-card text-muted-foreground",
+            stepNodeClassName(step.status),
           )}
         >
           {isDone ? <CheckIcon weight="bold" aria-label="Hecho" /> : stepNumber}
@@ -64,37 +54,24 @@ export function StepRow({ step, stepNumber, onStatusChange, onDiscard }: StepRow
           isInProgress && "border-primary-bright/60 shadow-brand",
         )}
       >
-        <div className="relative aspect-[760/420] w-full shrink-0 bg-muted sm:w-52">
-          {step.courseImageUrl ? (
-            <Image
-              src={step.courseImageUrl}
-              alt={`Portada del curso ${step.courseTitle}`}
-              fill
-              sizes="(min-width: 640px) 208px, 100vw"
-              className={cn("object-cover transition", isDone && "opacity-50 grayscale")}
-            />
-          ) : (
-            <div className="flex size-full items-center justify-center text-muted-foreground">
-              <BookOpenTextIcon className="size-8" aria-hidden="true" />
-            </div>
-          )}
+        <CourseCover
+          imageUrl={step.courseImageUrl}
+          alt={`Portada del curso ${step.courseTitle}`}
+          sizes="(min-width: 640px) 208px, 100vw"
+          isDimmed={isDone}
+          className="w-full sm:w-52"
+          iconClassName="size-8"
+        >
           {isInProgress ? (
             <Badge className="absolute top-2 left-2 shadow-brand-glow">En curso</Badge>
           ) : null}
-        </div>
+        </CourseCover>
 
         <div className="flex min-w-0 flex-1 flex-col gap-3 p-4">
           <div className="flex flex-col gap-1.5">
             <div className="flex flex-wrap items-center gap-2">
-              {step.origin === "interes" ? (
-                <Badge variant="outline">interés</Badge>
-              ) : (
-                <LevelBadge nivel={step.origin} />
-              )}
-              <span className="flex items-center gap-1 text-xs text-muted-foreground">
-                <ClockIcon aria-hidden="true" />
-                {formatHours(step.courseHours)}
-              </span>
+              <StepOriginBadge origin={step.origin} />
+              <CourseDuration hours={step.courseHours} />
             </div>
             <h3
               className={cn(

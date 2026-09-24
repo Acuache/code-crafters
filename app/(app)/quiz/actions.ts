@@ -1,11 +1,11 @@
 "use server";
 
 import { assessmentAnswersSchema } from "@/components/quiz/quiz-schema";
+import type { ActionFailure } from "@/lib/action-result";
 import { requireUser } from "@/lib/supabase/guards";
 import { createClient } from "@/lib/supabase/server";
 
-export type SaveAssessmentResult =
-  { ok: true; assessmentId: string } | { ok: false; message: string };
+export type SaveAssessmentResult = { ok: true; assessmentId: string } | ActionFailure;
 
 // `answers` entra como `unknown` y se revalida acá con el mismo schema que el cliente, aunque el
 // cliente ya haya validado: esta server action es un endpoint público y el `user_id` lo pone

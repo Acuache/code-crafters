@@ -1,22 +1,12 @@
-import Image from "next/image";
 import type { RefObject } from "react";
-import {
-  ArrowSquareOutIcon,
-  BookOpenTextIcon,
-  ClockIcon,
-  ExamIcon,
-  TrashIcon,
-  XIcon,
-} from "@phosphor-icons/react";
+import { ArrowSquareOutIcon, ExamIcon, TrashIcon, XIcon } from "@phosphor-icons/react";
 
-import { LevelBadge } from "@/components/brand/level-badge";
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -27,21 +17,18 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { formatHours } from "@/lib/progress/path-progress";
-import { cn } from "@/lib/utils";
 
-import type { PathStepView } from "./path-steps-view";
+import { CourseCover } from "./course-cover";
+import type { PathStepView } from "./path-step";
+import { CourseDuration, StepOriginBadge } from "./step-meta";
 import { StepStatusToggle, type SelectableStepStatus } from "./step-status-toggle";
 
 type StepDetailDialogProps = {
-  // Separado de `step`: al cerrar, el paso sigue ahí para que el modal no quede vacío durante la
-  // animación de salida.
+  // Separado de `step`: al cerrar, el paso sigue ahí y el modal no queda vacío mientras se anima.
   open: boolean;
-  // Se lee del estado optimista de path-steps-view.tsx, así un cambio de estado se ve al instante
-  // aquí, en el nodo y en el conector a la vez.
   step: PathStepView | null;
   stepNumber: number;
-  // El nodo que abrió el modal: al cerrarse, el foco vuelve ahí (no hay DialogTrigger).
+  // No hay DialogTrigger: al cerrar, el foco vuelve al nodo que abrió el modal.
   returnFocusRef: RefObject<HTMLElement | null>;
   onClose: () => void;
   onStatusChange: (status: SelectableStepStatus) => void;
@@ -108,7 +95,7 @@ function StepDetail({
   quizzesEnabled,
   onOpenQuiz,
 }: StepDetailProps) {
-  // Mismo guard que step-row.tsx: sin él, el toggle recibiría un estado sin opción para mostrar.
+  // Mismo guard que step-row.tsx: el toggle no tiene opción para un paso descartado.
   if (step.status === "discarded") {
     return null;
   }
@@ -118,22 +105,15 @@ function StepDetail({
 
   return (
     <>
-      <div className="relative aspect-[760/420] w-full shrink-0 bg-muted">
-        {step.courseImageUrl ? (
-          <Image
-            src={step.courseImageUrl}
-            alt={`Portada del curso ${step.courseTitle}`}
-            fill
-            sizes="(min-width: 640px) 512px, 100vw"
-            className={cn("object-cover", isDone && "opacity-50 grayscale")}
-          />
-        ) : (
-          <div className="flex size-full items-center justify-center text-muted-foreground">
-            <BookOpenTextIcon className="size-10" aria-hidden="true" />
-          </div>
-        )}
-        {/* Cerrar propio en vez del de DialogContent: va sobre la portada y necesita fondo sólido
-            para no perderse contra la imagen. */}
+      <CourseCover
+        imageUrl={step.courseImageUrl}
+        alt={`Portada del curso ${step.courseTitle}`}
+        sizes="(min-width: 640px) 512px, 100vw"
+        isDimmed={isDone}
+        className="w-full"
+        iconClassName="size-10"
+      >
+        {/* Cerrar propio: va sobre la portada y necesita fondo sólido para no perderse. */}
         <DialogClose
           render={
             <Button
@@ -146,7 +126,7 @@ function StepDetail({
           <XIcon />
           <span className="sr-only">Cerrar</span>
         </DialogClose>
-      </div>
+      </CourseCover>
 
       <div className="flex flex-col gap-5 p-6">
         <DialogHeader className="gap-3">
@@ -154,15 +134,8 @@ function StepDetail({
             <span className="text-xs font-medium text-muted-foreground tabular-nums">
               Paso {stepNumber}
             </span>
-            {step.origin === "interes" ? (
-              <Badge variant="outline">interés</Badge>
-            ) : (
-              <LevelBadge nivel={step.origin} />
-            )}
-            <span className="flex items-center gap-1 text-xs text-muted-foreground">
-              <ClockIcon aria-hidden="true" />
-              {formatHours(step.courseHours)}
-            </span>
+            <StepOriginBadge origin={step.origin} />
+            <CourseDuration hours={step.courseHours} />
           </div>
           <DialogTitle className="text-xl leading-snug font-semibold text-pretty">
             {step.courseTitle}
@@ -212,8 +185,7 @@ type QuizSectionProps = {
   onOpenQuiz: (chapterTitle: string | null) => void;
 };
 
-// Quizzes generados con IA (aporte de Ariel, ADR 0005). Aprobar el del curso es otra forma de
-// marcarlo "Hecho"; los de capítulo son práctica y no cambian el estado.
+// Aprobar el quiz del curso también lo marca "Hecho"; los de capítulo son práctica.
 function QuizSection({ chapters, isDone, onOpenQuiz }: QuizSectionProps) {
   return (
     <div className="flex flex-col gap-3 rounded-xl bg-muted/50 p-4">
