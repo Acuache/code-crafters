@@ -14,6 +14,35 @@ export type Database = {
   }
   public: {
     Tables: {
+      ai_personalizations: {
+        Row: {
+          created_at: string
+          id: number
+          path_id: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: never
+          path_id?: string | null
+          user_id?: string
+        }
+        Update: {
+          created_at?: string
+          id?: never
+          path_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_personalizations_path_id_fkey"
+            columns: ["path_id"]
+            isOneToOne: false
+            referencedRelation: "learning_paths"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       assessments: {
         Row: {
           answers: Json
@@ -118,31 +147,43 @@ export type Database = {
       }
       learning_paths: {
         Row: {
+          ai_adjustments: Json | null
+          ai_summary: string | null
+          ai_title: string | null
           assessment_id: string | null
           budget_hours: number | null
           created_at: string
           goal: string
           id: string
+          personalized_at: string | null
           summary: string | null
           title: string
           user_id: string
         }
         Insert: {
+          ai_adjustments?: Json | null
+          ai_summary?: string | null
+          ai_title?: string | null
           assessment_id?: string | null
           budget_hours?: number | null
           created_at?: string
           goal: string
           id?: string
+          personalized_at?: string | null
           summary?: string | null
           title: string
           user_id: string
         }
         Update: {
+          ai_adjustments?: Json | null
+          ai_summary?: string | null
+          ai_title?: string | null
           assessment_id?: string | null
           budget_hours?: number | null
           created_at?: string
           goal?: string
           id?: string
+          personalized_at?: string | null
           summary?: string | null
           title?: string
           user_id?: string
@@ -159,6 +200,7 @@ export type Database = {
       }
       path_steps: {
         Row: {
+          ai_reason: string | null
           completed_at: string | null
           course_id: number
           created_at: string
@@ -174,6 +216,7 @@ export type Database = {
           status: Database["public"]["Enums"]["path_step_status"]
         }
         Insert: {
+          ai_reason?: string | null
           completed_at?: string | null
           course_id: number
           created_at?: string
@@ -189,6 +232,7 @@ export type Database = {
           status?: Database["public"]["Enums"]["path_step_status"]
         }
         Update: {
+          ai_reason?: string | null
           completed_at?: string | null
           course_id?: number
           created_at?: string
@@ -328,7 +372,15 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      apply_ai_personalization: {
+        Args: {
+          p_path_id: string
+          p_reasons: Json
+          p_summary: string
+          p_title: string
+        }
+        Returns: undefined
+      }
     }
     Enums: {
       course_difficulty: "principiante" | "intermedio" | "avanzado"
