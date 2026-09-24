@@ -49,6 +49,15 @@
 
 > ⚠️ Conviene confirmar con la organización que Supabase y React Flow cuentan como "tecnología de DevTalles". Supabase es Postgres, que sí tiene curso.
 
+### Incremento implementado: quizzes y racha (2026-09-23)
+
+La ruta guardada ya cuenta con progreso persistente, prácticas de capítulo, evaluaciones de curso y
+racha diaria. Los quizzes usan Vercel AI SDK con OpenRouter (`@openrouter/ai-sdk-provider`), se generan
+una vez por objetivo y se comparten entre usuarios; sus intentos permanecen privados. El umbral de
+aprobación es 60%, la fecha de actividad se deriva en Postgres desde la zona IANA y toda la finalización
+se ejecuta mediante una función transaccional e idempotente. Este incremento no añade XP, niveles ni
+insignias, que permanecen en el alcance del spec 13.
+
 ---
 
 ## Arquitectura

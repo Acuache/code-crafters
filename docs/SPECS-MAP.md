@@ -53,7 +53,7 @@ Decisiones de base para todo el mapa:
 | 10 | `admin-catalog` | Panel `/admin`: CRUD de cursos y de su ubicación en programas, protegido por rol `admin` | 02, 03 | Semana 2 |
 | 11 | `ai-personalization` | Capa 2: título, resumen y razones escritas por IA sobre la ruta ya guardada, con límite diario | 07 | Semana 2 |
 | 12 | `visual-path-map` | Mapa de la ruta con React Flow + dagre y panel de detalle por nodo | 08 | Semana 2 |
-| 13 | `gamification` | XP por curso, niveles, insignias, racha y celebración al completar | 08 | Semana 2 |
+| 13 | `gamification` | XP por curso, niveles e insignias; la racha y celebración de quizzes ya están implementadas | 08 | Semana 2 |
 | 14 | `path-sharing` | Ruta pública en `/r/[slug]` con tarjeta OG para pegar en Discord | 08 | Semana 2 |
 | 15 | `path-recalculation` | Botón "Ajustar mi ruta": cuestionario prellenado con las respuestas anteriores; con IA, un texto libre se traduce a cambios de chips (nunca de cursos) antes de confirmar; sin IA, se editan los chips a mano. Genera una ruta nueva, no pisa la anterior (COULD, primero en recortarse) | 08, 11 | Semana 2 |
 
@@ -381,6 +381,11 @@ XP por curso completado (según las horas del curso), niveles, insignias, racha 
 existe** en el repo — este spec lo conecta a datos reales, no lo crea. Añade columnas a `profiles`
 (xp, level, streak) y tablas de insignias (`achievements`, `user_achievements`) sobre el esquema base
 del 02.
+
+> Implementación adelantada (2026-09-23): la vista persistente de ruta, los quizzes de curso/capítulo,
+> la racha diaria y sus celebraciones ya se entregaron según
+> `docs/superpowers/specs/2026-09-23-quizzes-progress-streak-design.md`. El futuro spec 13 conserva como
+> alcance pendiente únicamente XP, niveles, insignias y cualquier celebración general asociada a ellos.
 
 ### 14 · `path-sharing`
 
