@@ -150,12 +150,15 @@ export function QuizForm() {
           <Button type="button" variant="outline" onClick={handleBack} disabled={currentStep === 0}>
             Atrás
           </Button>
+          {/* Las `key` distintas obligan a React a crear otro <button> en vez de reusar el mismo
+              cambiándole el `type`: sin ellas, el clic en "Siguiente" del paso 5 terminaba sobre
+              un botón que ya era `submit` y enviaba el formulario, salteando el texto libre. */}
           {isLastStep ? (
-            <Button type="submit" disabled={isPending}>
+            <Button key="submit" type="submit" disabled={isPending}>
               {isPending ? "Guardando…" : "Guardar mis respuestas"}
             </Button>
           ) : (
-            <Button type="button" onClick={handleNext}>
+            <Button key="next" type="button" onClick={handleNext}>
               Siguiente
             </Button>
           )}

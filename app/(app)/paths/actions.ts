@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation";
 
 import { assessmentAnswersSchema } from "@/components/quiz/quiz-schema";
+import { adjustProfileFromFreeText } from "@/lib/ai/personalize-path";
 import { loadCatalog } from "@/lib/catalog/catalog";
 import { buildPath } from "@/lib/paths/build-path";
 import type { BuiltStep, DiscardedStep } from "@/lib/paths/types";
@@ -61,10 +62,8 @@ export async function generatePath(assessmentId: string): Promise<GeneratePathRe
   }
 
   // buildPath() (spec 04) no conoce `freeText`; el resto ya calza con LearnerProfile gracias a la
-  // aserción de tipos que deja components/quiz/quiz-schema.ts. El `void` está sólo para que
-  // @typescript-eslint/no-unused-vars no marque el campo descartado del destructuring.
-  const { freeText, ...profile } = parsed.data;
-  void freeText;
+  // aserción de tipos que deja components/quiz/quiz-schema.ts.
+  const { freeText, ...answeredProfile } = parsed.data;
 
   const { catalog, programs, courseIds, programIds } = await loadCatalog(supabase);
 
@@ -74,6 +73,15 @@ export async function generatePath(assessmentId: string): Promise<GeneratePathRe
   if (catalog.length === 0 || programs.length === 0) {
     return { ok: false, message: "El catálogo todavía no está cargado. Avisá al equipo." };
   }
+
+  // Spec 11: con key y texto libre, la IA traduce ese texto a ajustes de meta, intereses y
+  // tecnologías dominadas (nunca cursos), y el motor arma la ruta con eso. Sin key o ante
+  // cualquier falla devuelve las respuestas tal cual. assessments.answers no se toca.
+  const { profile, applied: aiAdjustments } = await adjustProfileFromFreeText(
+    supabase,
+    answeredProfile,
+    freeText,
+  );
 
   const built = buildPath(profile, catalog, programs);
 
@@ -86,6 +94,7 @@ export async function generatePath(assessmentId: string): Promise<GeneratePathRe
       goal: built.goal,
       summary: built.summary,
       budget_hours: built.budgetHours,
+      ai_adjustments: aiAdjustments,
     })
     .select("id")
     .single();

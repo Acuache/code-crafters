@@ -139,7 +139,7 @@ los anteriores (no depende de nada); y 11, 12, 13, 14 entre sí una vez cerrado 
    `app/(app)/dashboard/*`, `components/dashboard/*` y `lib/progress/next-step{,.test}.ts` (archivo
    propio dentro de la carpeta del 08: `findNextStep`, el "próximo curso" de una ruta), el 10 de
    `app/(admin)/*`, `components/admin/*`, `lib/admin/*` y `components/ui/checkbox.tsx` (primitiva de
-   shadcn agregada por el 10), etc. Cada spec declara en su alcance los archivos que toca.
+   shadcn agregada por el 10), el 11 de `lib/ai/*` y `components/ai/*`, etc. Cada spec declara en su alcance los archivos que toca.
    **Excepción explícita a la propiedad temporal (dashboard), ya resuelta:** el spec 09
    (`paths-dashboard`) movió el placeholder `app/dashboard/page.tsx` del spec 03 a
    `app/(app)/dashboard/page.tsx` como primer paso de su plan y después lo reescribió; nunca
@@ -154,6 +154,14 @@ los anteriores (no depende de nada); y 11, 12, 13, 14 entre sí una vez cerrado 
    **Excepción explícita al link del panel:** el spec 10 agrega en `app/(app)/dashboard/page.tsx`
    (del 09) solo el botón "Panel de administración", visible para `role = 'admin'` — el 09 lo dejó
    fuera de su alcance esperando al 10, y el jurado evalúa navegando la app, no tecleando `/admin`.
+   **Excepciones explícitas del spec 11 (IA):** en `app/(app)/paths/actions.ts` (del 07), el ajuste de
+   respuestas con IA justo antes de `buildPath()` y la columna `ai_adjustments` en el insert; en
+   `app/(app)/paths/[id]/page.tsx` (del 08), la lectura de las columnas `ai_*`, el `AiBadge`, el
+   aviso de ajustes y la personalización automática; en `app/(app)/dashboard/page.tsx` (del 09),
+   mostrar `ai_title ?? title`; en `components/quiz/steps/free-text-step.tsx` (del 06), solo el texto
+   de ayuda; y en `components/quiz/quiz-form.tsx` (del 06), una `key` distinta en los botones
+   "Siguiente"/"Guardar" — bug del 06 que salteaba el paso de texto libre, encontrado al implementar
+   el 11.
 6. **Migraciones nuevas solo en 02, 11, 13 y 14**, y esos cuatro no se implementan en paralelo entre sí:
    el orden de los archivos de migración depende del orden de merge, y ramas simultáneas lo rompen. El
    02 crea el esquema base —incluye `profiles.role` y las tablas `programs`/`program_courses`—; 11, 13
@@ -185,7 +193,7 @@ Las que siguen sin marcar en `docs/investigacion/ANALISIS-IA.md` §11 y en las c
 | ~~Cuántas horas como máximo puede añadir el paso de intereses sobre la ruta oficial (hoy nada impide que 12 chips marcados dupliquen la ruta)~~ — **cerrada por el spec 04**: `Math.max(0.25 * budgetHours, budgetHours - officialHours)` en `applyInterests` — nunca menos del 25% del presupuesto, pero tampoco menos que el espacio libre real sobre la ruta oficial ya armada | — |
 | ~~Qué campos de un curso son editables desde el panel (¿también `slug` y `url`, o solo los descriptivos?)~~ — **cerrada por el spec 10**: todos, incluidos `url`, horas y flags; el `slug` se escribe al crear y queda fijo, porque `INTERESTS` y `TECH_TO_SLUGS` (spec 04) lo nombran en el código. "Borrar" un curso es desactivarlo, y se rechaza mientras esté en algún programa o lo use el motor | — |
 | ~~Si el rol `admin` puede crear programas nuevos o solo asignar cursos a los 13 ya existentes~~ — **cerrada por el spec 10**: puede crear programas y editar nombre y posición (no borrarlos), con un aviso visible cuando ninguna meta de `lib/paths/goals.ts` lo nombra: sumarlo al cuestionario sigue siendo un cambio de código | — |
-| Límite diario de personalizaciones por usuario (sugerido: 5) — no bloquea generar rutas nuevas, solo la reescritura con IA de una ya generada | 11 |
+| ~~Límite diario de personalizaciones por usuario (sugerido: 5)~~ — **cerrada por el spec 11**: 5 usos por usuario en una ventana móvil de 24 h, contados en la tabla `ai_personalizations` (un uso por llamada al modelo, salga bien o no). Generar una ruta nunca se bloquea: sin usos, se genera sin ajuste ni redacción de IA | — |
 | ~~Mini-quiz de re-evaluación vs. "Recalcular mi ruta"~~ — **cerrada por el [ADR 0004](decisiones/0004-donde-vive-la-personalizacion.md)**: ninguna de las dos. Es un cuestionario prellenado que la IA puede ajustar por chips a partir de texto libre (nunca cursos); sin IA, los chips se editan a mano. Genera una ruta nueva | — |
 | ~~Cuándo el motor descarta un slug de interés porque coincide con una tecnología que el usuario ya domina (ej. marcó Node como dominado y el interés "Microservicios" sugiere `nestjs-microservicios`)~~ — **cerrada por el spec 04**: `applyInterests` descarta solo el `courseSlug` puntual y prueba el siguiente del mismo interés; si ninguno queda libre, ese interés no aporta nada (no se pierde el interés completo por una coincidencia parcial) | — |
 | ~~Qué se muestra en el paso de intereses cuando el programa solo tiene 1 curso opcional real (7 de 18 combinaciones de stack de la maqueta)~~ — **cerrada por el ADR 0003**: el paso de intereses dejó de depender del stack. Es una lista plana de ~12 intereses transversales al catálogo completo, igual para todos los perfiles; `STACK_INTERESTS` de la maqueta queda reemplazada, no se copia al app (ver `SPECS-MAP.md` §6) | — |
@@ -369,6 +377,14 @@ decorativo. **No crea ninguna migración propia**, usa las tablas y RLS que ya d
 porque exista una dependencia técnica pendiente.
 
 ### 11 · `ai-personalization`
+
+> **Implementado distinto de lo que sigue** — manda `specs/11-ai-personalization.md`. Resumen: la IA
+> escucha el texto libre del cuestionario en dos momentos. Al generar, lo traduce a ajustes de meta,
+> intereses y tecnologías dominadas (listas cerradas, nunca cursos) con los que el motor arma la
+> ruta, y la ruta muestra "Ajustamos tu ruta por lo que contaste". Al abrir la ruta, redacta título,
+> resumen y razones una sola vez, sin botón. Solo corre si el usuario escribió texto libre y hay
+> `OPENAI_API_KEY`; modelo `gpt-6-luna`. El spec 15 reusa `requestProfileAdjustment` para su
+> versión con confirmación.
 
 La Capa 2 del diseño del ADR 0001: sobre una ruta que la Capa 1 (el motor del 04) ya armó y guardó, la
 IA escribe título, resumen y las razones de cada paso. La IA **no agrega ni quita cursos** — los slugs

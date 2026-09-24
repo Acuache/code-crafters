@@ -23,6 +23,7 @@ import { createClient } from "@/lib/supabase/server";
 type LoadedPathRow = {
   id: string;
   title: string;
+  ai_title: string | null;
   created_at: string;
   budget_hours: number | string | null;
   path_steps: {
@@ -48,7 +49,9 @@ function toDashboardPath(row: LoadedPathRow): DashboardPath {
 
   return {
     id: row.id,
-    title: row.title,
+    // Spec 11: el título de la IA si la ruta se personalizó, igual que en /paths/[id], para que la
+    // misma ruta no tenga dos nombres según la pantalla.
+    title: row.ai_title ?? row.title,
     createdAt: row.created_at,
     progress: summarizePathProgress(steps, budgetHours),
     nextStep: findNextStep(steps),
@@ -71,7 +74,7 @@ export default async function DashboardPage() {
   const { data: rows } = await supabase
     .from("learning_paths")
     .select(
-      "id, title, created_at, budget_hours, path_steps(status, stage, position, courses(title, hours))",
+      "id, title, ai_title, created_at, budget_hours, path_steps(status, stage, position, courses(title, hours))",
     )
     .order("created_at", { ascending: false });
 
