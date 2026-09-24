@@ -1,0 +1,14 @@
+# Generados: se reescriben con su propia herramienta.
+components/ui/
+lib/supabase/database.types.ts
+package-lock.json
+
+# Contenido que no es código de la app.
+.agents/
+.claude/
+data/
+docs/
+specs/
+supabase/
+public/
+*.md

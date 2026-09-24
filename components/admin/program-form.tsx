@@ -9,13 +9,7 @@ import { z } from "zod";
 import { createProgram, updateProgram } from "@/app/(admin)/admin/programs/actions";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import {
-  Field,
-  FieldDescription,
-  FieldError,
-  FieldGroup,
-  FieldLabel,
-} from "@/components/ui/field";
+import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
 import {
@@ -67,7 +61,11 @@ export function ProgramForm(props: ProgramFormProps) {
   }
 
   return (
-    <form onSubmit={form.handleSubmit(handleValidSubmit)} noValidate className="flex flex-col gap-6">
+    <form
+      onSubmit={form.handleSubmit(handleValidSubmit)}
+      noValidate
+      className="flex flex-col gap-6"
+    >
       <FieldGroup>
         <Field data-invalid={!!errors.slug} data-disabled={isEditing || undefined}>
           <FieldLabel htmlFor="program-slug">Slug</FieldLabel>

@@ -96,7 +96,11 @@ export function PathCard({ path }: PathCardProps) {
       </CardContent>
 
       <CardFooter>
-        <Button className="w-full" render={<Link href={`/paths/${path.id}`} />} nativeButton={false}>
+        <Button
+          className="w-full"
+          render={<Link href={`/paths/${path.id}`} />}
+          nativeButton={false}
+        >
           {getActionLabel(path)}
           <ArrowRightIcon data-icon="inline-end" />
         </Button>

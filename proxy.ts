@@ -18,14 +18,12 @@ export async function proxy(request: NextRequest) {
         },
         setAll(cookiesToSet, headers) {
           cookiesToSet.forEach(({ name, value, options }) =>
-            response.cookies.set(name, value, options)
+            response.cookies.set(name, value, options),
           );
-          Object.entries(headers).forEach(([key, value]) =>
-            response.headers.set(key, value)
-          );
+          Object.entries(headers).forEach(([key, value]) => response.headers.set(key, value));
         },
       },
-    }
+    },
   );
 
   // Dispara el refresh del token si expiró y valida el JWT contra las claves
@@ -36,7 +34,5 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
-  ],
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)"],
 };

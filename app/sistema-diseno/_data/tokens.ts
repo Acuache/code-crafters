@@ -11,13 +11,13 @@
  */
 
 type ColorToken = {
-  variable: string
-  className: string
-  label: string
-  darkValue: string
-  lightValue: string
-  usage: string
-}
+  variable: string;
+  className: string;
+  label: string;
+  darkValue: string;
+  lightValue: string;
+  usage: string;
+};
 
 const superficies: ColorToken[] = [
   {
@@ -58,7 +58,8 @@ const superficies: ColorToken[] = [
     label: "Elevada",
     darkValue: "oklch(0.2606 0.0724 290.87) · #251c44",
     lightValue: "oklch(1 0 0) · #ffffff",
-    usage: "Menús y popovers que flotan sobre una card. --muted comparte este valor en oscuro, pero en claro es oklch(0.9556 0.0228 291.37) · #f0eeff.",
+    usage:
+      "Menús y popovers que flotan sobre una card. --muted comparte este valor en oscuro, pero en claro es oklch(0.9556 0.0228 291.37) · #f0eeff.",
   },
   {
     variable: "--accent",
@@ -76,7 +77,7 @@ const superficies: ColorToken[] = [
     lightValue: "oklch(0.9300 0.0300 291.37) · #e7e5fb",
     usage: "Botones y controles secundarios.",
   },
-]
+];
 
 const texto: ColorToken[] = [
   {
@@ -93,9 +94,10 @@ const texto: ColorToken[] = [
     label: "Texto secundario",
     darkValue: "oklch(0.6894 0.0775 291.14) · #9b93c8",
     lightValue: "oklch(0.4500 0.0700 291.34) · #564e79",
-    usage: "6.11:1 en card (oscuro) · 7.61:1 en card (claro). Evitar sobre --secondary en oscuro (4.04:1).",
+    usage:
+      "6.11:1 en card (oscuro) · 7.61:1 en card (claro). Evitar sobre --secondary en oscuro (4.04:1).",
   },
-]
+];
 
 const marca: ColorToken[] = [
   {
@@ -104,7 +106,8 @@ const marca: ColorToken[] = [
     label: "Primary",
     darkValue: "oklch(0.4061 0.2370 277.33) · #3a14c4",
     lightValue: "oklch(0.4061 0.2370 277.33) · #3a14c4",
-    usage: "Relleno de botones y CTAs con texto encima (8.85:1). Como superficie sin texto da solo 1.82:1 en oscuro: usar --primary-bright.",
+    usage:
+      "Relleno de botones y CTAs con texto encima (8.85:1). Como superficie sin texto da solo 1.82:1 en oscuro: usar --primary-bright.",
   },
   {
     variable: "--primary-end",
@@ -120,7 +123,7 @@ const marca: ColorToken[] = [
     label: "Primary bright",
     darkValue: "oklch(0.6279 0.1972 283.78) · #7e70f9",
     lightValue: "oklch(0.4061 0.2370 277.33) · #3a14c4",
-    usage: "Enlaces (variant=\"link\") e indicadores sin texto: 4.89:1 en oscuro.",
+    usage: 'Enlaces (variant="link") e indicadores sin texto: 4.89:1 en oscuro.',
   },
   {
     variable: "--ring",
@@ -128,9 +131,10 @@ const marca: ColorToken[] = [
     label: "Ring",
     darkValue: "oklch(0.8151 0.0938 288.92) · #c0b9fc",
     lightValue: "oklch(0.4061 0.2370 277.33) · #3a14c4",
-    usage: "Anillo de foco. El borde sólido de foco (10.16:1 / 9.52:1) es el indicador que cumple contraste, el halo a 50% es un refuerzo visual.",
+    usage:
+      "Anillo de foco. El borde sólido de foco (10.16:1 / 9.52:1) es el indicador que cumple contraste, el halo a 50% es un refuerzo visual.",
   },
-]
+];
 
 const niveles: ColorToken[] = [
   {
@@ -157,7 +161,7 @@ const niveles: ColorToken[] = [
     lightValue: "oklch(0.5550 0.0600 291.00) · #736d94",
     usage: "Curso opcional: puede saltarse. 5.45:1 / 4.55:1.",
   },
-]
+];
 
 const ia: ColorToken[] = [
   {
@@ -168,15 +172,50 @@ const ia: ColorToken[] = [
     lightValue: "oklch(0.5450 0.1500 116.50) · #6c7900",
     usage: "Único uso: marcar contenido que produjo la Capa 2 (IA). 12.11:1 / 4.50:1.",
   },
-]
+];
 
 const charts: ColorToken[] = [
-  { variable: "--chart-1", className: "bg-chart-1", label: "Chart 1", darkValue: "#7e70f9", lightValue: "#3a14c4", usage: "Serie 1." },
-  { variable: "--chart-2", className: "bg-chart-2", label: "Chart 2", darkValue: "#c0b9fc", lightValue: "#7168b5", usage: "Serie 2." },
-  { variable: "--chart-3", className: "bg-chart-3", label: "Chart 3", darkValue: "#c8dd09", lightValue: "#6c7900", usage: "Serie 3." },
-  { variable: "--chart-4", className: "bg-chart-4", label: "Chart 4", darkValue: "#fccd56", lightValue: "#926b00", usage: "Serie 4." },
-  { variable: "--chart-5", className: "bg-chart-5", label: "Chart 5", darkValue: "#f4aea3", lightValue: "#c04d40", usage: "Serie 5." },
-]
+  {
+    variable: "--chart-1",
+    className: "bg-chart-1",
+    label: "Chart 1",
+    darkValue: "#7e70f9",
+    lightValue: "#3a14c4",
+    usage: "Serie 1.",
+  },
+  {
+    variable: "--chart-2",
+    className: "bg-chart-2",
+    label: "Chart 2",
+    darkValue: "#c0b9fc",
+    lightValue: "#7168b5",
+    usage: "Serie 2.",
+  },
+  {
+    variable: "--chart-3",
+    className: "bg-chart-3",
+    label: "Chart 3",
+    darkValue: "#c8dd09",
+    lightValue: "#6c7900",
+    usage: "Serie 3.",
+  },
+  {
+    variable: "--chart-4",
+    className: "bg-chart-4",
+    label: "Chart 4",
+    darkValue: "#fccd56",
+    lightValue: "#926b00",
+    usage: "Serie 4.",
+  },
+  {
+    variable: "--chart-5",
+    className: "bg-chart-5",
+    label: "Chart 5",
+    darkValue: "#f4aea3",
+    lightValue: "#c04d40",
+    usage: "Serie 5.",
+  },
+];
 
 const estado: ColorToken[] = [
   {
@@ -187,32 +226,52 @@ const estado: ColorToken[] = [
     lightValue: "oklch(0.577 0.245 27.325)",
     usage: "Errores y acciones destructivas. Sin tocar: debe distinguirse de la paleta de marca.",
   },
-]
+];
 
-const paletaTokens = { superficies, texto, marca, niveles, ia, charts, estado }
+const paletaTokens = { superficies, texto, marca, niveles, ia, charts, estado };
 
 type TypeToken = {
-  className: string
-  label: string
-  cssValue: string
-  usage: string
-}
+  className: string;
+  label: string;
+  cssValue: string;
+  usage: string;
+};
 
 const escalaTipografica: TypeToken[] = [
-  { className: "text-display", label: "Display", cssValue: "clamp(2.25rem, 1.5rem + 3.2vw, 3.75rem) · 700", usage: "H1 de landing y portadas." },
-  { className: "text-title", label: "Title", cssValue: "clamp(1.75rem, 1.35rem + 1.8vw, 2.5rem)", usage: "H2 de sección." },
+  {
+    className: "text-display",
+    label: "Display",
+    cssValue: "clamp(2.25rem, 1.5rem + 3.2vw, 3.75rem) · 700",
+    usage: "H1 de landing y portadas.",
+  },
+  {
+    className: "text-title",
+    label: "Title",
+    cssValue: "clamp(1.75rem, 1.35rem + 1.8vw, 2.5rem)",
+    usage: "H2 de sección.",
+  },
   { className: "text-2xl", label: "Heading", cssValue: "1.5rem", usage: "H3." },
   { className: "text-lg", label: "Lead", cssValue: "1.125rem", usage: "Párrafo destacado." },
   { className: "text-base", label: "Body", cssValue: "1rem", usage: "Texto de cuerpo." },
-  { className: "text-sm", label: "Small", cssValue: "0.875rem", usage: "Texto secundario, metadatos." },
-  { className: "text-eyebrow", label: "Eyebrow", cssValue: "0.75rem · tracking 0.08em", usage: "Etiqueta uppercase sobre un título." },
-]
+  {
+    className: "text-sm",
+    label: "Small",
+    cssValue: "0.875rem",
+    usage: "Texto secundario, metadatos.",
+  },
+  {
+    className: "text-eyebrow",
+    label: "Eyebrow",
+    cssValue: "0.75rem · tracking 0.08em",
+    usage: "Etiqueta uppercase sobre un título.",
+  },
+];
 
 type ShapeToken = {
-  className: string
-  label: string
-  cssValue: string
-}
+  className: string;
+  label: string;
+  cssValue: string;
+};
 
 const escalaRadios: ShapeToken[] = [
   { className: "rounded-sm", label: "sm", cssValue: "calc(var(--radius) * 0.6) = 8.4px" },
@@ -223,14 +282,22 @@ const escalaRadios: ShapeToken[] = [
   { className: "rounded-3xl", label: "3xl", cssValue: "calc(var(--radius) * 2.2) = 30.8px" },
   { className: "rounded-4xl", label: "4xl", cssValue: "calc(var(--radius) * 2.6) = 36.4px" },
   { className: "rounded-full", label: "full", cssValue: "9999px — pills de CTA" },
-]
+];
 
 const escalaSombras: ShapeToken[] = [
   { className: "shadow-xs", label: "xs", cssValue: "sombra base de shadcn" },
   { className: "shadow-md", label: "md", cssValue: "sombra base de shadcn" },
-  { className: "shadow-brand", label: "brand", cssValue: "sombra violeta difusa (en oscuro suma un halo lavanda de 1px)" },
-  { className: "shadow-brand-glow", label: "brand-glow", cssValue: "glow violeta para CTAs (variant=\"brand\")" },
-]
+  {
+    className: "shadow-brand",
+    label: "brand",
+    cssValue: "sombra violeta difusa (en oscuro suma un halo lavanda de 1px)",
+  },
+  {
+    className: "shadow-brand-glow",
+    label: "brand-glow",
+    cssValue: 'glow violeta para CTAs (variant="brand")',
+  },
+];
 
-export { paletaTokens, escalaTipografica, escalaRadios, escalaSombras }
-export type { ColorToken, TypeToken, ShapeToken }
+export { paletaTokens, escalaTipografica, escalaRadios, escalaSombras };
+export type { ColorToken, TypeToken, ShapeToken };

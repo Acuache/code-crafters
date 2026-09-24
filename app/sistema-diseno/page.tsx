@@ -1,23 +1,24 @@
-import type { Metadata } from "next"
-import Image from "next/image"
+import type { Metadata } from "next";
+import Image from "next/image";
 
-import { Eyebrow } from "@/components/brand/eyebrow"
-import { ThemeToggle } from "@/components/theme-toggle"
-import { Section } from "./_components/section"
-import { PaletteSection } from "./_components/palette-section"
-import { ContrastSection } from "./_components/contrast-section"
-import { TypographySection } from "./_components/typography-section"
-import { ShapeSection } from "./_components/shape-section"
-import { ComponentGallery } from "./_components/component-gallery"
-import { StateGallery } from "./_components/state-gallery"
-import { PatternsSection } from "./_components/patterns-section"
-import { UsageRules } from "./_components/usage-rules"
+import { Eyebrow } from "@/components/brand/eyebrow";
+import { ThemeToggle } from "@/components/theme-toggle";
+import { Section } from "./_components/section";
+import { PaletteSection } from "./_components/palette-section";
+import { ContrastSection } from "./_components/contrast-section";
+import { TypographySection } from "./_components/typography-section";
+import { ShapeSection } from "./_components/shape-section";
+import { ComponentGallery } from "./_components/component-gallery";
+import { StateGallery } from "./_components/state-gallery";
+import { PatternsSection } from "./_components/patterns-section";
+import { UsageRules } from "./_components/usage-rules";
 
 export const metadata: Metadata = {
   title: "Sistema de diseño",
-  description: "Tokens, tipografía y componentes de DevPathlles, inspirados en cursos.devtalles.com.",
+  description:
+    "Tokens, tipografía y componentes de DevPathlles, inspirados en cursos.devtalles.com.",
   robots: { index: false },
-}
+};
 
 export default function SistemaDisenoPage() {
   return (
@@ -26,12 +27,14 @@ export default function SistemaDisenoPage() {
         <div className="absolute top-4 right-4">
           <ThemeToggle />
         </div>
-        <div className="bg-logo-backdrop rounded-2xl px-6 py-4">
+        <div className="rounded-2xl bg-logo-backdrop px-6 py-4">
           <Image src="/logo.webp" alt="" width={240} height={92} />
         </div>
         <Eyebrow>Sistema de diseño</Eyebrow>
-        <h1 className="text-display max-w-2xl text-balance">DevPathlles, con la marca de DevTalles</h1>
-        <p className="text-muted-foreground max-w-xl text-lg">
+        <h1 className="max-w-2xl text-display text-balance">
+          DevPathlles, con la marca de DevTalles
+        </h1>
+        <p className="max-w-xl text-lg text-muted-foreground">
           Paleta, tipografía y componentes tomados del CSS real de{" "}
           <a
             href="https://cursos.devtalles.com/"
@@ -77,10 +80,7 @@ export default function SistemaDisenoPage() {
         <StateGallery />
       </Section>
 
-      <Section
-        eyebrow="Patrones del producto"
-        title="Bloques para quiz, ruta y dashboard"
-      >
+      <Section eyebrow="Patrones del producto" title="Bloques para quiz, ruta y dashboard">
         <PatternsSection />
       </Section>
 
@@ -88,5 +88,5 @@ export default function SistemaDisenoPage() {
         <UsageRules />
       </Section>
     </div>
-  )
+  );
 }

@@ -7,8 +7,7 @@ export async function GET(request: Request) {
   const providerError = searchParams.get("error");
 
   if (!code) {
-    const errorCode =
-      providerError === "access_denied" ? "oauth_denied" : "oauth_callback_failed";
+    const errorCode = providerError === "access_denied" ? "oauth_denied" : "oauth_callback_failed";
     return NextResponse.redirect(`${origin}/login?error=${errorCode}`);
   }
 

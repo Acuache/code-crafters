@@ -71,7 +71,7 @@ export function PathMapNode({
 
   return (
     <li
-      className="absolute flex flex-col items-center motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-4 motion-safe:duration-300 motion-safe:fill-mode-both"
+      className="absolute flex flex-col items-center motion-safe:animate-in motion-safe:duration-300 motion-safe:fill-mode-both motion-safe:fade-in motion-safe:slide-in-from-bottom-4"
       style={placement}
     >
       <div className="relative">
@@ -80,7 +80,7 @@ export function PathMapNode({
           // entrada va en el envoltorio porque animate-ping ya ocupa la animación del hijo.
           <span
             aria-hidden="true"
-            className="absolute -inset-2 motion-safe:animate-in motion-safe:fade-in motion-safe:zoom-in-50 motion-safe:duration-300 motion-safe:fill-mode-both"
+            className="absolute -inset-2 motion-safe:animate-in motion-safe:duration-300 motion-safe:fill-mode-both motion-safe:zoom-in-50 motion-safe:fade-in"
             style={arrivalDelay}
           >
             <span className="absolute inset-0 rounded-full bg-primary-bright/25 motion-safe:animate-ping" />
@@ -110,7 +110,7 @@ export function PathMapNode({
               className="absolute bottom-full left-1/2 mb-3 -translate-x-1/2"
             >
               <span
-                className="relative block rounded-full bg-primary-bright px-3 py-1 font-heading text-xs font-bold tracking-wide whitespace-nowrap text-primary-bright-foreground uppercase shadow-md motion-safe:animate-in motion-safe:fade-in motion-safe:zoom-in-75 motion-safe:slide-in-from-bottom-2 motion-safe:duration-300 motion-safe:fill-mode-both"
+                className="relative block rounded-full bg-primary-bright px-3 py-1 font-heading text-xs font-bold tracking-wide whitespace-nowrap text-primary-bright-foreground uppercase shadow-md motion-safe:animate-in motion-safe:duration-300 motion-safe:fill-mode-both motion-safe:zoom-in-75 motion-safe:fade-in motion-safe:slide-in-from-bottom-2"
                 style={arrivalDelay}
               >
                 {bubbleText}

@@ -36,14 +36,14 @@ const DEADLINE_ITEMS: { value: DeadlineMonths; label: string }[] = [
 ];
 
 export function TimeStep({ control }: { control: Control<AssessmentAnswers> }) {
-  const {
-    field: hoursField,
-    fieldState: hoursFieldState,
-  } = useController({ control, name: "hoursPerWeek" });
-  const {
-    field: deadlineField,
-    fieldState: deadlineFieldState,
-  } = useController({ control, name: "deadlineMonths" });
+  const { field: hoursField, fieldState: hoursFieldState } = useController({
+    control,
+    name: "hoursPerWeek",
+  });
+  const { field: deadlineField, fieldState: deadlineFieldState } = useController({
+    control,
+    name: "deadlineMonths",
+  });
 
   return (
     <FieldSet>

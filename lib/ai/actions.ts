@@ -20,8 +20,7 @@ import {
 import type { Personalization } from "./personalization-schema";
 
 export type PersonalizePathResult =
-  | { ok: true }
-  | { ok: false; reason: "not_configured" | "limit_reached" | "failed" | "not_found" };
+  { ok: true } | { ok: false; reason: "not_configured" | "limit_reached" | "failed" | "not_found" };
 
 const pathIdSchema = z.uuid();
 

@@ -59,7 +59,10 @@ export async function createProgram(input: unknown): Promise<AdminActionResult> 
   redirect(`/admin/programs/${encodeURIComponent(parsedInput.data.slug)}`);
 }
 
-export async function updateProgram(programId: unknown, input: unknown): Promise<AdminActionResult> {
+export async function updateProgram(
+  programId: unknown,
+  input: unknown,
+): Promise<AdminActionResult> {
   await requireAdmin();
 
   const parsedId = idSchema.safeParse(programId);

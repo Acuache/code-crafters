@@ -1,10 +1,10 @@
-import { Progress, ProgressLabel } from "@/components/ui/progress"
+import { Progress, ProgressLabel } from "@/components/ui/progress";
 
 type XpBarProps = {
-  nivel: number
-  xpActual: number
-  xpSiguienteNivel: number
-}
+  nivel: number;
+  xpActual: number;
+  xpSiguienteNivel: number;
+};
 
 /**
  * Barra de progreso de XP para el dashboard (docs/ROADMAP.md: "mis rutas +
@@ -17,18 +17,18 @@ type XpBarProps = {
  * un Client Component.
  */
 function XpBar({ nivel, xpActual, xpSiguienteNivel }: XpBarProps) {
-  const progressPercentage = Math.min(100, Math.round((xpActual / xpSiguienteNivel) * 100))
+  const progressPercentage = Math.min(100, Math.round((xpActual / xpSiguienteNivel) * 100));
 
   return (
     <Progress value={progressPercentage} className="flex-col items-stretch gap-1.5">
       <div className="flex items-center justify-between">
         <ProgressLabel>Nivel {nivel}</ProgressLabel>
-        <span className="text-muted-foreground ml-auto text-sm tabular-nums">
+        <span className="ml-auto text-sm text-muted-foreground tabular-nums">
           {xpActual} / {xpSiguienteNivel} XP
         </span>
       </div>
     </Progress>
-  )
+  );
 }
 
-export { XpBar }
+export { XpBar };

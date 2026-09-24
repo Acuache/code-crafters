@@ -58,9 +58,7 @@ export function DeletePathButton({ pathId, pathTitle }: DeletePathButtonProps) {
   return (
     <Dialog open={isOpen} onOpenChange={handleOpenChange}>
       <DialogTrigger
-        render={
-          <Button variant="ghost" size="icon-sm" aria-label={`Eliminar ruta ${pathTitle}`} />
-        }
+        render={<Button variant="ghost" size="icon-sm" aria-label={`Eliminar ruta ${pathTitle}`} />}
       >
         <TrashIcon />
       </DialogTrigger>

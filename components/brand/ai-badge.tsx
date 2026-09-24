@@ -1,6 +1,6 @@
-import { SparkleIcon } from "@phosphor-icons/react/ssr"
+import { SparkleIcon } from "@phosphor-icons/react/ssr";
 
-import { Badge } from "@/components/ui/badge"
+import { Badge } from "@/components/ui/badge";
 
 /**
  * El lima (--ai) es, en toda la investigación del proyecto
@@ -18,7 +18,7 @@ function AiBadge() {
       <SparkleIcon data-icon="inline-start" />
       Generado con IA
     </Badge>
-  )
+  );
 }
 
-export { AiBadge }
+export { AiBadge };

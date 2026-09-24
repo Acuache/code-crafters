@@ -140,7 +140,11 @@ function PlacementDialog({
     <Dialog open={isOpen} onOpenChange={handleOpenChange}>
       <DialogTrigger render={trigger} />
       <DialogContent>
-        <form onSubmit={form.handleSubmit(handleValidSubmit)} noValidate className="flex flex-col gap-6">
+        <form
+          onSubmit={form.handleSubmit(handleValidSubmit)}
+          noValidate
+          className="flex flex-col gap-6"
+        >
           <DialogHeader>
             <DialogTitle>{title}</DialogTitle>
             <DialogDescription>{description}</DialogDescription>

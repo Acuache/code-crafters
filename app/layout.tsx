@@ -13,8 +13,7 @@ const geistMono = Geist_Mono({ subsets: ["latin"], variable: "--font-mono" });
 
 export const metadata: Metadata = {
   title: "DevPathlles",
-  description:
-    "Generador de rutas de aprendizaje sobre el catálogo de cursos de DevTalles.",
+  description: "Generador de rutas de aprendizaje sobre el catálogo de cursos de DevTalles.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
@@ -22,9 +21,15 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html
       lang="es"
       suppressHydrationWarning
-      className={cn("h-full", "antialiased", dmSans.variable, spaceGrotesk.variable, geistMono.variable)}
+      className={cn(
+        "h-full",
+        "antialiased",
+        dmSans.variable,
+        spaceGrotesk.variable,
+        geistMono.variable,
+      )}
     >
-      <body className="min-h-full flex flex-col">
+      <body className="flex min-h-full flex-col">
         <ThemeProvider attribute="class" defaultTheme="dark">
           <TooltipProvider>{children}</TooltipProvider>
         </ThemeProvider>

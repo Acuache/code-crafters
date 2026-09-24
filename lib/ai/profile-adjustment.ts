@@ -49,7 +49,7 @@ export const appliedAdjustmentSchema = z.object({
   explanation: z.string(),
 });
 
-type ListChanges ={ list: string[]; added: string[]; removed: string[] };
+type ListChanges = { list: string[]; added: string[]; removed: string[] };
 
 // Aplica add/remove sobre una lista de slugs. Un slug pedido en add y en remove a la vez es una
 // contradicción del modelo: se ignora. Sumar lo que ya está o quitar lo que no está no cuenta.
@@ -156,9 +156,12 @@ export function buildProfileAdjustmentPrompt(
       `- Intereses: ${currentInterests.length > 0 ? currentInterests.join(", ") : "ninguno"}`,
       `- Tecnologías que ya domina: ${currentMastered.length > 0 ? currentMastered.join(", ") : "ninguna"}`,
     ].join("\n"),
-    ["Texto libre del estudiante:", FREE_TEXT_OPEN_TAG, sanitizeFreeText(freeText), FREE_TEXT_CLOSE_TAG].join(
-      "\n",
-    ),
+    [
+      "Texto libre del estudiante:",
+      FREE_TEXT_OPEN_TAG,
+      sanitizeFreeText(freeText),
+      FREE_TEXT_CLOSE_TAG,
+    ].join("\n"),
     ["Metas posibles:", formatOptions(Object.entries(GOALS))].join("\n"),
     ["Intereses posibles:", formatOptions(Object.entries(INTERESTS))].join("\n"),
     ["Tecnologías posibles:", formatOptions(Object.entries(TECHNOLOGIES))].join("\n"),

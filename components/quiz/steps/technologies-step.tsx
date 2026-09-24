@@ -3,13 +3,7 @@
 import { type Control, useController } from "react-hook-form";
 
 import type { AssessmentAnswers } from "@/components/quiz/quiz-schema";
-import {
-  Field,
-  FieldDescription,
-  FieldGroup,
-  FieldLegend,
-  FieldSet,
-} from "@/components/ui/field";
+import { Field, FieldDescription, FieldGroup, FieldLegend, FieldSet } from "@/components/ui/field";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { TECHNOLOGIES } from "@/lib/paths/interests";
 

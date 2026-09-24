@@ -173,7 +173,7 @@ export default async function PathPage({ params, searchParams }: PathPageProps) 
         </Button>
       </div>
 
-      <header className="brand-gradient-soft relative flex items-center gap-6 overflow-hidden rounded-3xl border p-6 shadow-brand sm:p-8">
+      <header className="relative flex items-center gap-6 overflow-hidden rounded-3xl border brand-gradient-soft p-6 shadow-brand sm:p-8">
         <div className="flex min-w-0 flex-1 flex-col gap-3">
           <div className="flex flex-wrap items-center gap-2">
             <Eyebrow className="flex items-center gap-2">

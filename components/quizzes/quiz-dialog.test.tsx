@@ -69,7 +69,9 @@ describe("QuizDialog", () => {
 
     expect(screen.getByText("Preparando tu quiz…")).toBeTruthy();
     expect(await screen.findByText("Pregunta 1")).toBeTruthy();
-    expect((screen.getByRole("button", { name: "Siguiente" }) as HTMLButtonElement).disabled).toBe(true);
+    expect((screen.getByRole("button", { name: "Siguiente" }) as HTMLButtonElement).disabled).toBe(
+      true,
+    );
   });
 
   it("no muestra la corrección hasta entregar, y después la muestra por pregunta", async () => {

@@ -132,7 +132,7 @@ function UnitBanner({ group }: { group: StepGroup }) {
   );
 
   return (
-    <div className="brand-gradient-soft flex flex-col gap-3 rounded-3xl border p-5 shadow-brand">
+    <div className="flex flex-col gap-3 rounded-3xl border brand-gradient-soft p-5 shadow-brand">
       <div className="flex flex-wrap items-end justify-between gap-2">
         <div className="flex flex-col gap-1">
           <Eyebrow>{group.isInterestGroup ? "Extra" : "Programa oficial"}</Eyebrow>
@@ -199,7 +199,7 @@ function Mascot({ nodePosition }: { nodePosition: NodePosition }) {
         alt=""
         width={MASCOT_SIZE}
         height={MASCOT_SIZE}
-        className="size-16 max-w-none drop-shadow-lg motion-safe:animate-in motion-safe:fade-in motion-safe:zoom-in-75 motion-safe:duration-300 motion-safe:fill-mode-both"
+        className="size-16 max-w-none drop-shadow-lg motion-safe:animate-in motion-safe:duration-300 motion-safe:fill-mode-both motion-safe:zoom-in-75 motion-safe:fade-in"
         style={{ animationDelay: `${FOLLOW_DELAY_MS}ms` }}
       />
     </div>

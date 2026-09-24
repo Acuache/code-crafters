@@ -64,7 +64,7 @@ const SYSTEM_PROMPT = [
   "Tu texto es lo único que distingue esta ruta de la ruta oficial, así que tiene que notarse hecho para esta persona:",
   "- El título y el resumen retoman su meta y su situación concreta, no una fórmula que serviría para cualquiera.",
   "- Cada razón conecta el curso con algo concreto de esta persona: lo que ya domina, su meta, su tiempo, sus intereses o lo que contó de sí misma. No repitas la misma idea en varias razones.",
-  "- Nada de frases de relleno como \"un paso vital\", \"esencial para tu carrera\" o \"te llevará al siguiente nivel\".",
+  '- Nada de frases de relleno como "un paso vital", "esencial para tu carrera" o "te llevará al siguiente nivel".',
   "Reglas:",
   "- Usa solo los courseSlug de la lista. No menciones cursos que no estén en ella.",
   "- Sobre el contenido de un curso, no digas nada que no esté en su resultado esperado. Si un curso no tiene resultado esperado, habla de su lugar en la ruta, no de lo que enseña.",

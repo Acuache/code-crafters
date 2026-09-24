@@ -33,13 +33,17 @@ describe("computeStreak", () => {
 
   it("la mejor racha es la más larga aunque no sea la actual", () => {
     expect(
-      computeStreak(["2026-09-10", "2026-09-11", "2026-09-12", "2026-09-22", "2026-09-23"], "2026-09-23"),
+      computeStreak(
+        ["2026-09-10", "2026-09-11", "2026-09-12", "2026-09-22", "2026-09-23"],
+        "2026-09-23",
+      ),
     ).toEqual({ current: 2, best: 3, isActiveToday: true });
   });
 
   it("ignora repetidos y el orden de entrada", () => {
-    expect(computeStreak(["2026-09-23", "2026-09-21", "2026-09-22", "2026-09-22"], "2026-09-23"))
-      .toMatchObject({ current: 3, best: 3 });
+    expect(
+      computeStreak(["2026-09-23", "2026-09-21", "2026-09-22", "2026-09-22"], "2026-09-23"),
+    ).toMatchObject({ current: 3, best: 3 });
   });
 
   it("cruza fin de mes y fin de año", () => {

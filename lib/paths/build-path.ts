@@ -37,7 +37,9 @@ function sumHours(steps: { courseSlug: string }[], catalog: CatalogCourse[]): nu
 }
 
 function isMarkedInterest(courseSlug: string, interests: string[]): boolean {
-  return interests.some((interestSlug) => INTERESTS[interestSlug]?.courseSlugs.includes(courseSlug));
+  return interests.some((interestSlug) =>
+    INTERESTS[interestSlug]?.courseSlugs.includes(courseSlug),
+  );
 }
 
 function isMasteredCourse(courseSlug: string, masteredTechnologies: string[]): boolean {

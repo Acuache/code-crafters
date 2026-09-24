@@ -150,7 +150,11 @@ export function CourseForm(props: CourseFormProps) {
   }
 
   return (
-    <form onSubmit={form.handleSubmit(handleValidSubmit)} noValidate className="flex flex-col gap-8">
+    <form
+      onSubmit={form.handleSubmit(handleValidSubmit)}
+      noValidate
+      className="flex flex-col gap-8"
+    >
       <FieldSet>
         <FieldLegend>Datos del curso</FieldLegend>
         <FieldGroup>
@@ -258,7 +262,8 @@ export function CourseForm(props: CourseFormProps) {
               {...form.register("imageUrl")}
             />
             <FieldDescription>
-              Opcional. Solo imágenes de {THINKIFIC_IMAGE_HOST}, el CDN de las portadas de DevTalles.
+              Opcional. Solo imágenes de {THINKIFIC_IMAGE_HOST}, el CDN de las portadas de
+              DevTalles.
             </FieldDescription>
             <FieldError errors={[errors.imageUrl]} />
           </Field>
@@ -307,7 +312,9 @@ export function CourseForm(props: CourseFormProps) {
               aria-invalid={!!errors.price}
               {...form.register("price", { valueAsNumber: true })}
             />
-            <FieldDescription>Vacío si el curso solo se consigue con la suscripción PRO.</FieldDescription>
+            <FieldDescription>
+              Vacío si el curso solo se consigue con la suscripción PRO.
+            </FieldDescription>
             <FieldError errors={[errors.price]} />
           </Field>
         </FieldGroup>

@@ -43,9 +43,7 @@ export function GoalStep({ control }: { control: Control<AssessmentAnswers> }) {
     field.onChange("");
   }
 
-  const goalsInArea = area
-    ? Object.entries(GOALS).filter(([, goal]) => goal.area === area)
-    : [];
+  const goalsInArea = area ? Object.entries(GOALS).filter(([, goal]) => goal.area === area) : [];
   const goalItems = goalsInArea.map(([slug, goal]) => ({ value: slug, label: goal.label }));
 
   return (

@@ -42,7 +42,10 @@ export function StreakCard({ streak, activityDates, today }: StreakCardProps) {
         <div className="flex items-center gap-3">
           <FireIcon
             weight="fill"
-            className={cn("size-9", streak.current > 0 ? "text-primary-bright" : "text-muted-foreground")}
+            className={cn(
+              "size-9",
+              streak.current > 0 ? "text-primary-bright" : "text-muted-foreground",
+            )}
             aria-hidden="true"
           />
           <div className="flex flex-col">

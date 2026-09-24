@@ -41,7 +41,9 @@ const modelQuizSchema = z.object({
       prompt: z.string().describe("La pregunta, en español."),
       options: z.array(z.string()).describe("Exactamente cuatro opciones distintas."),
       correctOption: z.number().int().describe("Índice (0 a 3) de la opción correcta."),
-      explanation: z.string().describe("Por qué esa es la respuesta correcta, en una o dos frases."),
+      explanation: z
+        .string()
+        .describe("Por qué esa es la respuesta correcta, en una o dos frases."),
     }),
   ),
 });
@@ -92,7 +94,8 @@ export async function generateQuiz(
   }
 
   // En un quiz de capítulo el modelo solo ve ese capítulo, para que no pregunte por el resto.
-  const chapters = isChapterQuiz && input.chapterTitle ? [input.chapterTitle] : input.course.chapters;
+  const chapters =
+    isChapterQuiz && input.chapterTitle ? [input.chapterTitle] : input.course.chapters;
   const context = { ...input.course, chapters };
 
   const rawQuiz = await callModel({ questionCount: QUESTION_COUNT[input.kind], context });

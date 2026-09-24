@@ -5,12 +5,7 @@ export type QuizKind = "course" | "chapter";
 const nonBlankText = (maxLength: number) => z.string().trim().min(1).max(maxLength);
 
 const optionsSchema = z
-  .tuple([
-    nonBlankText(240),
-    nonBlankText(240),
-    nonBlankText(240),
-    nonBlankText(240),
-  ])
+  .tuple([nonBlankText(240), nonBlankText(240), nonBlankText(240), nonBlankText(240)])
   .refine((options) => new Set(options).size === options.length, {
     message: "Las cuatro opciones deben ser distintas.",
   });

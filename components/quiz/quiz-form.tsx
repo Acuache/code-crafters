@@ -100,11 +100,7 @@ export function QuizForm() {
             </Alert>
           </CardContent>
           <CardFooter className="justify-between">
-            <Button
-              variant="outline"
-              render={<Link href="/dashboard" />}
-              nativeButton={false}
-            >
+            <Button variant="outline" render={<Link href="/dashboard" />} nativeButton={false}>
               Volver al dashboard
             </Button>
             <Button onClick={handleRetryGeneration} disabled={isPending}>

@@ -1,4 +1,4 @@
-import { Badge } from "@/components/ui/badge"
+import { Badge } from "@/components/ui/badge";
 import {
   Table,
   TableBody,
@@ -6,15 +6,15 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
+} from "@/components/ui/table";
 
 type ContrastRow = {
-  pair: string
-  darkRatio: string
-  lightRatio: string
-  passes: boolean
-  note?: string
-}
+  pair: string;
+  darkRatio: string;
+  lightRatio: string;
+  passes: boolean;
+  note?: string;
+};
 
 /**
  * Ratios medidos con una conversión OKLCH → sRGB propia, no estimados.
@@ -46,10 +46,15 @@ const CONTRAST_ROWS: ContrastRow[] = [
     note: "El borde sólido focus-visible:border-ring (10.16:1 / 9.52:1) es el que garantiza el foco visible.",
   },
   { pair: "level-required / background", darkRatio: "10.03:1", lightRatio: "4.52:1", passes: true },
-  { pair: "level-recommended / background", darkRatio: "12.29:1", lightRatio: "4.59:1", passes: true },
+  {
+    pair: "level-recommended / background",
+    darkRatio: "12.29:1",
+    lightRatio: "4.59:1",
+    passes: true,
+  },
   { pair: "level-optional / background", darkRatio: "5.45:1", lightRatio: "4.55:1", passes: true },
   { pair: "ai / background", darkRatio: "12.11:1", lightRatio: "4.50:1", passes: true },
-]
+];
 
 function ContrastSection() {
   return (
@@ -68,7 +73,7 @@ function ContrastSection() {
             <TableCell>
               <div className="flex flex-col gap-1">
                 <code className="text-sm">{row.pair}</code>
-                {row.note ? <p className="text-muted-foreground text-xs">{row.note}</p> : null}
+                {row.note ? <p className="text-xs text-muted-foreground">{row.note}</p> : null}
               </div>
             </TableCell>
             <TableCell className="font-mono">{row.darkRatio}</TableCell>
@@ -82,7 +87,7 @@ function ContrastSection() {
         ))}
       </TableBody>
     </Table>
-  )
+  );
 }
 
-export { ContrastSection }
+export { ContrastSection };

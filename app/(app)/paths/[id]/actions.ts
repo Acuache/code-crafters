@@ -175,7 +175,11 @@ export async function requestQuiz(target: unknown): Promise<QuizActionResult<Saf
     const quizChapter = kind === "chapter" ? chapterTitle : null;
 
     const record = await getOrCreateQuiz(
-      { targetKey: buildTargetKey(course.id, quizChapter), title: quizChapter ?? course.title, kind },
+      {
+        targetKey: buildTargetKey(course.id, quizChapter),
+        title: quizChapter ?? course.title,
+        kind,
+      },
       {
         store: createSupabaseQuizStore(createAdminClient(), {
           courseId: course.id,

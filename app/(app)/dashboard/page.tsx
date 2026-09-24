@@ -83,14 +83,14 @@ export default async function DashboardPage() {
 
   return (
     <div className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-8 px-4 py-10 sm:px-6">
-      <header className="brand-gradient-soft flex flex-wrap items-center gap-4 rounded-3xl border p-6 shadow-brand sm:p-8">
+      <header className="flex flex-wrap items-center gap-4 rounded-3xl border brand-gradient-soft p-6 shadow-brand sm:p-8">
         <Avatar size="lg">
           {user.avatarUrl ? <AvatarImage src={user.avatarUrl} alt="" /> : null}
           <AvatarFallback>{initials}</AvatarFallback>
         </Avatar>
         <div className="flex min-w-0 flex-1 flex-col gap-1">
           <Eyebrow>Tu panel</Eyebrow>
-          <h1 className="text-title truncate">Hola, {displayName}</h1>
+          <h1 className="truncate text-title">Hola, {displayName}</h1>
         </div>
         {/* Excepción a la regla 5 del mapa: el spec 10 agrega solo este link para el admin. */}
         {user.role === "admin" ? (

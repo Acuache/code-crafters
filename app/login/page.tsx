@@ -2,13 +2,7 @@ import Image from "next/image";
 import { redirect } from "next/navigation";
 
 import { Eyebrow } from "@/components/brand/eyebrow";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { createClient } from "@/lib/supabase/server";
 import { signInWithProvider, type OAuthProvider } from "@/lib/supabase/actions";
@@ -53,7 +47,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
   return (
     <div className="flex flex-1 flex-col items-center justify-center gap-8 px-6 py-24">
       <div className="flex flex-col items-center gap-4 text-center">
-        <div className="bg-logo-backdrop rounded-2xl px-6 py-4">
+        <div className="rounded-2xl bg-logo-backdrop px-6 py-4">
           <Image src="/logo.webp" alt="DevPathlles" width={240} height={92} priority />
         </div>
         <Eyebrow>Iniciar sesión</Eyebrow>

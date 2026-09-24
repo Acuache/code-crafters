@@ -172,7 +172,9 @@ export function QuizDialog({
   const currentQuestion = quiz?.questions[questionIndex];
   const isLastQuestion = quiz !== null && questionIndex === quiz.questions.length - 1;
   const hasCurrentAnswer = answers[questionIndex] !== undefined;
-  const progressPercent = quiz ? Math.round(((questionIndex + 1) / quiz.questions.length) * 100) : 0;
+  const progressPercent = quiz
+    ? Math.round(((questionIndex + 1) / quiz.questions.length) * 100)
+    : 0;
 
   return (
     <Dialog open={target !== null} onOpenChange={handleOpenChange}>
@@ -219,7 +221,10 @@ export function QuizDialog({
                   Entregar
                 </Button>
               ) : (
-                <Button disabled={!hasCurrentAnswer} onClick={() => setQuestionIndex(questionIndex + 1)}>
+                <Button
+                  disabled={!hasCurrentAnswer}
+                  onClick={() => setQuestionIndex(questionIndex + 1)}
+                >
                   Siguiente
                 </Button>
               )}

@@ -43,7 +43,9 @@ function toProgramInput(slug: string, route: RawRoute): ProgramInput {
   return { slug, steps };
 }
 
-const rawPrograms = JSON.parse(fs.readFileSync(path.join(DATA_DIR, "programs.json"), "utf8")) as RawProgram[];
+const rawPrograms = JSON.parse(
+  fs.readFileSync(path.join(DATA_DIR, "programs.json"), "utf8"),
+) as RawProgram[];
 
 const programs: ProgramInput[] = [];
 for (const program of rawPrograms) {
@@ -102,7 +104,13 @@ describe("buildPath", () => {
     const merged = mergeOfficialSteps(resolvedPrograms, profile);
     const { steps: afterMastery } = dropMasteredTechnologies(merged, profile);
     const officialHours = totalHoursOf(afterMastery.map((step) => step.courseSlug));
-    const { steps: beforeTrim } = applyInterests(afterMastery, profile, budgetHours, officialHours, catalog);
+    const { steps: beforeTrim } = applyInterests(
+      afterMastery,
+      profile,
+      budgetHours,
+      officialHours,
+      catalog,
+    );
     const totalBeforeTrim = totalHoursOf(beforeTrim.map((step) => step.courseSlug));
 
     expect(totalBeforeTrim).toBe(276);
@@ -134,7 +142,9 @@ describe("buildPath", () => {
 
     expect(totalHoursOf(officialSteps.map((step) => step.courseSlug))).toBe(23.5);
     expect(totalHoursOf(interestSteps.map((step) => step.courseSlug))).toBe(42.5);
-    expect(result.discarded.filter((step) => step.discardReason === "superaba el cupo de intereses")).toHaveLength(0);
+    expect(
+      result.discarded.filter((step) => step.discardReason === "superaba el cupo de intereses"),
+    ).toHaveLength(0);
     expect(result.fitsInBudget).toBe(true);
   });
 
@@ -150,13 +160,21 @@ describe("buildPath", () => {
 
     const result = buildPath(profile, catalog, programs);
 
-    const discardedReactDeCero = result.discarded.find((step) => step.courseSlug === "react-de-cero");
+    const discardedReactDeCero = result.discarded.find(
+      (step) => step.courseSlug === "react-de-cero",
+    );
     expect(discardedReactDeCero?.discardReason).toBe("ya lo dominás");
     expect(discardedReactDeCero?.origin).toBe("requerido");
 
     const remainingCourseSlugs = result.steps.map((step) => step.courseSlug).sort();
     expect(remainingCourseSlugs).toEqual(
-      ["javascript-moderno", "nextjs", "react-pro", "sql-con-postgres", "typescript-guia-completa"].sort(),
+      [
+        "javascript-moderno",
+        "nextjs",
+        "react-pro",
+        "sql-con-postgres",
+        "typescript-guia-completa",
+      ].sort(),
     );
   });
 
