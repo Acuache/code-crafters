@@ -1,6 +1,7 @@
 "use client";
 
-import { startTransition, useOptimistic } from "react";
+import { startTransition, useOptimistic, useRef, useState } from "react";
+import { ListBulletsIcon, MapTrifoldIcon } from "@phosphor-icons/react";
 
 import {
   discardStep,
@@ -9,6 +10,7 @@ import {
   type StepActionResult,
 } from "@/app/(app)/paths/[id]/actions";
 import { Eyebrow } from "@/components/brand/eyebrow";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast, Toaster } from "@/components/ui/toast";
 import type { StepOrigin } from "@/lib/paths/types";
 import {
@@ -20,6 +22,8 @@ import {
 
 import { BudgetCard } from "./budget-card";
 import { DiscardedSteps } from "./discarded-steps";
+import { PathMap } from "./path-map";
+import { StepDetailDialog } from "./step-detail-dialog";
 import { StepRow } from "./step-row";
 import type { SelectableStepStatus } from "./step-status-toggle";
 
@@ -57,16 +61,23 @@ function applyChange(steps: PathStepView[], change: OptimisticChange): PathStepV
     }
 
     if (change.type === "discard") {
-      return { ...step, status: "discarded", discardReason: USER_DISCARD_REASON };
+      return {
+        ...step,
+        status: "discarded",
+        discardReason: USER_DISCARD_REASON,
+      };
     }
 
     return { ...step, status: "pending", discardReason: null };
   });
 }
 
-type StepGroup = {
+export type StepGroup = {
   key: string;
   title: string;
+  // El mapa (spec 12) lo lee en vez de importar INTERESTS_GROUP_KEY: así path-map.tsx solo importa
+  // tipos de este archivo y no hay un ciclo de módulos entre los dos.
+  isInterestGroup: boolean;
   steps: PathStepView[];
 };
 
@@ -80,6 +91,7 @@ function groupByProgram(activeSteps: PathStepView[]): StepGroup[] {
   const interestGroup: StepGroup = {
     key: INTERESTS_GROUP_KEY,
     title: "Por tus intereses",
+    isInterestGroup: true,
     steps: [],
   };
 
@@ -92,7 +104,12 @@ function groupByProgram(activeSteps: PathStepView[]): StepGroup[] {
     const groupKey = step.programSlug ?? "sin-programa";
     let group = programGroups.get(groupKey);
     if (!group) {
-      group = { key: groupKey, title: step.programName ?? "Otros cursos", steps: [] };
+      group = {
+        key: groupKey,
+        title: step.programName ?? "Otros cursos",
+        isInterestGroup: false,
+        steps: [],
+      };
       programGroups.set(groupKey, group);
     }
     group.steps.push(step);
@@ -106,12 +123,35 @@ function groupByProgram(activeSteps: PathStepView[]): StepGroup[] {
   return groups;
 }
 
+// Spec 12: la ruta se ve como mapa (por defecto) o como la lista del spec 08.
+export type PathView = "mapa" | "lista";
+
+function isPathView(value: unknown): value is PathView {
+  return value === "mapa" || value === "lista";
+}
+
+// La vista vive en la URL para que recargar o compartir el link la conserve. replaceState en vez
+// de router.replace: la página es dinámica y router.replace volvería a pedir el Server Component
+// (queries de la ruta y chequeo de IA) solo para cambiar de pestaña. Next.js sincroniza
+// replaceState con su router de forma nativa.
+function writeViewToUrl(view: PathView) {
+  const url = new URL(window.location.href);
+  if (view === "lista") {
+    url.searchParams.set("vista", "lista");
+  } else {
+    url.searchParams.delete("vista");
+  }
+
+  window.history.replaceState(null, "", url);
+}
+
 type PathStepsViewProps = {
   steps: PathStepView[];
   budgetHours: number | null;
+  initialView: PathView;
 };
 
-export function PathStepsView({ steps, budgetHours }: PathStepsViewProps) {
+export function PathStepsView({ steps, budgetHours, initialView }: PathStepsViewProps) {
   // Si una action falla, el servidor no cambió nada: al terminar la transición el valor optimista
   // deja de aplicarse y la vista vuelve sola a lo que dicen las props, sin rollback manual.
   const [optimisticSteps, applyOptimisticChange] = useOptimistic(steps, applyChange);
@@ -122,7 +162,10 @@ export function PathStepsView({ steps, budgetHours }: PathStepsViewProps) {
   // así el número siempre coincide con "paso N de M" de la tarjeta de progreso.
   const stepNumbers = new Map(activeSteps.map((step, index) => [step.id, index + 1]));
   const progress = summarizePathProgress(
-    optimisticSteps.map((step) => ({ status: step.status, hours: step.courseHours })),
+    optimisticSteps.map((step) => ({
+      status: step.status,
+      hours: step.courseHours,
+    })),
     budgetHours,
   );
 
@@ -142,6 +185,45 @@ export function PathStepsView({ steps, budgetHours }: PathStepsViewProps) {
 
       onSuccess?.();
     });
+  }
+
+  const [view, setView] = useState<PathView>(initialView);
+  // El paso del modal de detalle del mapa. Se guarda el id, no el paso: el modal lee el paso de
+  // optimisticSteps y así refleja cada cambio de estado al instante.
+  const [selectedStepId, setSelectedStepId] = useState<string | null>(null);
+  const [isDetailOpen, setIsDetailOpen] = useState(false);
+  // El nodo que abrió el modal, para devolverle el foco al cerrarlo.
+  const detailTriggerRef = useRef<HTMLElement | null>(null);
+  const selectedStep = optimisticSteps.find((step) => step.id === selectedStepId) ?? null;
+
+  function handleViewChange(value: unknown) {
+    if (!isPathView(value)) {
+      return;
+    }
+
+    setView(value);
+    writeViewToUrl(value);
+  }
+
+  function openStepDetail(stepId: string, trigger: HTMLButtonElement) {
+    detailTriggerRef.current = trigger;
+    setSelectedStepId(stepId);
+    setIsDetailOpen(true);
+  }
+
+  function discardFromDetail(step: PathStepView) {
+    setIsDetailOpen(false);
+    handleDiscard(step);
+  }
+
+  // Marcar "Hecho" cierra el modal: el paso ya no necesita nada más, y así se ve el pop del nodo y
+  // cómo se rellena su tramo del camino. "Pendiente" y "En curso" lo dejan abierto.
+  function changeStatusFromDetail(stepId: string, status: SelectableStepStatus) {
+    if (status === "done") {
+      setIsDetailOpen(false);
+    }
+
+    handleStatusChange(stepId, status);
   }
 
   function handleStatusChange(stepId: string, status: SelectableStepStatus) {
@@ -173,47 +255,94 @@ export function PathStepsView({ steps, budgetHours }: PathStepsViewProps) {
     });
   }
 
+  const groups = groupByProgram(activeSteps);
+
   return (
     <Toaster>
       <div className="flex flex-col gap-10">
         <BudgetCard progress={progress} budgetHours={budgetHours} />
 
-        {groupByProgram(activeSteps).map((group) => {
-          const groupProgress = summarizePathProgress(
-            group.steps.map((step) => ({ status: step.status, hours: step.courseHours })),
-            null,
-          );
-          const isInterestGroup = group.key === INTERESTS_GROUP_KEY;
+        <Tabs value={view} onValueChange={handleViewChange} className="gap-8">
+          <TabsList className="self-center">
+            <TabsTrigger value="mapa" className="px-4">
+              <MapTrifoldIcon data-icon="inline-start" />
+              Mapa
+            </TabsTrigger>
+            <TabsTrigger value="lista" className="px-4">
+              <ListBulletsIcon data-icon="inline-start" />
+              Lista
+            </TabsTrigger>
+          </TabsList>
 
-          return (
-            <section key={group.key} className="flex flex-col gap-4">
-              <div className="flex flex-wrap items-end justify-between gap-2 border-b pb-3">
-                <div className="flex flex-col gap-1">
-                  <Eyebrow>{isInterestGroup ? "Extra" : "Programa oficial"}</Eyebrow>
-                  <h2 className="font-heading text-xl font-semibold">{group.title}</h2>
-                </div>
-                <span className="text-sm text-muted-foreground tabular-nums">
-                  {groupProgress.doneCount} de {groupProgress.activeCount} hechos ·{" "}
-                  {formatHours(groupProgress.activeHours)}
-                </span>
-              </div>
-              <ol>
-                {group.steps.map((step) => (
-                  <StepRow
-                    key={step.id}
-                    step={step}
-                    stepNumber={stepNumbers.get(step.id) ?? 0}
-                    onStatusChange={(status) => handleStatusChange(step.id, status)}
-                    onDiscard={() => handleDiscard(step)}
-                  />
-                ))}
-              </ol>
-            </section>
-          );
-        })}
+          <TabsContent value="mapa">
+            <PathMap
+              groups={groups}
+              stepNumbers={stepNumbers}
+              totalSteps={activeSteps.length}
+              onOpenStep={openStepDetail}
+            />
+          </TabsContent>
+
+          <TabsContent value="lista" className="flex flex-col gap-10">
+            {groups.map((group) => {
+              const groupProgress = summarizePathProgress(
+                group.steps.map((step) => ({
+                  status: step.status,
+                  hours: step.courseHours,
+                })),
+                null,
+              );
+              const isInterestGroup = group.key === INTERESTS_GROUP_KEY;
+
+              return (
+                <section key={group.key} className="flex flex-col gap-4">
+                  <div className="flex flex-wrap items-end justify-between gap-2 border-b pb-3">
+                    <div className="flex flex-col gap-1">
+                      <Eyebrow>{isInterestGroup ? "Extra" : "Programa oficial"}</Eyebrow>
+                      <h2 className="font-heading text-xl font-semibold">{group.title}</h2>
+                    </div>
+                    <span className="text-sm text-muted-foreground tabular-nums">
+                      {groupProgress.doneCount} de {groupProgress.activeCount} hechos ·{" "}
+                      {formatHours(groupProgress.activeHours)}
+                    </span>
+                  </div>
+                  <ol>
+                    {group.steps.map((step) => (
+                      <StepRow
+                        key={step.id}
+                        step={step}
+                        stepNumber={stepNumbers.get(step.id) ?? 0}
+                        onStatusChange={(status) => handleStatusChange(step.id, status)}
+                        onDiscard={() => handleDiscard(step)}
+                      />
+                    ))}
+                  </ol>
+                </section>
+              );
+            })}
+          </TabsContent>
+        </Tabs>
 
         <DiscardedSteps steps={discardedSteps} onRestore={handleRestore} />
       </div>
+
+      <StepDetailDialog
+        open={isDetailOpen}
+        step={selectedStep}
+        stepNumber={selectedStep ? (stepNumbers.get(selectedStep.id) ?? 0) : 0}
+        returnFocusRef={detailTriggerRef}
+        onClose={() => setIsDetailOpen(false)}
+        onStatusChange={(status) => {
+          if (selectedStep) {
+            changeStatusFromDetail(selectedStep.id, status);
+          }
+        }}
+        onDiscard={() => {
+          if (selectedStep) {
+            discardFromDetail(selectedStep);
+          }
+        }}
+      />
     </Toaster>
   );
 }

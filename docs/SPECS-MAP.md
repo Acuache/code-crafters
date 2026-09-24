@@ -52,7 +52,7 @@ Decisiones de base para todo el mapa:
 | 09 | `paths-dashboard` | Dashboard con todas mis rutas, su progreso y el acceso a crear otra | 08 | **Hito 1** |
 | 10 | `admin-catalog` | Panel `/admin`: CRUD de cursos y de su ubicación en programas, protegido por rol `admin` | 02, 03 | Semana 2 |
 | 11 | `ai-personalization` | Capa 2: título, resumen y razones escritas por IA sobre la ruta ya guardada, con límite diario | 07 | Semana 2 |
-| 12 | `visual-path-map` | Mapa de la ruta con React Flow + dagre y panel de detalle por nodo | 08 | Semana 2 |
+| 12 | `visual-path-map` | Mapa de la ruta en zigzag estilo Duolingo (CSS + SVG, sin React Flow), por defecto en `/paths/[id]`, con modal de detalle por nodo | 08, 09 | Semana 2 |
 | 13 | `gamification` | XP por curso, niveles, insignias, racha y celebración al completar | 08 | Semana 2 |
 | 14 | `path-sharing` | Ruta pública en `/r/[slug]` con tarjeta OG para pegar en Discord | 08 | Semana 2 |
 | 15 | `path-recalculation` | Botón "Ajustar mi ruta": cuestionario prellenado con las respuestas anteriores; con IA, un texto libre se traduce a cambios de chips (nunca de cursos) antes de confirmar; sin IA, se editan los chips a mano. Genera una ruta nueva, no pisa la anterior (COULD, primero en recortarse) | 08, 11 | Semana 2 |
@@ -139,7 +139,8 @@ los anteriores (no depende de nada); y 11, 12, 13, 14 entre sí una vez cerrado 
    `app/(app)/dashboard/*`, `components/dashboard/*` y `lib/progress/next-step{,.test}.ts` (archivo
    propio dentro de la carpeta del 08: `findNextStep`, el "próximo curso" de una ruta), el 10 de
    `app/(admin)/*`, `components/admin/*`, `lib/admin/*` y `components/ui/checkbox.tsx` (primitiva de
-   shadcn agregada por el 10), el 11 de `lib/ai/*` y `components/ai/*`, etc. Cada spec declara en su alcance los archivos que toca.
+   shadcn agregada por el 10), el 11 de `lib/ai/*` y `components/ai/*`, el 12 de `lib/path-map/*` y
+   `components/paths/{path-map,path-map-node,step-detail-dialog}.tsx`, etc. Cada spec declara en su alcance los archivos que toca.
    **Excepción explícita a la propiedad temporal (dashboard), ya resuelta:** el spec 09
    (`paths-dashboard`) movió el placeholder `app/dashboard/page.tsx` del spec 03 a
    `app/(app)/dashboard/page.tsx` como primer paso de su plan y después lo reescribió; nunca
@@ -162,6 +163,10 @@ los anteriores (no depende de nada); y 11, 12, 13, 14 entre sí una vez cerrado 
    de ayuda; y en `components/quiz/quiz-form.tsx` (del 06), una `key` distinta en los botones
    "Siguiente"/"Guardar" — bug del 06 que salteaba el paso de texto libre, encontrado al implementar
    el 11.
+   **Excepciones explícitas del spec 12 (mapa):** en `components/paths/path-steps-view.tsx` (del 08),
+   las pestañas "Mapa"/"Lista", el paso seleccionado, el modal de detalle, `isInterestGroup` en
+   `StepGroup` y cerrar el modal al marcar "Hecho"; en `app/(app)/paths/[id]/page.tsx` (del 08), leer
+   `searchParams.vista`; y en `app/globals.css`, solo el token `--animate-step-pop`.
 6. **Migraciones nuevas solo en 02, 11, 13 y 14**, y esos cuatro no se implementan en paralelo entre sí:
    el orden de los archivos de migración depende del orden de merge, y ramas simultáneas lo rompen. El
    02 crea el esquema base —incluye `profiles.role` y las tablas `programs`/`program_courses`—; 11, 13
@@ -398,14 +403,16 @@ este límite.
 
 ### 12 · `visual-path-map`
 
-Una vista alternativa sobre los mismos datos del 08, no un modelo nuevo: el mapa de la ruta con React
-Flow y layout automático de dagre, nodos coloreados por estado, un panel (Sheet) de detalle al hacer
-clic en un nodo con link a DevTalles y cambio de estado, y un toggle para alternar entre mapa y lista.
-**Pendiente para su `/spec`:** durante el spec 08 el usuario pidió que el mapa sea un recorrido
-estilo Duolingo (camino en zigzag con nodos que se recorren). Como la ruta es lineal, conviene
-evaluar en la fase de preguntas si React Flow + dagre sigue haciendo falta o alcanza con CSS sobre
-los componentes existentes. El panel de detalle reusa `components/paths/step-status-toggle.tsx`
-(spec 08).
+> **Implementado distinto de lo que planeaba este mapa** — manda `specs/12-visual-path-map.md`.
+
+Una vista alternativa sobre los mismos datos del 08, no un modelo nuevo, y la que se ve por defecto
+en `/paths/[id]` (`?vista=lista` abre la lista). Sin React Flow ni dagre: la ruta es lineal, así que
+el camino en zigzag estilo Duolingo sale de una función pura (`lib/path-map/zigzag-layout.ts`) y se
+dibuja con CSS + SVG. Una unidad por programa con su banner y progreso, nodos por estado, conector
+que se rellena al completar, y el astronauta con halo y globo en el próximo paso (`findNextStep` del
+09). Tocar un nodo abre un modal de detalle que reusa `step-status-toggle.tsx` (spec 08); marcar
+"Hecho" lo cierra y el progreso "viaja" al siguiente paso. Todas las animaciones respetan
+`prefers-reduced-motion`.
 
 ### 13 · `gamification`
 

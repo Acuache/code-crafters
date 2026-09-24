@@ -7,7 +7,11 @@ import { AutoPersonalizer } from "@/components/ai/auto-personalizer";
 import { ProfileAdjustmentsNote } from "@/components/ai/profile-adjustments-note";
 import { AiBadge } from "@/components/brand/ai-badge";
 import { Eyebrow } from "@/components/brand/eyebrow";
-import { PathStepsView, type PathStepView } from "@/components/paths/path-steps-view";
+import {
+  PathStepsView,
+  type PathStepView,
+  type PathView,
+} from "@/components/paths/path-steps-view";
 import { Button } from "@/components/ui/button";
 import { assessmentAnswersSchema } from "@/components/quiz/quiz-schema";
 import { remainingPersonalizations } from "@/lib/ai/daily-limit";
@@ -22,6 +26,7 @@ import { createClient } from "@/lib/supabase/server";
 
 type PathPageProps = {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ vista?: string | string[] }>;
 };
 
 const STEP_ORIGINS: readonly StepOrigin[] = ["requerido", "recomendado", "opcional", "interes"];
@@ -73,8 +78,11 @@ async function shouldAutoPersonalize(
   return attemptsForPath === 0;
 }
 
-export default async function PathPage({ params }: PathPageProps) {
+export default async function PathPage({ params, searchParams }: PathPageProps) {
   const { id } = await params;
+  // Spec 12: el mapa es la vista por defecto; cualquier valor que no sea "lista" cae en el mapa.
+  const { vista } = await searchParams;
+  const initialView: PathView = vista === "lista" ? "lista" : "mapa";
 
   await requireUser();
   const supabase = await createClient();
@@ -172,7 +180,7 @@ export default async function PathPage({ params }: PathPageProps) {
 
       {path.ai_adjustments ? <ProfileAdjustmentsNote adjustments={path.ai_adjustments} /> : null}
 
-      <PathStepsView steps={steps} budgetHours={budgetHours} />
+      <PathStepsView steps={steps} budgetHours={budgetHours} initialView={initialView} />
     </div>
   );
 }
