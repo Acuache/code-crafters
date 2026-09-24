@@ -124,6 +124,32 @@ describe("QuizDialog", () => {
     await user.click(screen.getByRole("button", { name: "Intentar de nuevo" }));
     expect(await screen.findByText("Pregunta 1")).toBeTruthy();
   });
+
+  it("si se corta la conexión al entregar, avisa y deja volver a las respuestas", async () => {
+    const user = userEvent.setup();
+    const submit = vi.fn().mockRejectedValue(new TypeError("Failed to fetch"));
+
+    render(
+      <QuizDialog
+        target={target}
+        onClose={vi.fn()}
+        onAttemptSaved={vi.fn()}
+        requestQuizAction={vi.fn().mockResolvedValue({ ok: true, data: chapterQuiz })}
+        submitAttemptAction={submit}
+      />,
+    );
+
+    await screen.findByText("Pregunta 1");
+    for (let index = 0; index < 3; index += 1) {
+      await user.click(screen.getByRole("radio", { name: "A" }));
+      const nextLabel = index < 2 ? "Siguiente" : "Entregar";
+      await user.click(screen.getByRole("button", { name: nextLabel }));
+    }
+
+    expect(await screen.findByText(/Se perdió la conexión/)).toBeTruthy();
+    await user.click(screen.getByRole("button", { name: "Intentar de nuevo" }));
+    expect(screen.getByRole("button", { name: "Entregar" })).toBeTruthy();
+  });
 });
 
 describe("QuizResult", () => {

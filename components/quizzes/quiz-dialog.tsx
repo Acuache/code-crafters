@@ -45,6 +45,9 @@ type QuizDialogProps = {
 
 type Phase = "loading" | "answering" | "submitting" | "result" | "error";
 
+// Una action rechaza (en vez de devolver ok: false) cuando se corta la conexión.
+const CONNECTION_ERROR = "Se perdió la conexión. Revisa tu internet e intenta de nuevo.";
+
 function describeQuiz(quiz: SafeQuiz | null): string {
   if (!quiz) {
     return "Pon a prueba lo que aprendiste";
@@ -102,11 +105,17 @@ export function QuizDialog({
     }
 
     let isActive = true;
-    void requestQuizAction(target).then((response) => {
-      if (isActive) {
-        applyQuizResponse(response);
-      }
-    });
+    requestQuizAction(target)
+      .then((response) => {
+        if (isActive) {
+          applyQuizResponse(response);
+        }
+      })
+      .catch(() => {
+        if (isActive) {
+          showError(CONNECTION_ERROR);
+        }
+      });
 
     return () => {
       isActive = false;
@@ -131,14 +140,21 @@ export function QuizDialog({
     }
 
     setPhase("submitting");
-    const response = await submitAttemptAction({
-      quizId: quiz.id,
-      pathId: target.pathId,
-      pathStepId: target.pathStepId,
-      answers: completeAnswers,
-      timezone: browserTimeZone(),
-      idempotencyKey: idempotencyKey.current,
-    });
+    let response: ActionResultWithData<AttemptResult>;
+    try {
+      // Reintentar tras un corte reusa la misma clave: si el intento sí se guardó, vuelve ese.
+      response = await submitAttemptAction({
+        quizId: quiz.id,
+        pathId: target.pathId,
+        pathStepId: target.pathStepId,
+        answers: completeAnswers,
+        timezone: browserTimeZone(),
+        idempotencyKey: idempotencyKey.current,
+      });
+    } catch {
+      showError(CONNECTION_ERROR);
+      return;
+    }
 
     if (!response.ok) {
       showError(response.message);
@@ -161,7 +177,9 @@ export function QuizDialog({
     }
 
     setPhase("loading");
-    void requestQuizAction(target).then(applyQuizResponse);
+    requestQuizAction(target)
+      .then(applyQuizResponse)
+      .catch(() => showError(CONNECTION_ERROR));
   }
 
   function handleOpenChange(nextOpen: boolean) {
