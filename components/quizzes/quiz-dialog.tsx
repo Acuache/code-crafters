@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/dialog";
 import { Progress } from "@/components/ui/progress";
 import { Spinner } from "@/components/ui/spinner";
+import { browserTimeZone } from "@/lib/gamification/streak";
 import type { QuizKind, SafeQuiz } from "@/lib/quizzes/schema";
 
 import { QuizQuestion } from "./quiz-question";
@@ -50,10 +51,6 @@ function describeQuiz(quiz: SafeQuiz | null): string {
 
   const kindLabel = quiz.kind === "chapter" ? "de práctica" : "del curso";
   return `${quiz.questions.length} preguntas ${kindLabel} · aprobás con ${quiz.passPercentage} %`;
-}
-
-function currentTimeZone(): string {
-  return Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC";
 }
 
 export function QuizDialog({
@@ -138,7 +135,7 @@ export function QuizDialog({
       pathId: target.pathId,
       pathStepId: target.pathStepId,
       answers: completeAnswers,
-      timezone: currentTimeZone(),
+      timezone: browserTimeZone(),
       idempotencyKey: idempotencyKey.current,
     });
 

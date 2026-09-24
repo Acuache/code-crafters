@@ -256,6 +256,10 @@ defecto en el seed.
 - [ ] No quedan quizzes por capítulo, `lib/quizzes/generate.ts`, `lib/supabase/admin.ts` ni
       `SUPABASE_SECRET_KEY` en el repo.
 - [ ] La app funciona sin `OPENAI_API_KEY`, incluidos los quizzes.
+- [ ] Si la entrega falla por red, el diálogo muestra el error y deja reintentar (no se queda en
+      "Corrigiendo…").
+- [ ] Los textos que mencionan el porcentaje para aprobar usan el `pass_percentage` del quiz, no
+      un 60 fijo.
 - [ ] `npm run test`, `npm run lint` y `npm run build` pasan.
 
 ## Decisiones

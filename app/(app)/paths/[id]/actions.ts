@@ -19,7 +19,7 @@ export type StepActionResult = { ok: true } | { ok: false; message: string };
 // `discarded` no es un estado válido acá: se entra a él sólo por discardStep, que exige `pending`.
 const stepIdSchema = z.uuid();
 const selectableStatusSchema = z.enum(["pending", "in_progress", "done"]);
-// La validación real de la zona la hace Postgres (record_step_activity cae a UTC si no existe).
+// Postgres valida la zona y cae a UTC si no existe.
 const timeZoneSchema = z.string().min(1).max(64);
 
 const INVALID_INPUT: StepActionResult = { ok: false, message: "El paso no es válido." };
@@ -82,7 +82,7 @@ export async function setStepStatus(
   return result;
 }
 
-// La racha es accesoria: si falla, el paso igual queda marcado y el usuario no ve ningún error.
+// Si la racha falla, el paso igual queda guardado.
 async function recordStreakDay(
   supabase: Awaited<ReturnType<typeof createClient>>,
   stepId: string,
@@ -140,10 +140,6 @@ export async function restoreStep(stepId: unknown): Promise<StepActionResult> {
 
   return finishStepUpdate(data, Boolean(error), "Sólo podés restaurar los pasos que quitaste vos.");
 }
-
-// ---------------------------------------------------------------------------------------------
-// Quizzes (aporte de Ariel, ver docs/decisiones/0005-quizzes-y-racha-unificados.md)
-// ---------------------------------------------------------------------------------------------
 
 export type QuizActionResult<T> = { ok: true; data: T } | { ok: false; message: string };
 
@@ -217,8 +213,7 @@ const questionResultSchema = z.object({
   explanation: z.string(),
 });
 
-// Lo que devuelve submit_quiz_attempt (supabase/migrations/20260924130000_unify_streak.sql). Se
-// valida en vez de castear: el RPC devuelve `Json` sin tipo.
+// El RPC devuelve `Json` sin tipo: se valida en vez de castear.
 const attemptResultSchema = z.object({
   attemptId: z.uuid(),
   correctCount: z.number(),

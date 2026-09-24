@@ -16,6 +16,7 @@ import { Eyebrow } from "@/components/brand/eyebrow";
 import { QuizDialog, type QuizTarget } from "@/components/quizzes/quiz-dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast, Toaster } from "@/components/ui/toast";
+import { browserTimeZone } from "@/lib/gamification/streak";
 import type { StepOrigin } from "@/lib/paths/types";
 import {
   formatHours,
@@ -155,15 +156,8 @@ type PathStepsViewProps = {
   steps: PathStepView[];
   budgetHours: number | null;
   initialView: PathView;
-  // false sin OPENAI_API_KEY o SUPABASE_SECRET_KEY: los botones de quiz no aparecen y la ruta
-  // funciona igual con el toggle de estado.
   quizzesEnabled: boolean;
 };
-
-// La zona del navegador: el servidor la usa para saber qué día local cuenta para la racha.
-function browserTimeZone(): string {
-  return Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC";
-}
 
 export function PathStepsView({
   pathId,
@@ -253,13 +247,12 @@ export function PathStepsView({
     );
   }
 
-  // El quiz abierto; null = cerrado. Se abre desde el modal de detalle, que se cierra antes para no
-  // apilar dos diálogos.
   const [quizTarget, setQuizTarget] = useState<QuizTarget | null>(null);
-  // Cambia en cada apertura para montar un QuizDialog nuevo, con su estado desde cero.
+  // `key` del QuizDialog: cada apertura lo monta desde cero.
   const [quizSession, setQuizSession] = useState(0);
 
   function openQuiz(stepId: string, chapterTitle: string | null) {
+    // Se cierra el detalle para no apilar dos diálogos.
     setIsDetailOpen(false);
     setQuizSession((session) => session + 1);
     setQuizTarget({
@@ -394,8 +387,7 @@ export function PathStepsView({
         key={quizSession}
         target={quizTarget}
         onClose={() => setQuizTarget(null)}
-        // Aprobar el quiz del curso marca el paso como hecho y suma la racha en el servidor: se
-        // vuelve a pedir la página para que el mapa y la racha lo muestren.
+        // El servidor pudo marcar el paso y sumar la racha.
         onAttemptSaved={() => router.refresh()}
         requestQuizAction={requestQuiz}
         submitAttemptAction={submitQuizAttempt}

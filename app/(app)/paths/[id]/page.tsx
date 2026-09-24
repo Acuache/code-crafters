@@ -81,9 +81,7 @@ async function shouldAutoPersonalize(
   return attemptsForPath === 0;
 }
 
-// La racha se deriva al leer (ADR 0005): los días de streak_activities más "hoy" en la zona que el
-// usuario usó por última vez, porque el servidor no conoce la zona del navegador. RLS filtra al
-// dueño; si algo falla, se muestra en cero en vez de romper la página.
+// "Hoy" sale de la última zona guardada: el servidor no conoce la del navegador.
 async function loadStreak(supabase: Awaited<ReturnType<typeof createClient>>, userId: string) {
   const [{ data: activities }, { data: profile }] = await Promise.all([
     supabase.from("streak_activities").select("activity_date"),
@@ -157,13 +155,14 @@ export default async function PathPage({ params, searchParams }: PathPageProps) 
   const title = path.ai_title ?? path.title;
   const summary = path.ai_summary ?? path.summary;
   const isPersonalized = path.personalized_at !== null;
-  const autoPersonalize = await shouldAutoPersonalize(supabase, {
-    pathId: path.id,
-    isPersonalized,
-    answers: path.assessments?.answers,
-  });
-
-  const streakView = await loadStreak(supabase, user.userId);
+  const [autoPersonalize, streakView] = await Promise.all([
+    shouldAutoPersonalize(supabase, {
+      pathId: path.id,
+      isPersonalized,
+      answers: path.assessments?.answers,
+    }),
+    loadStreak(supabase, user.userId),
+  ]);
 
   return (
     <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-6 px-4 py-10 sm:px-6">

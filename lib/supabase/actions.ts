@@ -30,12 +30,7 @@ async function getOrigin(): Promise<string> {
   return "http://localhost:3000";
 }
 
-// `formData` no se usa, pero el parámetro es obligatorio: el proveedor viene
-// pre-atado con .bind() y <form action> siempre pasa el FormData como último argumento.
-export async function signInWithProvider(
-  provider: OAuthProvider,
-  formData: FormData
-): Promise<void> {
+export async function signInWithProvider(provider: OAuthProvider): Promise<void> {
   const supabase = await createClient();
   const origin = await getOrigin();
 

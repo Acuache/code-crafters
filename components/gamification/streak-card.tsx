@@ -1,20 +1,17 @@
 import { FireIcon } from "@phosphor-icons/react/ssr";
 
 import { Card, CardContent } from "@/components/ui/card";
-import type { StreakSummary } from "@/lib/gamification/streak";
+import { MS_PER_DAY, type StreakSummary } from "@/lib/gamification/streak";
 import { cn } from "@/lib/utils";
 
 type StreakCardProps = {
   streak: StreakSummary;
-  // Fechas ISO de streak_activities.
   activityDates: string[];
-  // "Hoy" ISO en la zona del usuario (todayInTimeZone): el calendario no usa el reloj del
-  // servidor, que puede estar en otro día.
+  // En la zona del usuario: el reloj del servidor puede estar en otro día.
   today: string;
 };
 
 const WEEK_LENGTH = 7;
-const MS_PER_DAY = 86_400_000;
 const WEEKDAY_FORMAT = new Intl.DateTimeFormat("es-ES", { weekday: "narrow", timeZone: "UTC" });
 const FULL_DATE_FORMAT = new Intl.DateTimeFormat("es-ES", {
   weekday: "long",
@@ -23,7 +20,6 @@ const FULL_DATE_FORMAT = new Intl.DateTimeFormat("es-ES", {
   timeZone: "UTC",
 });
 
-// Los últimos 7 días terminando hoy, como fechas UTC a medianoche: solo se usan para mostrar.
 function lastWeek(today: string): Date[] {
   const todayMs = Date.parse(`${today}T00:00:00Z`);
 
@@ -37,8 +33,6 @@ function formatDays(count: number): string {
   return count === 1 ? "1 día" : `${count} días`;
 }
 
-// Aporte de Ariel (ver docs/decisiones/0005-quizzes-y-racha-unificados.md): racha actual, récord y
-// la última semana. Suma un día al aprobar un quiz o al avanzar un paso.
 export function StreakCard({ streak, activityDates, today }: StreakCardProps) {
   const activeDates = new Set(activityDates);
 
