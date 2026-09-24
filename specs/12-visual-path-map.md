@@ -61,13 +61,13 @@ determinista se calcula con una función pura de pocas líneas y se dibuja con C
 **Qué NO entra (queda para otros specs o fuera):**
 
 - React Flow, dagre o cualquier dependencia nueva en `package.json`.
-- Confetti, XP, niveles, insignias o racha (spec 13). El "pop" de este spec es una animación del
-  nodo, no una celebración: el spec 13 decide si le suma algo encima.
+- Confetti, XP, niveles, insignias o racha (spec 14). El "pop" de este spec es una animación del
+  nodo, no una celebración: el spec 14 decide si le suma algo encima.
 - Bloquear pasos pendientes hasta completar el anterior (ver Decisiones).
 - Mostrar los pasos descartados en el camino: siguen en el acordeón "Qué quitamos y por qué" del
   08, debajo de las dos vistas.
 - Reordenar pasos arrastrando nodos, zoom o paneo del mapa.
-- Mapa en el dashboard o en la ruta pública (spec 14): solo `/paths/[id]`.
+- Mapa en el dashboard o en la ruta pública (spec 15): solo `/paths/[id]`.
 - Cualquier migración, columna o action nueva (regla 6 del mapa).
 - Tocar `lib/progress/*` (08/09), `lib/paths/*` (04) o `components/paths/step-row.tsx`.
 
@@ -326,7 +326,7 @@ conector a la vez.
 - **Dos pasos con el mismo título.** Rompería la identificación del próximo paso por título. Hoy no
   pasa porque el motor deduplica por curso; si pasara, se marcaría el primero en orden de estudio,
   que igual es el correcto según `findNextStep`.
-- **Conflicto con el spec 13**, que probablemente también toque `path-steps-view.tsx` para la
+- **Conflicto con el spec 14**, que probablemente también toque `path-steps-view.tsx` para la
   celebración. Mitigación: este spec deja el `onStatusChange` en un solo lugar
-  (`handleStatusChange`) para que el 13 se enganche ahí sin tocar el mapa; no se implementan en
+  (`handleStatusChange`) para que el 14 se enganche ahí sin tocar el mapa; no se implementan en
   paralelo.

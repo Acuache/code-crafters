@@ -6,10 +6,10 @@ Generador de rutas de aprendizaje sobre el catálogo real de cursos de [DevTalle
 
 | Hecho | Pendiente |
 |---|---|
-| Scaffold de Next.js 16 (App Router, TypeScript, Tailwind v4) | Cuestionario de habilidades e intereses |
-| Catálogo de DevTalles extraído y versionado (`data/`) | Motor de rutas (reglas + personalización con IA) |
-| Documentación del proyecto y decisiones (`docs/`) | Login y registro con Discord |
-| — | Guardar rutas, marcar progreso, deploy |
+| Next.js 16, Supabase, autenticación y catálogo persistente | Módulos posteriores descritos en el roadmap |
+| Cuestionario inicial y generación de rutas por reglas | Deploy y validación de producción |
+| Ruta interactiva con progreso persistente | — |
+| Quizzes compartidos, intentos privados y racha diaria | — |
 
 El detalle del plan está en [`docs/ROADMAP.md`](docs/ROADMAP.md).
 
@@ -17,11 +17,25 @@ El detalle del plan está en [`docs/ROADMAP.md`](docs/ROADMAP.md).
 
 - Node.js **20.9.0 o superior** (lo exige Next.js 16).
 - npm.
+- Docker, para Supabase local.
+
+## Variables de entorno
+
+Copiá `.env.example` a `.env.local` y completá las variables de Supabase. Las dos claves de IA son opcionales: sin ellas la ruta se genera y se recorre igual.
+
+```dotenv
+OPENAI_API_KEY=tu_clave_de_openai          # personalización de la ruta y quizzes
+SUPABASE_SECRET_KEY=tu_clave_secreta       # guardar los quizzes compartidos
+```
+
+Las dos son secretos exclusivos del servidor: nunca uses el prefijo `NEXT_PUBLIC_` para ellas ni las expongas al navegador. Sin alguna de las dos, los botones de quiz no aparecen.
 
 ## Cómo levantarlo
 
 ```bash
 npm install
+npx supabase start
+npx supabase migration up
 npm run dev
 ```
 
@@ -33,7 +47,20 @@ Otros comandos:
 npm run build   # build de producción
 npm run start   # correr un build de producción
 npm run lint    # ESLint
+npm test        # Vitest
+npx supabase test db # pruebas pgTAP
 ```
+
+## Quizzes, progreso y racha
+
+Los quizzes y la racha los diseñó Ariel Tonato; cómo se integraron con el mapa de la ruta está en [`docs/decisiones/0005-quizzes-y-racha-unificados.md`](docs/decisiones/0005-quizzes-y-racha-unificados.md).
+
+- Desde el detalle de cada paso del mapa: un quiz de 10 preguntas del curso y una práctica de 3 preguntas por capítulo, generados con OpenAI.
+- Un quiz generado se reutiliza entre todos los usuarios para el mismo curso o capítulo; los intentos, resultados y progreso son privados mediante RLS.
+- Se aprueba con 60 %. Aprobar el quiz del curso lo marca como hecho; también se puede marcar a mano con el selector de estado.
+- La corrección por pregunta se ve recién al entregar, calculada en Postgres.
+- La racha suma como máximo un día por fecha local (zona del navegador) al aprobar un quiz o al pasar un paso a "En curso" o "Hecho".
+- Si falta una clave o OpenAI falla, la ruta sigue funcionando y el diálogo permite reintentar.
 
 ## Estructura del repo
 

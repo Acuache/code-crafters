@@ -7,6 +7,7 @@ import { AutoPersonalizer } from "@/components/ai/auto-personalizer";
 import { ProfileAdjustmentsNote } from "@/components/ai/profile-adjustments-note";
 import { AiBadge } from "@/components/brand/ai-badge";
 import { Eyebrow } from "@/components/brand/eyebrow";
+import { StreakCard } from "@/components/gamification/streak-card";
 import {
   PathStepsView,
   type PathStepView,
@@ -20,7 +21,9 @@ import {
   countPersonalizationsInLast24h,
   isAiConfigured,
 } from "@/lib/ai/personalize-path";
+import { computeStreak, todayInTimeZone } from "@/lib/gamification/streak";
 import type { StepOrigin } from "@/lib/paths/types";
+import { isQuizConfigured } from "@/lib/quizzes/generate";
 import { requireUser } from "@/lib/supabase/guards";
 import { createClient } from "@/lib/supabase/server";
 
@@ -78,13 +81,28 @@ async function shouldAutoPersonalize(
   return attemptsForPath === 0;
 }
 
+// La racha se deriva al leer (ADR 0005): los días de streak_activities más "hoy" en la zona que el
+// usuario usó por última vez, porque el servidor no conoce la zona del navegador. RLS filtra al
+// dueño; si algo falla, se muestra en cero en vez de romper la página.
+async function loadStreak(supabase: Awaited<ReturnType<typeof createClient>>, userId: string) {
+  const [{ data: activities }, { data: profile }] = await Promise.all([
+    supabase.from("streak_activities").select("activity_date"),
+    supabase.from("profiles").select("timezone").eq("id", userId).maybeSingle(),
+  ]);
+
+  const activityDates = (activities ?? []).map((activity) => activity.activity_date);
+  const today = todayInTimeZone(profile?.timezone ?? "UTC");
+
+  return { streak: computeStreak(activityDates, today), activityDates, today };
+}
+
 export default async function PathPage({ params, searchParams }: PathPageProps) {
   const { id } = await params;
   // Spec 12: el mapa es la vista por defecto; cualquier valor que no sea "lista" cae en el mapa.
   const { vista } = await searchParams;
   const initialView: PathView = vista === "lista" ? "lista" : "mapa";
 
-  await requireUser();
+  const user = await requireUser();
   const supabase = await createClient();
 
   // RLS filtra al dueño: una ruta ajena o inexistente no vuelve y da 404.
@@ -105,7 +123,7 @@ export default async function PathPage({ params, searchParams }: PathPageProps) 
   const { data: rawSteps } = await supabase
     .from("path_steps")
     .select(
-      "id, stage, position, origin, reason, ai_reason, status, discard_reason, courses(title, hours, url, image_url), programs(slug, name)",
+      "id, stage, position, origin, reason, ai_reason, status, discard_reason, courses(title, hours, url, image_url, chapters), programs(slug, name)",
     )
     .eq("path_id", path.id)
     .order("stage", { ascending: true })
@@ -126,6 +144,7 @@ export default async function PathPage({ params, searchParams }: PathPageProps) 
     courseHours: Number(row.courses.hours),
     courseUrl: row.courses.url,
     courseImageUrl: row.courses.image_url,
+    courseChapters: row.courses.chapters,
     // null para un curso que entró por interés sin pertenecer a un programa fusionado (ADR 0003).
     programSlug: row.programs?.slug ?? null,
     programName: row.programs?.name ?? null,
@@ -143,6 +162,8 @@ export default async function PathPage({ params, searchParams }: PathPageProps) 
     isPersonalized,
     answers: path.assessments?.answers,
   });
+
+  const streakView = await loadStreak(supabase, user.userId);
 
   return (
     <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-6 px-4 py-10 sm:px-6">
@@ -180,7 +201,19 @@ export default async function PathPage({ params, searchParams }: PathPageProps) 
 
       {path.ai_adjustments ? <ProfileAdjustmentsNote adjustments={path.ai_adjustments} /> : null}
 
-      <PathStepsView steps={steps} budgetHours={budgetHours} initialView={initialView} />
+      <StreakCard
+        streak={streakView.streak}
+        activityDates={streakView.activityDates}
+        today={streakView.today}
+      />
+
+      <PathStepsView
+        pathId={path.id}
+        steps={steps}
+        budgetHours={budgetHours}
+        initialView={initialView}
+        quizzesEnabled={isQuizConfigured()}
+      />
     </div>
   );
 }

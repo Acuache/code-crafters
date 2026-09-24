@@ -118,7 +118,7 @@ proyecto que no funcione al clonarlo, y el evaluador lo clona sin key.
 - Ajustar `level`, `hoursPerWeek` o `deadlineMonths` desde el texto libre: son datos que el usuario
   eligió explícitamente con controles numéricos o de nivel, y el presupuesto de horas depende de
   ellos.
-- Confirmar el ajuste antes de generar: se muestra después, en la ruta. El spec 15 ("Ajustar mi
+- Confirmar el ajuste antes de generar: se muestra después, en la ruta. El spec 16 ("Ajustar mi
   ruta") es el que agrega confirmación y edición a mano.
 - Reescribir los motivos de descarte (`discard_reason`) o las razones de los pasos descartados:
   solo se personalizan los pasos vigentes (`status <> 'discarded'`).
@@ -131,7 +131,7 @@ proyecto que no funcione al clonarlo, y el evaluador lo clona sin key.
 - Caché por hash de perfil (`ANALISIS-IA.md` §8): cada clic es una llamada nueva, acotada por el
   límite diario.
 - El cuestionario prellenado con confirmación y edición a mano ("Ajustar mi ruta"): es del spec
-  15, que reusará `requestProfileAdjustment`, el límite y la tabla `ai_personalizations` de este
+  16, que reusará `requestProfileAdjustment`, el límite y la tabla `ai_personalizations` de este
   spec.
 - Tocar `lib/paths/*`, `lib/catalog/*`, `lib/progress/*`, `app/(app)/paths/actions.ts` (salvo el
   ajuste antes de `buildPath()`), `app/(app)/paths/[id]/actions.ts`, `components/paths/*`, `components/quiz/*` (salvo el texto de
@@ -174,7 +174,7 @@ alter table public.path_steps
   add column ai_reason text;
 
 -- Un registro por intento que llega a llamar al modelo (éxito o falla). Es la base del límite
--- diario; el spec 15 lo reusa para la traducción de texto libre a chips.
+-- diario; el spec 16 lo reusa para la traducción de texto libre a chips.
 create table public.ai_personalizations (
   id bigint generated always as identity primary key,
   user_id uuid not null default auth.uid() references auth.users (id) on delete cascade,
@@ -592,9 +592,9 @@ ruta por lo que contaste", la `explanation` y una lista de `Badge`: "Meta: React
   explícitamente, y el aviso lo hace visible.
 - **Sí:** el ajuste se muestra después, en la ruta, sin confirmación previa. **No:** confirmar
   antes de generar. Sumaría una pantalla al camino crítico del Hito 1; la confirmación y la edición
-  a mano son del spec 15.
+  a mano son del spec 16.
 - **Sí:** las respuestas originales de `assessments` no se tocan y el ajuste va a
-  `learning_paths.ai_adjustments`. **No:** reescribir `assessments.answers`. El spec 15 prellena el
+  `learning_paths.ai_adjustments`. **No:** reescribir `assessments.answers`. El spec 16 prellena el
   cuestionario con lo que el usuario respondió, no con lo que la IA interpretó.
 - **Sí:** el ajuste cuenta como un uso del límite diario, pero sin usos la generación sigue sin
   ajuste. **No:** bloquear la generación. `docs/SPECS-MAP.md` §7: generar nunca queda bloqueado por
@@ -606,11 +606,11 @@ ruta por lo que contaste", la `explanation` y una lista de `Badge`: "Meta: React
   (`ANALISIS-IA.md` §3), y el texto honesto sirve con o sin key.
 - **Sí:** columnas `ai_*` aparte y la vista muestra `ai_* ?? original`. **No:** sobrescribir
   `title`, `summary` y `reason`. Se conserva la versión por plantilla, un paso que la IA no nombró
-  cae solo a su razón original, y el spec 15 o un futuro "ver original" la tienen disponible.
+  cae solo a su razón original, y el spec 16 o un futuro "ver original" la tienen disponible.
   Decisión del usuario.
 - **Sí:** una tabla `ai_personalizations` con 5 usos por usuario en una ventana móvil de 24 h.
   **No:** contar `personalized_at`, que no cuenta los reintentos sobre la misma ruta. **No:** día
-  calendario, que depende de la zona horaria. La tabla la puede reusar el spec 15 (ADR 0004 asume
+  calendario, que depende de la zona horaria. La tabla la puede reusar el spec 16 (ADR 0004 asume
   el límite compartido). Decisión del usuario. _(Cierra la decisión pendiente "límite diario de
   personalizaciones" de la §4 del mapa.)_
 - **Sí:** el intento se registra antes de llamar al modelo y cuenta aunque falle. **No:** contar
@@ -671,7 +671,7 @@ ruta por lo que contaste", la `explanation` y una lista de `Badge`: "Meta: React
 | El modelo nombrado o la API del AI SDK difieren de lo que suele aparecer en ejemplos | Paso 1 del plan: se verifica con Context7 y en platform.openai.com antes de escribir                                                                                                                                       |
 | La key llega al bundle del cliente                                                   | `import "server-only"` en `personalize-path.ts`, sin prefijo `NEXT_PUBLIC_`, y el `grep` sobre `.next/static` del paso 9                                                                                                   |
 | `numeric` (`hours`, `budget_hours`) llega como string desde PostgREST                | Se normaliza con `Number()` al armar el `PersonalizationInput`, igual que en los specs 07–10                                                                                                                               |
-| La IA malinterpreta el texto libre y cambia la meta o los intereses sin que el usuario lo quisiera | El prompt exige cambiar solo lo que el texto justifica con claridad ("ante la duda, nada"); el aviso en la ruta muestra cada cambio; las respuestas originales quedan en `assessments` y el usuario puede generar otra ruta (y en el spec 15, ajustarla a mano) |
+| La IA malinterpreta el texto libre y cambia la meta o los intereses sin que el usuario lo quisiera | El prompt exige cambiar solo lo que el texto justifica con claridad ("ante la duda, nada"); el aviso en la ruta muestra cada cambio; las respuestas originales quedan en `assessments` y el usuario puede generar otra ruta (y en el spec 16, ajustarla a mano) |
 | El ajuste suma hasta 8 s a la pantalla "Armando tu ruta…" | Solo corre si el usuario escribió texto libre; timeout de 8 s y, si se corta, se genera sin ajuste |
 | Migración en paralelo con 13 o 14 (regla 6)                                          | Este spec no se implementa en paralelo con 13 ni 14                                                                                                                                                                        |
 
@@ -682,7 +682,7 @@ ruta por lo que contaste", la `explanation` y una lista de `Badge`: "Meta: React
 - Ajustar nivel, horas o plazo desde el texto libre, o confirmar el ajuste antes de generar (spec
   15).
 - Reescribir los motivos de descarte.
-- La traducción de texto libre a chips (spec 15).
+- La traducción de texto libre a chips (spec 16).
 - Cambios a `lib/paths/*`, `lib/catalog/*`, `lib/progress/*`, `components/paths/*`,
   `components/quiz/*` (salvo el texto de ayuda de `free-text-step.tsx`), `components/dashboard/*`,
   `components/brand/*`, ni a las páginas de `/paths/[id]` y `/dashboard` fuera de lo descrito en el

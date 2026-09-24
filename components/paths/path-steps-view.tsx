@@ -1,15 +1,19 @@
 "use client";
 
 import { startTransition, useOptimistic, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { ListBulletsIcon, MapTrifoldIcon } from "@phosphor-icons/react";
 
 import {
   discardStep,
+  requestQuiz,
   restoreStep,
   setStepStatus,
+  submitQuizAttempt,
   type StepActionResult,
 } from "@/app/(app)/paths/[id]/actions";
 import { Eyebrow } from "@/components/brand/eyebrow";
+import { QuizDialog, type QuizTarget } from "@/components/quizzes/quiz-dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast, Toaster } from "@/components/ui/toast";
 import type { StepOrigin } from "@/lib/paths/types";
@@ -41,6 +45,7 @@ export type PathStepView = {
   courseHours: number;
   courseUrl: string;
   courseImageUrl: string | null;
+  courseChapters: string[];
   programSlug: string | null;
   programName: string | null;
 };
@@ -146,12 +151,28 @@ function writeViewToUrl(view: PathView) {
 }
 
 type PathStepsViewProps = {
+  pathId: string;
   steps: PathStepView[];
   budgetHours: number | null;
   initialView: PathView;
+  // false sin OPENAI_API_KEY o SUPABASE_SECRET_KEY: los botones de quiz no aparecen y la ruta
+  // funciona igual con el toggle de estado.
+  quizzesEnabled: boolean;
 };
 
-export function PathStepsView({ steps, budgetHours, initialView }: PathStepsViewProps) {
+// La zona del navegador: el servidor la usa para saber qué día local cuenta para la racha.
+function browserTimeZone(): string {
+  return Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC";
+}
+
+export function PathStepsView({
+  pathId,
+  steps,
+  budgetHours,
+  initialView,
+  quizzesEnabled,
+}: PathStepsViewProps) {
+  const router = useRouter();
   // Si una action falla, el servidor no cambió nada: al terminar la transición el valor optimista
   // deja de aplicarse y la vista vuelve sola a lo que dicen las props, sin rollback manual.
   const [optimisticSteps, applyOptimisticChange] = useOptimistic(steps, applyChange);
@@ -227,7 +248,26 @@ export function PathStepsView({ steps, budgetHours, initialView }: PathStepsView
   }
 
   function handleStatusChange(stepId: string, status: SelectableStepStatus) {
-    runStepAction({ type: "status", stepId, status }, () => setStepStatus(stepId, status));
+    runStepAction({ type: "status", stepId, status }, () =>
+      setStepStatus(stepId, status, browserTimeZone()),
+    );
+  }
+
+  // El quiz abierto; null = cerrado. Se abre desde el modal de detalle, que se cierra antes para no
+  // apilar dos diálogos.
+  const [quizTarget, setQuizTarget] = useState<QuizTarget | null>(null);
+  // Cambia en cada apertura para montar un QuizDialog nuevo, con su estado desde cero.
+  const [quizSession, setQuizSession] = useState(0);
+
+  function openQuiz(stepId: string, chapterTitle: string | null) {
+    setIsDetailOpen(false);
+    setQuizSession((session) => session + 1);
+    setQuizTarget({
+      pathId,
+      pathStepId: stepId,
+      kind: chapterTitle ? "chapter" : "course",
+      chapterTitle,
+    });
   }
 
   function handleRestore(stepId: string) {
@@ -342,6 +382,23 @@ export function PathStepsView({ steps, budgetHours, initialView }: PathStepsView
             discardFromDetail(selectedStep);
           }
         }}
+        quizzesEnabled={quizzesEnabled}
+        onOpenQuiz={(chapterTitle) => {
+          if (selectedStep) {
+            openQuiz(selectedStep.id, chapterTitle);
+          }
+        }}
+      />
+
+      <QuizDialog
+        key={quizSession}
+        target={quizTarget}
+        onClose={() => setQuizTarget(null)}
+        // Aprobar el quiz del curso marca el paso como hecho y suma la racha en el servidor: se
+        // vuelve a pedir la página para que el mapa y la racha lo muestren.
+        onAttemptSaved={() => router.refresh()}
+        requestQuizAction={requestQuiz}
+        submitAttemptAction={submitQuizAttempt}
       />
     </Toaster>
   );

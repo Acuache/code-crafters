@@ -277,6 +277,7 @@ export type Database = {
           created_at: string
           id: string
           role: Database["public"]["Enums"]["user_role"]
+          timezone: string
           username: string | null
         }
         Insert: {
@@ -284,6 +285,7 @@ export type Database = {
           created_at?: string
           id: string
           role?: Database["public"]["Enums"]["user_role"]
+          timezone?: string
           username?: string | null
         }
         Update: {
@@ -291,6 +293,7 @@ export type Database = {
           created_at?: string
           id?: string
           role?: Database["public"]["Enums"]["user_role"]
+          timezone?: string
           username?: string | null
         }
         Relationships: []
@@ -367,6 +370,179 @@ export type Database = {
         }
         Relationships: []
       }
+      quiz_attempts: {
+        Row: {
+          activity_date: string
+          answers: Json
+          correct_count: number
+          id: string
+          idempotency_key: string
+          pass_percentage: number
+          passed: boolean
+          path_id: string
+          path_step_id: string
+          quiz_id: string
+          score_percentage: number
+          started_at: string
+          submitted_at: string
+          timezone: string
+          user_id: string
+        }
+        Insert: {
+          activity_date: string
+          answers: Json
+          correct_count: number
+          id?: string
+          idempotency_key: string
+          pass_percentage: number
+          passed: boolean
+          path_id: string
+          path_step_id: string
+          quiz_id: string
+          score_percentage: number
+          started_at?: string
+          submitted_at?: string
+          timezone: string
+          user_id: string
+        }
+        Update: {
+          activity_date?: string
+          answers?: Json
+          correct_count?: number
+          id?: string
+          idempotency_key?: string
+          pass_percentage?: number
+          passed?: boolean
+          path_id?: string
+          path_step_id?: string
+          quiz_id?: string
+          score_percentage?: number
+          started_at?: string
+          submitted_at?: string
+          timezone?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quiz_attempts_path_id_fkey"
+            columns: ["path_id"]
+            isOneToOne: false
+            referencedRelation: "learning_paths"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "quiz_attempts_path_step_id_fkey"
+            columns: ["path_step_id"]
+            isOneToOne: false
+            referencedRelation: "path_steps"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "quiz_attempts_quiz_id_fkey"
+            columns: ["quiz_id"]
+            isOneToOne: false
+            referencedRelation: "quizzes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      quizzes: {
+        Row: {
+          chapter_title: string | null
+          course_id: number
+          created_at: string
+          failure_message: string | null
+          id: string
+          is_active: boolean
+          kind: Database["public"]["Enums"]["quiz_kind"]
+          model: string | null
+          pass_percentage: number
+          questions: Json | null
+          status: Database["public"]["Enums"]["quiz_generation_status"]
+          target_key: string
+          title: string
+          updated_at: string
+          version: number
+        }
+        Insert: {
+          chapter_title?: string | null
+          course_id: number
+          created_at?: string
+          failure_message?: string | null
+          id?: string
+          is_active?: boolean
+          kind: Database["public"]["Enums"]["quiz_kind"]
+          model?: string | null
+          pass_percentage?: number
+          questions?: Json | null
+          status?: Database["public"]["Enums"]["quiz_generation_status"]
+          target_key: string
+          title: string
+          updated_at?: string
+          version?: number
+        }
+        Update: {
+          chapter_title?: string | null
+          course_id?: number
+          created_at?: string
+          failure_message?: string | null
+          id?: string
+          is_active?: boolean
+          kind?: Database["public"]["Enums"]["quiz_kind"]
+          model?: string | null
+          pass_percentage?: number
+          questions?: Json | null
+          status?: Database["public"]["Enums"]["quiz_generation_status"]
+          target_key?: string
+          title?: string
+          updated_at?: string
+          version?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quizzes_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      streak_activities: {
+        Row: {
+          activity_date: string
+          created_at: string
+          id: number
+          source_attempt_id: string | null
+          timezone: string
+          user_id: string
+        }
+        Insert: {
+          activity_date: string
+          created_at?: string
+          id?: never
+          source_attempt_id?: string | null
+          timezone: string
+          user_id: string
+        }
+        Update: {
+          activity_date?: string
+          created_at?: string
+          id?: never
+          source_attempt_id?: string | null
+          timezone?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "streak_activities_source_attempt_id_fkey"
+            columns: ["source_attempt_id"]
+            isOneToOne: true
+            referencedRelation: "quiz_attempts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -381,11 +557,31 @@ export type Database = {
         }
         Returns: undefined
       }
+      record_step_activity: {
+        Args: {
+          p_step_id: string
+          p_time_zone: string
+        }
+        Returns: undefined
+      }
+      submit_quiz_attempt: {
+        Args: {
+          p_answers: Json
+          p_idempotency_key: string
+          p_path_id: string
+          p_path_step_id: string
+          p_quiz_id: string
+          p_timezone: string
+        }
+        Returns: Json
+      }
     }
     Enums: {
       course_difficulty: "principiante" | "intermedio" | "avanzado"
       path_step_status: "pending" | "in_progress" | "done" | "discarded"
       program_course_level: "requerido" | "recomendado" | "opcional"
+      quiz_generation_status: "generating" | "ready" | "failed"
+      quiz_kind: "course" | "chapter"
       user_role: "user" | "admin"
     }
     CompositeTypes: {
@@ -517,6 +713,8 @@ export const Constants = {
       course_difficulty: ["principiante", "intermedio", "avanzado"],
       path_step_status: ["pending", "in_progress", "done", "discarded"],
       program_course_level: ["requerido", "recomendado", "opcional"],
+      quiz_generation_status: ["generating", "ready", "failed"],
+      quiz_kind: ["course", "chapter"],
       user_role: ["user", "admin"],
     },
   },

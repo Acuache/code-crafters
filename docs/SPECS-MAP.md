@@ -10,7 +10,7 @@ Decisiones de base para todo el mapa:
 
 - El código vive en la raíz del repo (`app/`, `components/`, `lib/`, `proxy.ts`), no en `src/`. No hay
   spec de migración a `src/`.
-- Granularidad fina: un spec por entregable, 15 en total.
+- Granularidad fina: un spec por entregable, 16 en total.
 - Rama única `master`. Cada spec sale de `master` y vuelve ahí como `spec-NN-slug`
   (`specs/.spec-config.yml` con `AutoCreateBranch: true`, el default que crea el primer `/spec`).
 - **Dos roles: `user` y `admin`.** `ENUNCIADO.md` pide que la app "permita la adición de nuevas
@@ -53,9 +53,10 @@ Decisiones de base para todo el mapa:
 | 10 | `admin-catalog` | Panel `/admin`: CRUD de cursos y de su ubicación en programas, protegido por rol `admin` | 02, 03 | Semana 2 |
 | 11 | `ai-personalization` | Capa 2: título, resumen y razones escritas por IA sobre la ruta ya guardada, con límite diario | 07 | Semana 2 |
 | 12 | `visual-path-map` | Mapa de la ruta en zigzag estilo Duolingo (CSS + SVG, sin React Flow), por defecto en `/paths/[id]`, con modal de detalle por nodo | 08, 09 | Semana 2 |
-| 13 | `gamification` | XP por curso, niveles, insignias, racha y celebración al completar | 08 | Semana 2 |
-| 14 | `path-sharing` | Ruta pública en `/r/[slug]` con tarjeta OG para pegar en Discord | 08 | Semana 2 |
-| 15 | `path-recalculation` | Botón "Ajustar mi ruta": cuestionario prellenado con las respuestas anteriores; con IA, un texto libre se traduce a cambios de chips (nunca de cursos) antes de confirmar; sin IA, se editan los chips a mano. Genera una ruta nueva, no pisa la anterior (COULD, primero en recortarse) | 08, 11 | Semana 2 |
+| 13 | `course-quizzes` | Un quiz por curso escrito por el admin desde `/admin` (sin IA), con 3 preguntas de ejemplo por curso, feedback al instante, y aprobarlo marca el paso como hecho y suma racha (ADR 0005) | 08, 10, 12 | Semana 2 |
+| 14 | `gamification` | XP por curso, niveles, insignias y celebración al completar, sobre la racha y los quizzes del 13 | 08, 12, 13 | Semana 2 |
+| 15 | `path-sharing` | Ruta pública en `/r/[slug]` con tarjeta OG para pegar en Discord | 08 | Semana 2 |
+| 16 | `path-recalculation` | Botón "Ajustar mi ruta": cuestionario prellenado con las respuestas anteriores; con IA, un texto libre se traduce a cambios de chips (nunca de cursos) antes de confirmar; sin IA, se editan los chips a mano. Genera una ruta nueva, no pisa la anterior (COULD, primero en recortarse) | 08, 11 | Semana 2 |
 
 Ramas resultantes: `spec-01-catalog-enrichment`, `spec-02-supabase-schema`, … (las deriva `/spec-impl`
 del nombre del archivo).
@@ -79,19 +80,20 @@ del nombre del archivo).
                                                  │
                 ┌────────────────────────────────┼───────────────────────┐
                 ▼                                ▼                       ▼
-         12 visual-path-map              13 gamification        14 path-sharing
+         12 visual-path-map ──► 13 course-quizzes ──► 14 gamification      15 path-sharing
 
  05 landing             (sin dependencias)
  10 admin-catalog       (depende de 02 + 03; agendado después del Hito 1)
  11 ai-personalization  (depende de 07)
- 15 path-recalculation  (depende de 08 + 11)   ← COULD
+ 13 course-quizzes      (también depende de 10: el editor vive en /admin)
+ 16 path-recalculation  (depende de 08 + 11)   ← COULD
 ```
 
 **Camino crítico:** 01 → 02 → 03 → 06 → 07 → 08 → 09. Todo lo demás cuelga de ahí.
 
 **Qué corre en paralelo:** 04 con 03 (el motor es una función pura, no toca la DB; solo necesita el
 vocabulario de 15 `programs.slug` que fija el 02, no sus migraciones ni su RLS); 05 con cualquiera de
-los anteriores (no depende de nada); y 11, 12, 13, 14 entre sí una vez cerrado el 08.
+los anteriores (no depende de nada); y 11, 12 y 15 entre sí una vez cerrado el 08 (13 va después de 12, y 14 después de 13).
 
 **Tres puntos de sincronización que hay que escribir dentro de los specs, no descubrirlos después:**
 
@@ -167,11 +169,13 @@ los anteriores (no depende de nada); y 11, 12, 13, 14 entre sí una vez cerrado 
    las pestañas "Mapa"/"Lista", el paso seleccionado, el modal de detalle, `isInterestGroup` en
    `StepGroup` y cerrar el modal al marcar "Hecho"; en `app/(app)/paths/[id]/page.tsx` (del 08), leer
    `searchParams.vista`; y en `app/globals.css`, solo el token `--animate-step-pop`.
-6. **Migraciones nuevas solo en 02, 11, 13 y 14**, y esos cuatro no se implementan en paralelo entre sí:
+6. **Migraciones nuevas solo en 02, 11, 13 y 15**, y esos cuatro no se implementan en paralelo entre sí:
    el orden de los archivos de migración depende del orden de merge, y ramas simultáneas lo rompen. El
    02 crea el esquema base —incluye `profiles.role` y las tablas `programs`/`program_courses`—; 11, 13
-   y 14 añaden cada uno sus columnas o tablas para poder recortarse sin dejar tablas muertas. El 10
-   (`admin-catalog`) **no crea ninguna migración propia**: usa el esquema que ya dejó el 02.
+   y 15 añaden cada uno sus columnas o tablas para poder recortarse sin dejar tablas muertas. El 10
+   (`admin-catalog`) **no crea ninguna migración propia**: usa el esquema que ya dejó el 02. Fuera
+   de la numeración, los quizzes y la racha de Ariel (`20260923120000_quizzes_progress_streak.sql`)
+   y su integración (`20260924130000_unify_streak.sql`, ADR 0005) ya están en el repo.
 7. **Antes de cada `/spec-impl`:** estar en `master`, con el árbol limpio y actualizado. La fase 3 del
    skill se detiene si `git status` no está vacío.
 8. **Lo que aparezca fuera de alcance durante un `/spec-impl` va al spec que le toca según el mapa**, no
@@ -224,7 +228,7 @@ convencional.
   diseño ya construido, documentado en `/sistema-diseno` y en el ADR 0002. Entrada de 03, 05, 06, 08,
   09, 10 y 12. La regla general ("componer, no crear") vive en `CLAUDE.md` §"UI: componer, no crear";
   no se repite acá.
-- `components/gamification/xp-bar.tsx` — **ya existe**; el spec 13 lo conecta, no lo crea.
+- `components/gamification/xp-bar.tsx` — **ya existe**; el spec 14 lo conecta, no lo crea.
 - `lib/supabase/{client,server}.ts` y `proxy.ts` — clientes SSR ya escritos con `getAll`/`setAll` y
   refresh con `getClaims()`. Entrada del 03; el 03 añade login/callback y el rol en sesión, no reescribe
   esto.
@@ -243,8 +247,8 @@ convencional.
   ya publicado por DevTalles, hoy sin uso ni spec dueño. Insumo disponible, no asignado.
 - `public/logo.webp`, `public/astronauta.webp`, `public/streak/*.webp` — assets de marca ya
   optimizados, catalogados en `CLAUDE.md` §"Marca y assets". El logo es entrada de 05 (hero de la
-  landing) y 14 (tarjeta OG); la mascota sola, de 07 (pantalla de "generando ruta"); las 5 imágenes de
-  `streak/` (cuatro celebraciones + recordatorio de racha), del 13.
+  landing) y 15 (tarjeta OG); la mascota sola, de 07 (pantalla de "generando ruta"); las 5 imágenes de
+  `streak/` (cuatro celebraciones + recordatorio de racha), del 14.
 
 ## 7. Qué construye cada spec
 
@@ -275,8 +279,8 @@ auto-promueve a admin)—, el trigger que crea la fila de `profiles` leyendo los
 cualquiera de los tres proveedores OAuth del spec 03 (Discord, Google, GitHub), y el seed que carga
 el catálogo enriquecido y las 15 rutas oficiales desde `data/programs.json`. `programs` tiene 15
 filas, una por ruta oficial, no una por programa agrupado: React y Dart aportan 2 rutas cada uno. Es
-el único spec que crea el esquema base; 11, 13 y 14 solo le añaden columnas o tablas encima
-(`achievements` y `user_achievements` los crea el 13, no el 02), y 10 no crea ninguna. Todo salvo el
+el único spec que crea el esquema base; 11, 13 y 15 solo le añaden columnas o tablas encima, y 10
+no crea ninguna. Todo salvo el
 último paso es independiente del 01, por eso puede arrancar el día 1 con el enriquecimiento todavía
 en curso.
 
@@ -354,7 +358,7 @@ La vista en **lista** de la ruta guardada (el mapa visual es el 12, un spec apar
 procedencia por paso (por qué entró ese curso), un acordeón "Qué quitamos y por qué" (por qué salió
 uno que la ruta oficial sí tenía), el control para cambiar el estado de cada paso
 (pending/in_progress/done) y un botón para descartar un paso todavía `pending`, con opción de
-deshacer. Dueña de `app/(app)/paths/[id]/*`. Es la base sobre la que cuelgan 09, 12, 13, 14 y 15 —
+deshacer. Dueña de `app/(app)/paths/[id]/*`. Es la base sobre la que cuelgan 09, 12, 13, 14, 15 y 16 —
 ninguno de esos repite esta vista, todos la extienden o la referencian.
 
 ### 09 · `paths-dashboard`
@@ -388,7 +392,7 @@ porque exista una dependencia técnica pendiente.
 > intereses y tecnologías dominadas (listas cerradas, nunca cursos) con los que el motor arma la
 > ruta, y la ruta muestra "Ajustamos tu ruta por lo que contaste". Al abrir la ruta, redacta título,
 > resumen y razones una sola vez, sin botón. Solo corre si el usuario escribió texto libre y hay
-> `OPENAI_API_KEY`; modelo `gpt-6-luna`. El spec 15 reusa `requestProfileAdjustment` para su
+> `OPENAI_API_KEY`; modelo `gpt-6-luna`. El spec 16 reusa `requestProfileAdjustment` para su
 > versión con confirmación.
 
 La Capa 2 del diseño del ADR 0001: sobre una ruta que la Capa 1 (el motor del 04) ya armó y guardó, la
@@ -414,22 +418,31 @@ que se rellena al completar, y el astronauta con halo y globo en el próximo pas
 "Hecho" lo cierra y el progreso "viaja" al siguiente paso. Todas las animaciones respetan
 `prefers-reduced-motion`.
 
-### 13 · `gamification`
+### 13 · `course-quizzes`
 
-XP por curso completado (según las horas del curso), niveles, insignias, racha de días y una celebración
-(confetti) al completar un paso o una ruta. El componente `components/gamification/xp-bar.tsx` **ya
-existe** en el repo — este spec lo conecta a datos reales, no lo crea. Añade columnas a `profiles`
-(xp, level, streak) y tablas de insignias (`achievements`, `user_achievements`) sobre el esquema base
-del 02.
+Reemplaza los quizzes generados con IA del ADR 0005 por un quiz por curso que el admin escribe y
+edita en `/admin/courses/[slug]/quiz` (spec 10). El seed trae 3 preguntas sencillas para cada uno
+de los 74 cursos. Al elegir una opción se ve al instante si es correcta y por qué; aprobar marca el
+paso como "Hecho" y suma a la racha. Saca la práctica por capítulo, la generación con IA y
+`SUPABASE_SECRET_KEY`. Crea migración (simplifica `quizzes` y le da RLS solo-admin) y el seed.
 
-### 14 · `path-sharing`
+### 14 · `gamification`
+
+XP por curso completado (según las horas del curso), niveles, insignias y una celebración (confetti)
+al completar un paso o una ruta, también cuando se completa aprobando el quiz del curso. La racha y
+los quizzes ya existen (aporte de Ariel, integrado según [ADR 0005](decisiones/0005-quizzes-y-racha-unificados.md)):
+este spec usa `streak_activities` y `lib/gamification/streak.ts` en vez de crear su propia racha. El
+componente `components/gamification/xp-bar.tsx` **ya existe** — este spec lo conecta a datos reales.
+XP, nivel e insignias se derivan al leer, sin columnas nuevas en `profiles`.
+
+### 15 · `path-sharing`
 
 Una versión pública y de solo lectura de una ruta en `/r/[slug]`, más una tarjeta OG
 (`opengraph-image.tsx`) para que se vea bien al pegar el link en Discord. Su RLS debe garantizar que solo
 las rutas con `is_public = true` sean legibles por terceros; las privadas siguen protegidas igual que en
 el 08.
 
-### 15 · `path-recalculation`
+### 16 · `path-recalculation`
 
 El único spec **COULD** del mapa — el primero en recortarse si el tiempo aprieta. Descartado tanto el
 mini-quiz de re-evaluación adaptativa de `ROADMAP.md` como que la IA decida cursos sobre la ruta ya

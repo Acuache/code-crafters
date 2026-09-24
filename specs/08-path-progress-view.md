@@ -17,8 +17,8 @@ procedencia **y el descarte** visibles — está guardada en `path_steps` (`orig
 
 Este spec cierra ese hueco y cumple la mitad de "guardar varias rutas y **marcar progreso**" del
 `docs/ENUNCIADO.md` (la otra mitad, ver todas las rutas, es el spec 09). Es la base sobre la que
-cuelgan 09 (reusa el cálculo de progreso), 12 (reusa el control de estado), 13 (reusa
-`completed_at`), 14 y 15.
+cuelgan 09 (reusa el cálculo de progreso), 12 (reusa el control de estado), 14 (reusa
+`completed_at`), 15 y 16.
 
 **Dependencias, una por motivo distinto:**
 
@@ -66,8 +66,8 @@ intereses"`), que este spec muestra tal cual, sin reinterpretarlos.
 
 - El dashboard con todas las rutas (spec 09). Este spec sólo deja un link "Volver al dashboard" al
   placeholder de `app/dashboard/page.tsx` que ya existe.
-- Mapa visual con React Flow (12), XP / niveles / insignias / racha / confetti al completar (13),
-  compartir (14), razones y título escritos por IA (11) y "Ajustar mi ruta" (15).
+- Mapa visual con React Flow (12), XP / niveles / insignias / racha / confetti al completar (14),
+  compartir (15), razones y título escritos por IA (11) y "Ajustar mi ruta" (16).
 - Restaurar un paso que descartó **el motor** ("ya lo dominás", "no cabía en tu tiempo", "superaba el
   cupo de intereses"): se muestran de sólo lectura (ver Decisiones).
 - Descartar un paso `in_progress` o `done`: sólo se descarta un `pending`.
@@ -289,7 +289,7 @@ programa no altera el orden de estudio.
 - **Sí:** sólo se restauran los pasos que quitó el usuario. **No:** restaurar también los que sacó el
   motor. Devolver un "no cabía en tu tiempo" rompe el invariante "un plan que cabe en tu tiempo" del
   ADR 0004, y devolver un "ya lo dominás" contradice la respuesta del propio usuario; para cambiar eso
-  está "Ajustar mi ruta" (spec 15), que genera una ruta nueva.
+  está "Ajustar mi ruta" (spec 16), que genera una ruta nueva.
 - **Sí:** distinguir el descarte del usuario por `discard_reason = USER_DISCARD_REASON` ("lo quitaste
   vos", la frase del ADR 0004). **No:** una columna `discarded_by`. Una columna nueva sería una
   migración, prohibida para este spec por la regla 6 del mapa; la constante vive en un solo lugar
@@ -298,7 +298,7 @@ programa no altera el orden de estudio.
   dirección. **No:** `Select` (dos clics, estado menos visible) ni un botón que sólo avanza (corregir un
   "Hecho" por error exigiría otro control). Volver de `done` a otro estado limpia `completed_at`.
 - **Sí:** progreso por horas (`doneHours / activeHours`). **No:** por cantidad de pasos. Es coherente
-  con el presupuesto de horas que arma el motor y con el XP por horas del spec 13; un curso de 46 h no
+  con el presupuesto de horas que arma el motor y con el XP por horas del spec 14; un curso de 46 h no
   pesa lo mismo que uno de 6 h. El conteo "N de M pasos" se muestra igual como texto.
 - **Sí:** `in_progress` no suma al avance. **No:** contarlo como medio curso. "En curso" no dice cuánto
   falta; sumar una fracción inventaría un dato.
@@ -330,7 +330,7 @@ programa no altera el orden de estudio.
   Thinkific vía `next/image` + `remotePatterns`) y la mascota `astronauta.webp` en la cabecera.
   **No:** una lista sólo de texto, ni las poses de `public/streak/`. Las portadas ya existen para los 74
   cursos y son las mismas que el usuario reconoce en cursos.devtalles.com; las poses de celebración y
-  racha están reservadas para el spec 13 (`CLAUDE.md` §"Marca y assets"). Pedido del usuario durante la
+  racha están reservadas para el spec 14 (`CLAUDE.md` §"Marca y assets"). Pedido del usuario durante la
   implementación ("más visual, usá las imágenes").
 - **Sí:** línea de tiempo vertical con nodos numerados dentro de la lista. **No:** un camino estilo
   Duolingo en zigzag. Ese recorrido es un mapa, y el mapa es el spec 12 (`visual-path-map`); el
@@ -351,8 +351,8 @@ programa no altera el orden de estudio.
 
 ## Qué **no** entra en este spec
 
-- Dashboard con todas las rutas (09), mapa visual (12), gamificación (13), compartir (14),
-  personalización con IA (11) y "Ajustar mi ruta" (15).
+- Dashboard con todas las rutas (09), mapa visual (12), gamificación (14), compartir (15),
+  personalización con IA (11) y "Ajustar mi ruta" (16).
 - Restaurar descartes del motor, descartar pasos `in_progress`/`done`, reordenar pasos, agregar cursos
   a mano, editar título o razones, borrar una ruta.
 - Cualquier migración o columna nueva, y cualquier cambio a `lib/paths/*`, `lib/catalog/*` o

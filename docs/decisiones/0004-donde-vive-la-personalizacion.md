@@ -86,7 +86,7 @@ correcta —la personalización se percibe fina— pero la causa no es el techo 
   visibles, mencionado tres veces en `docs/ROADMAP.md`— no tiene dónde vivir: `path_steps` no modela
   un paso descartado, y `docs/SPECS-MAP.md` describía el spec 08 solo con "por qué entró" un curso. Si
   el spec 02 se escribía sin esto, la pieza se volvía imposible de construir sin romper la regla 6 del
-  mapa (migraciones solo en 02, 11, 13 y 14).
+  mapa (migraciones solo en 02, 11, 13 y 15).
 - Darle a la IA `skip`/`add` (opción 2) cuesta una migración y ~11-15 h de trabajo de P2, y produce una
   ruta distinta según haya o no `OPENAI_API_KEY` — exactamente lo que el criterio 3 del `ENUNCIADO.md`
   evalúa al clonar el proyecto sin key.
@@ -111,7 +111,7 @@ original, con una versión mínima que sobrevive:
   `NestJS-Testing` o `net-pruebascompletas` —los únicos cursos de testing del catálogo—, porque el
   testing de React vive **dentro** de `react-de-cero`, no en un curso aparte. Un `z.enum` acotado
   obligaría al modelo a recomendar un curso de Nest o .NET a alguien haciendo React puro.
-- Si un curso ya marcado `done` desaparece de la ruta al ajustarla, el spec 13 ya le dio XP por ese
+- Si un curso ya marcado `done` desaparece de la ruta al ajustarla, el spec 14 ya le dio XP por ese
   curso: revocar cursos completados puede bajar de nivel o quitar una insignia ya celebrada.
 - La versión que sobrevive —la IA traduce texto libre a chips del cuestionario, nunca a cursos, y el
   resultado es una ruta nueva que no reemplaza a la anterior— no tiene ninguno de estos problemas: no
@@ -126,7 +126,7 @@ Se adoptan cinco piezas:
 ADR 0001 no se reabre en este punto.
 
 **2. El descarte se persiste y se muestra.** El spec 02 deja un lugar en el modelo de datos para el
-curso que el motor —o, desde el spec 15, el usuario— saca de una ruta, con su motivo (`"no cabía en tu
+curso que el motor —o, desde el spec 16, el usuario— saca de una ruta, con su motivo (`"no cabía en tu
 tiempo"`, `"ya lo dominás"`, `"lo quitaste vos"`). El spec 08 lo muestra en un acordeón "Qué quitamos y
 por qué", junto a los chips de procedencia que ya tenía planeados, y agrega un botón para descartar un
 paso `pending` a mano, con opción de deshacer — sin IA, sin migración nueva más allá de la que ya deja
@@ -137,7 +137,7 @@ usando datos que el motor ya tiene (plazo, tecnologías dominadas, programas fus
 fija de la maqueta. Es la parte más barata de esta decisión —horas de redacción, no créditos de IA— y
 la que más pesa en la sensación de personalización, según la Corrida 1.
 
-**4. "Ajustar mi ruta" (spec 15) es un cuestionario prellenado, con o sin IA.** Con
+**4. "Ajustar mi ruta" (spec 16) es un cuestionario prellenado, con o sin IA.** Con
 `OPENAI_API_KEY`, un campo de texto libre se traduce a cambios en los chips existentes (meta,
 intereses, horas, plazo) — acotados con `z.enum` a las listas cerradas del cuestionario, nunca a
 slugs de curso — y el usuario confirma antes de aplicar nada. Sin key, el mismo formulario prellenado
@@ -152,8 +152,8 @@ Se gana: evidencia medida de que el motor de reglas ya personaliza (delta de 7 a
 rutas, sin gastar IA), un lugar para la pieza que el ADR 0001 había prometido como respuesta a "esto ya
 está hecho" y que se había perdido en la traducción al mapa de specs, y una versión de "ajustar mi
 ruta" que cabe en 3-4 h de P2 en vez de las 11-15 h que costaba la versión con `skip`/`add` — sin
-arriesgar el spec 13 (XP) ni el 14 (compartir), que la regla 6 del mapa no deja correr en paralelo con
-una migración del 15.
+arriesgar el spec 14 (XP) ni el 15 (compartir), que la regla 6 del mapa no deja correr en paralelo con
+una migración del 16.
 
 Se sacrifica: la sensación de "hablar con la IA y que actúe directo" que tenía la propuesta original.
 El usuario que ajusta su ruta ve primero los chips que la IA cambió y confirma, no un cambio inmediato
@@ -169,7 +169,7 @@ Qué haría revisar esto:
   de interés más comunes. Sigue siendo decisión abierta del spec 04 (`docs/SPECS-MAP.md` §4).
 - Que los $10 de crédito de OpenAI tengan fecha de vencimiento anterior a la evaluación —pendiente de
   verificar desde el 2026-09-15 (`docs/investigacion/ANALISIS-IA.md` §11)—, lo que no cambia esta
-  decisión pero sí la urgencia de que el spec 15 funcione igual de bien sin key.
-- Que al implementar el spec 15 se necesite decidir si el límite diario de personalizaciones del spec
+  decisión pero sí la urgencia de que el spec 16 funcione igual de bien sin key.
+- Que al implementar el spec 16 se necesite decidir si el límite diario de personalizaciones del spec
   11 se comparte con la traducción de texto a chips, o si cada uno tiene el suyo — hoy se asume
   compartido, sin verificar contra el costo real por llamada.
