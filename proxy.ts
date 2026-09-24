@@ -1,6 +1,15 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
+// La landing, el login y /sistema-diseno son públicos.
+const PRIVATE_PATH_PREFIXES = ["/dashboard", "/quiz", "/paths", "/admin"];
+
+function isPrivatePath(pathname: string): boolean {
+  return PRIVATE_PATH_PREFIXES.some(
+    (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`),
+  );
+}
+
 export async function proxy(request: NextRequest) {
   const response = NextResponse.next({
     request: {
@@ -26,9 +35,17 @@ export async function proxy(request: NextRequest) {
     },
   );
 
-  // Dispara el refresh del token si expiró y valida el JWT contra las claves
-  // de firma de Supabase (recomendado por sobre confiar en getSession()).
-  await supabase.auth.getClaims();
+  // Refresca el token si venció y valida el JWT contra las claves de firma de Supabase.
+  const { data } = await supabase.auth.getClaims();
+
+  // Chequeo optimista: redirige antes de que la página empiece a transmitirse (con loading.tsx ya
+  // no podría devolver un 307). La verificación real sigue en requireUser() de cada página.
+  if (!data?.claims && isPrivatePath(request.nextUrl.pathname)) {
+    const loginUrl = request.nextUrl.clone();
+    loginUrl.pathname = "/login";
+    loginUrl.search = "";
+    return NextResponse.redirect(loginUrl);
+  }
 
   return response;
 }
