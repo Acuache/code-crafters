@@ -1,7 +1,5 @@
-// Schema del curso del panel de administración (SPEC 10). Lo comparten el formulario (cliente,
-// vía zodResolver) y las server actions (servidor): por eso cada preprocesado es idempotente —
-// acepta tanto lo que produce el formulario (texto del textarea, "" en un input vacío, NaN de un
-// input numérico vacío) como el valor ya normalizado que la action vuelve a validar.
+// Lo comparten el formulario y las server actions, así que cada preprocesado acepta tanto el valor
+// crudo del input como el ya normalizado que la action vuelve a validar.
 
 import { z } from "zod";
 
@@ -22,10 +20,8 @@ export function parseLines(text: string): string[] {
     .filter((line) => line.length > 0);
 }
 
-// Los parámetros de estos preprocesados están tipados con lo que manda el formulario: de ahí zod
-// infiere el tipo de entrada del schema (z.input), que es el tipo de los valores de
-// react-hook-form. En runtime el servidor recibe `unknown`, por eso cada uno chequea el tipo real y
-// deja pasar lo que no reconoce para que el schema de adentro lo rechace.
+// Tipados con lo que manda el formulario, para que z.input coincida con react-hook-form. En el
+// servidor llega `unknown`: lo que no reconocen lo dejan pasar para que lo rechace el schema.
 
 export function blankToNull(value: string | null): string | null {
   if (typeof value === "string" && value.trim() === "") {

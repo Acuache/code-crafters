@@ -46,10 +46,8 @@ type AutoPersonalizeContext = {
   answers: unknown;
 };
 
-// Spec 11: la IA redacta el texto de la ruta sola, una única vez, y solo si el usuario escribió
-// texto libre en el cuestionario — sin texto libre no tiene nada propio que contar, y la ruta se
-// queda con el texto de plantilla. Las consultas se hacen en orden de costo y se corta en la
-// primera que descarta; si un conteo falla, no se personaliza.
+// La IA redacta el texto de la ruta una sola vez, y solo si el usuario escribió texto libre: sin
+// él no tiene nada propio que contar. Las consultas van de la más barata a la más cara.
 async function shouldAutoPersonalize(
   supabase: Awaited<ReturnType<typeof createClient>>,
   { pathId, isPersonalized, answers }: AutoPersonalizeContext,
@@ -69,8 +67,7 @@ async function shouldAutoPersonalize(
     return false;
   }
 
-  // Un intento previo sobre esta ruta, aunque haya fallado, basta para no reintentar solo en
-  // cada visita.
+  // Un intento previo, aunque haya fallado, evita reintentar solo en cada visita.
   const attemptsForPath = await countPersonalizationAttemptsForPath(supabase, pathId);
   return attemptsForPath === 0;
 }
@@ -90,7 +87,7 @@ async function loadStreak(supabase: Awaited<ReturnType<typeof createClient>>, us
 
 export default async function PathPage({ params, searchParams }: PathPageProps) {
   const { id } = await params;
-  // Spec 12: el mapa es la vista por defecto; cualquier valor que no sea "lista" cae en el mapa.
+  // El mapa es la vista por defecto.
   const { vista } = await searchParams;
   const initialView: PathView = vista === "lista" ? "lista" : "mapa";
 
@@ -110,8 +107,8 @@ export default async function PathPage({ params, searchParams }: PathPageProps) 
     notFound();
   }
 
-  // Vigentes y descartados juntos: la vista los separa, para que el estado optimista pueda mover
-  // un paso de la lista al acordeón (y de vuelta) sin recargar.
+  // Vigentes y descartados juntos: así el estado optimista mueve un paso entre la lista y el
+  // acordeón sin recargar.
   const { data: rawSteps } = await supabase
     .from("path_steps")
     .select(
@@ -126,26 +123,23 @@ export default async function PathPage({ params, searchParams }: PathPageProps) 
     stage: row.stage,
     position: row.position,
     origin: toStepOrigin(row.origin),
-    // Spec 11: la razón de la IA si existe; si no, la de plantilla del motor (spec 04).
+    // La razón de la IA si existe; si no, la del motor.
     reason: row.ai_reason ?? row.reason,
     status: row.status,
     discardReason: row.discard_reason,
     courseTitle: row.courses.title,
-    // numeric(5,1) en Postgres: PostgREST puede devolverlo como string, y sin Number() la suma
-    // de horas concatenaría en vez de sumar.
     courseHours: Number(row.courses.hours),
     courseUrl: row.courses.url,
     courseImageUrl: row.courses.image_url,
     courseChapters: row.courses.chapters,
-    // null para un curso que entró por interés sin pertenecer a un programa fusionado (ADR 0003).
+    // null para un curso que entró por interés sin pertenecer a un programa de la ruta.
     programSlug: row.programs?.slug ?? null,
     programName: row.programs?.name ?? null,
   }));
 
   const budgetHours = path.budget_hours === null ? null : Number(path.budget_hours);
 
-  // Spec 11: el texto de la IA, cuando existe, reemplaza al de plantilla solo en pantalla; el
-  // original sigue en la base.
+  // El texto de la IA reemplaza al de plantilla solo en pantalla; el original sigue en la base.
   const title = path.ai_title ?? path.title;
   const summary = path.ai_summary ?? path.summary;
   const isPersonalized = path.personalized_at !== null;
@@ -182,7 +176,7 @@ export default async function PathPage({ params, searchParams }: PathPageProps) 
           ) : null}
           {autoPersonalize ? <AutoPersonalizer pathId={path.id} /> : null}
         </div>
-        {/* Decorativa: el título de la ruta ya está al lado, así que alt="" (CLAUDE.md §Marca). */}
+        {/* Decorativa: el título de la ruta ya está al lado. */}
         <Image
           src="/astronauta.webp"
           alt=""

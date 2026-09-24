@@ -32,11 +32,8 @@ function toStepRow(
   };
 }
 
-// `assessmentId` es lo único que recibe la action: vuelve a leer las respuestas desde `assessments`
-// (filtradas por RLS al dueño) en vez de confiar en un payload ya tipado del cliente — mismo patrón
-// que ya usa saveAssessment (spec 06), y mitiga el riesgo de `assessments.answers` como jsonb sin
-// versión.
-// Solo devuelve cuando falla: con éxito termina en redirect(), que corta la action y navega.
+// Recibe solo el id y vuelve a leer las respuestas de la base (RLS filtra al dueño) en vez de
+// confiar en lo que mande el cliente. Solo devuelve cuando falla: con éxito termina en redirect().
 export async function generatePath(assessmentId: string): Promise<ActionFailure> {
   const user = await requireUser();
   const supabase = await createClient();
@@ -56,22 +53,18 @@ export async function generatePath(assessmentId: string): Promise<ActionFailure>
     return { ok: false, message: GENERIC_ERROR_MESSAGE };
   }
 
-  // buildPath() (spec 04) no conoce `freeText`; el resto ya calza con LearnerProfile gracias a la
-  // aserción de tipos que deja components/quiz/quiz-schema.ts.
+  // El motor no usa `freeText`; el resto ya tiene la forma de LearnerProfile.
   const { freeText, ...answeredProfile } = parsed.data;
 
   const { catalog, programs, courseIds, programIds } = await loadCatalog(supabase);
 
-  // Sin este guard, un Supabase sin el seed del spec 02 aplicado produce una ruta de 0 pasos que
-  // igual se guarda y redirige sin error — la forma de "no funciona al clonarlo" que
-  // docs/ENUNCIADO.md descalifica.
+  // Sin el seed del catálogo se guardaría una ruta vacía sin ningún error.
   if (catalog.length === 0 || programs.length === 0) {
     return { ok: false, message: "El catálogo todavía no está cargado. Avisa al equipo." };
   }
 
-  // Spec 11: con key y texto libre, la IA traduce ese texto a ajustes de meta, intereses y
-  // tecnologías dominadas (nunca cursos), y el motor arma la ruta con eso. Sin key o ante
-  // cualquier falla devuelve las respuestas tal cual. assessments.answers no se toca.
+  // La IA traduce el texto libre a ajustes de meta, intereses y tecnologías (nunca cursos). Sin
+  // key o ante cualquier falla, las respuestas quedan tal cual.
   const { profile, applied: aiAdjustments } = await adjustProfileFromFreeText(
     supabase,
     answeredProfile,
@@ -110,8 +103,7 @@ export async function generatePath(assessmentId: string): Promise<ActionFailure>
   const { error: stepsError } = await supabase.from("path_steps").insert(stepRows);
 
   if (stepsError) {
-    // Compensación manual, no una función transaccional en Postgres: esa función sería una
-    // migración nueva, prohibida por la regla 6 de docs/SPECS-MAP.md para este spec.
+    // Sin transacción entre los dos inserts: si fallan los pasos, se borra la ruta a mano.
     await supabase.from("learning_paths").delete().eq("id", path.id);
     return { ok: false, message: GENERIC_ERROR_MESSAGE };
   }

@@ -119,7 +119,6 @@ export async function personalizePath(pathId: unknown): Promise<PersonalizePathR
   const steps: PersonalizationStep[] = rawSteps.map((row) => ({
     courseSlug: row.courses.slug,
     courseTitle: row.courses.title,
-    // numeric en Postgres: PostgREST puede devolverlo como string.
     hours: Number(row.courses.hours),
     difficulty: row.courses.difficulty,
     outcome: row.courses.outcome,

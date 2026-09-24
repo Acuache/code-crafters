@@ -1,4 +1,10 @@
-import type { ProgramLevel, StepOrigin } from "./types";
+import type { ExperienceLevel, ProgramLevel, StepOrigin } from "./types";
+
+export const EXPERIENCE_LEVELS = [
+  "empiezo_de_cero",
+  "tengo_bases",
+  "intermedio",
+] as const satisfies readonly ExperienceLevel[];
 
 export const PROGRAM_LEVELS = [
   "requerido",

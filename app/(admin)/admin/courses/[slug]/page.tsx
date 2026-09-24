@@ -44,7 +44,6 @@ export default async function EditCoursePage({ params }: { params: Promise<{ slu
     notFound();
   }
 
-  // numeric en Postgres: PostgREST puede devolverlo como string (mismo riesgo que en 07–09).
   const initialValues: CourseFormFields = {
     slug: course.slug,
     title: course.title,

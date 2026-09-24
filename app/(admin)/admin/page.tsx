@@ -24,7 +24,6 @@ function toAdminCourseRow(row: LoadedCourseRow): AdminCourseRow {
     id: row.id,
     slug: row.slug,
     title: row.title,
-    // numeric en Postgres: PostgREST puede devolverlo como string (mismo riesgo que en 07–09).
     hours: Number(row.hours),
     difficulty: row.difficulty,
     isActive: row.is_active,

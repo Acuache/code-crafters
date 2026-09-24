@@ -15,7 +15,8 @@ function toDayNumber(isoDate: string): number {
   return Date.UTC(year, month - 1, day) / MS_PER_DAY;
 }
 
-// `today` llega por parámetro, ya en la zona del usuario. Ignora fechas inválidas o futuras.
+// `days` puede venir en cualquier orden y con repetidos; `today` ya está en la zona del usuario.
+// Ignora fechas inválidas o futuras.
 export function computeStreak(days: string[], today: string): StreakSummary {
   const todayNumber = toDayNumber(today);
   const uniqueDayNumbers = new Set<number>();

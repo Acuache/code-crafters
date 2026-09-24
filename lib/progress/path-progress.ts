@@ -2,13 +2,11 @@ import type { Enums } from "@/lib/supabase/database.types";
 
 export type PathStepStatus = Enums<"path_step_status">;
 
-// Motivo con el que se guarda un paso que el usuario quitó a mano (la frase del ADR 0004). Es lo
-// único que lo distingue de un descarte del motor sin una columna nueva, así que restoreStep
-// filtra por este mismo valor en el servidor.
+// Lo único que distingue un paso quitado a mano de un descarte del motor: restoreStep filtra por
+// este mismo texto.
 export const USER_DISCARD_REASON = "lo quitaste tú";
 
-// Forma mínima que necesita el cálculo: el spec 09 la arma desde su propia query sin depender de
-// la forma que usa la vista de una ruta.
+// Forma mínima: el dashboard la arma desde su propia query, sin depender de la vista de la ruta.
 export type ProgressStep = {
   status: PathStepStatus;
   hours: number;
@@ -24,11 +22,8 @@ export type PathProgress = {
   overflowHours: number;
 };
 
-/**
- * Avance de una ruta medido en horas: los pasos descartados no cuentan, y `in_progress` no suma
- * a lo hecho porque "en curso" no dice cuánto falta. `fitsInBudget`/`overflowHours` se derivan acá
- * porque `learning_paths` no los persiste (spec 07).
- */
+// Avance medido en horas. Los descartados no cuentan, y `in_progress` no suma a lo hecho porque
+// "en curso" no dice cuánto falta.
 export function summarizePathProgress(
   steps: ProgressStep[],
   budgetHours: number | null,
@@ -52,8 +47,7 @@ export function summarizePathProgress(
     }
   }
 
-  // Redondeo a un decimal: las horas son numeric(5,1) y sumar floats como 8.5 + 6.5 + 0.1 deja
-  // residuos del tipo 15.100000000000001 que no deben llegar a la pantalla.
+  // Sumar floats deja residuos como 15.100000000000001 que no deben llegar a la pantalla.
   activeHours = roundToOneDecimal(activeHours);
   doneHours = roundToOneDecimal(doneHours);
 
@@ -91,8 +85,7 @@ export function isUserDiscarded(step: {
   return step.status === "discarded" && step.discardReason === USER_DISCARD_REASON;
 }
 
-// Locale fijo: la vista se renderiza en el servidor y se hidrata en el navegador, y sin locale
-// explícito cada entorno podría formatear el decimal distinto ("15.5" vs "15,5").
+// Locale fijo: servidor y navegador deben formatear igual para que la hidratación coincida.
 export function formatHours(hours: number): string {
   return `${hours.toLocaleString("es-ES", { maximumFractionDigits: 1 })} h`;
 }

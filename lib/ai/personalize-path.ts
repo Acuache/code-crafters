@@ -18,9 +18,8 @@ import {
   type ProfileAdjustment,
 } from "./profile-adjustment";
 
-// Modelo elegido por el usuario: gpt-6-luna ($0.10/$0.50 por 1M tokens, salida estructurada).
-// Antes se probaron gpt-4o-mini (ignoraba el texto libre y escribía razones de relleno) y
-// gpt-4.1-mini: la IA solo suma si la ruta se nota hecha para esa persona.
+// gpt-6-luna: barato y con salida estructurada. gpt-4o-mini ignoraba el texto libre y escribía
+// razones de relleno.
 export const PERSONALIZATION_MODEL = "gpt-6-luna";
 // gpt-6-luna razona, y su esfuerzo por defecto (medium) arriesga el timeout de 15 s. "low" alcanza
 // para redactar siguiendo las reglas del prompt.
@@ -39,9 +38,8 @@ export function isAiConfigured(): boolean {
   return Boolean(process.env.OPENAI_API_KEY);
 }
 
-// Usos del usuario en la ventana móvil de 24 h. Vive acá y no en daily-limit.ts para que ese
-// archivo siga siendo puro y testeable sin Supabase. La RLS de ai_personalizations ya filtra al
-// dueño; `count: "exact", head: true` cuenta sin traer filas.
+// Vive acá y no en daily-limit.ts para que ese archivo siga puro. RLS filtra al dueño, y
+// `head: true` cuenta sin traer filas.
 export async function countPersonalizationsInLast24h(
   supabase: SupabaseClient<Database>,
 ): Promise<number | null> {
@@ -59,8 +57,7 @@ export async function countPersonalizationsInLast24h(
   return count ?? 0;
 }
 
-// Intentos ya hechos sobre una ruta, en cualquier fecha. El arranque automático de /paths/[id]
-// solo corre cuando es 0: así un intento fallido no se reintenta solo en cada visita.
+// La personalización automática de /paths/[id] solo corre si esto da 0.
 export async function countPersonalizationAttemptsForPath(
   supabase: SupabaseClient<Database>,
   pathId: string,
@@ -77,8 +74,8 @@ export async function countPersonalizationAttemptsForPath(
   return count ?? 0;
 }
 
-// Nunca lanza: la Capa 2 es opcional por diseño (ADR 0001). Sin key, timeout, error de la API o
-// respuesta que no valida contra el schema → null, y la ruta se queda con su texto por plantilla.
+// Nunca lanza: la IA es opcional (ADR 0001). Ante cualquier falla devuelve null y la ruta se queda
+// con el texto de plantilla.
 export async function requestPersonalization(
   input: PersonalizationInput,
 ): Promise<Personalization | null> {
@@ -109,8 +106,8 @@ export async function requestPersonalization(
   }
 }
 
-// Misma política que requestPersonalization, pero corre en el camino crítico de generatePath
-// (pantalla "Armando tu ruta…"): por eso su timeout es más corto. Sin texto libre no llama.
+// Igual que requestPersonalization, pero con un timeout más corto: el usuario está esperando que
+// se arme su ruta.
 export async function requestProfileAdjustment(
   profile: LearnerProfile,
   freeText: string,
@@ -136,9 +133,8 @@ export async function requestProfileAdjustment(
   }
 }
 
-// Todo el ajuste de respuestas que generatePath (spec 07) necesita, en una sola llamada, para que
-// la excepción a la regla 5 en ese archivo sea una línea. Sin key, sin texto libre, sin usos del
-// día o ante cualquier falla devuelve el perfil original y applied null: generar nunca se bloquea.
+// Ante cualquier falla, o sin key, texto libre o usos del día, devuelve el perfil original: generar
+// la ruta nunca se bloquea por la IA.
 export async function adjustProfileFromFreeText(
   supabase: SupabaseClient<Database>,
   profile: LearnerProfile,
@@ -155,8 +151,7 @@ export async function adjustProfileFromFreeText(
     return unchanged;
   }
 
-  // El uso se registra antes de llamar al modelo, como en personalizePath. path_id queda null: la
-  // ruta todavía no existe.
+  // El uso se registra antes de llamar al modelo. path_id queda null: la ruta todavía no existe.
   const { error: logError } = await supabase.from("ai_personalizations").insert({ path_id: null });
   if (logError) {
     return unchanged;
@@ -181,8 +176,7 @@ function modelSettings(timeoutMs: number) {
   };
 }
 
-// Solo el tipo y el mensaje del error: nunca el prompt (lleva el texto libre del usuario) ni la
-// key. Queda en los logs de Vercel para depurar.
+// Nunca el prompt (lleva el texto libre del usuario) ni la key: solo el tipo y el mensaje.
 function logAiError(tag: string, error: unknown): void {
   const errorName = error instanceof Error ? error.name : "UnknownError";
   const errorMessage = error instanceof Error ? error.message : String(error);

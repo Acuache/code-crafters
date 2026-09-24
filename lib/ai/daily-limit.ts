@@ -1,6 +1,5 @@
-// Personalizaciones por usuario en una ventana móvil de 24 h (no día calendario: así no depende
-// de la zona horaria del usuario). Cada fila de `ai_personalizations` es un intento que llegó a
-// llamar al modelo, haya salido bien o no.
+// Ventana móvil de 24 h y no día calendario, para no depender de la zona horaria. Cuenta cada
+// llamada al modelo, haya salido bien o no.
 export const DAILY_PERSONALIZATION_LIMIT = 5;
 
 export function remainingPersonalizations(usedInLast24h: number): number {
