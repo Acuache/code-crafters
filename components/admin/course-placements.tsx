@@ -167,7 +167,7 @@ function PlacementDialog({
                       className="w-full"
                       aria-invalid={!!errors.programId}
                     >
-                      <SelectValue placeholder="Elegí un programa" />
+                      <SelectValue placeholder="Elige un programa" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectGroup>
@@ -217,7 +217,7 @@ function PlacementDialog({
                       className="w-full"
                       aria-invalid={!!errors.level}
                     >
-                      <SelectValue placeholder="Elegí un nivel" />
+                      <SelectValue placeholder="Elige un nivel" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectGroup>
@@ -238,7 +238,7 @@ function PlacementDialog({
               <FieldLabel htmlFor="placement-note">Nota</FieldLabel>
               <Textarea
                 id="placement-note"
-                placeholder="Opcional. Ej.: elegí uno de los dos."
+                placeholder="Opcional. Ej.: elige uno de los dos."
                 {...form.register("note")}
               />
             </Field>
@@ -385,7 +385,7 @@ export function CoursePlacements({
         {courseIsActive ? null : (
           <Alert>
             <WarningIcon />
-            <AlertDescription>Reactivá el curso para ubicarlo en un programa.</AlertDescription>
+            <AlertDescription>Reactiva el curso para ubicarlo en un programa.</AlertDescription>
           </Alert>
         )}
 
@@ -433,7 +433,7 @@ export function CoursePlacements({
                           note: placement.note ?? "",
                         }}
                         title={`Editar ubicación en ${placement.programName}`}
-                        description="Si cambiás el programa, la etapa o el nivel, el curso pasa al final de su nuevo grupo."
+                        description="Si cambias el programa, la etapa o el nivel, el curso pasa al final de su nuevo grupo."
                         submitLabel="Guardar"
                         trigger={
                           <Button

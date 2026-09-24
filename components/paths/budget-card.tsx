@@ -71,7 +71,7 @@ export function BudgetCard({ progress, budgetHours }: BudgetCardProps) {
               Tu ruta se pasa por {formatHours(progress.overflowHours)} de tu tiempo disponible
             </AlertTitle>
             <AlertDescription>
-              Podés quitar algún paso pendiente para que entre en tu plazo.
+              Puedes quitar algún paso pendiente para que entre en tu plazo.
             </AlertDescription>
           </Alert>
         )}

@@ -17,15 +17,16 @@ const providers: { id: OAuthProvider; label: string }[] = [
 const errorMessages: Record<string, { title: string; description: string }> = {
   oauth_denied: {
     title: "Inicio de sesión cancelado",
-    description: "Cancelaste el acceso con el proveedor. Podés intentarlo de nuevo cuando quieras.",
+    description:
+      "Cancelaste el acceso con el proveedor. Puedes intentarlo de nuevo cuando quieras.",
   },
   oauth_callback_failed: {
     title: "No pudimos completar el inicio de sesión",
-    description: "El enlace de acceso venció o no es válido. Intentá iniciar sesión de nuevo.",
+    description: "El enlace de acceso venció o no es válido. Intenta iniciar sesión de nuevo.",
   },
   oauth_init_failed: {
     title: "No pudimos iniciar el acceso",
-    description: "Ocurrió un problema al conectar con el proveedor. Intentá de nuevo.",
+    description: "Ocurrió un problema al conectar con el proveedor. Intenta de nuevo.",
   },
 };
 
@@ -55,9 +56,9 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
 
       <Card className="w-full max-w-sm">
         <CardHeader>
-          <CardTitle>Entrá a DevPathlles</CardTitle>
+          <CardTitle>Entra a DevPathlles</CardTitle>
           <CardDescription>
-            Elegí un proveedor para continuar. Lo usamos para guardar tus rutas y tu progreso.
+            Elige un proveedor para continuar. Lo usamos para guardar tus rutas y tu progreso.
           </CardDescription>
         </CardHeader>
         <CardContent>

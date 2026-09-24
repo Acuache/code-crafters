@@ -67,8 +67,8 @@ export function DiscardedSteps({ steps, onRestore }: DiscardedStepsProps) {
                         </span>
                       </div>
                     </div>
-                    {/* Sólo lo que quitó el usuario se restaura: devolver un descarte del motor
-                        rompería el presupuesto de horas o contradiría "ya lo dominás". */}
+                    {/* Solo lo que quitó el usuario se restaura: devolver un descarte del motor
+                        rompería el presupuesto de horas o contradiría "ya lo dominas". */}
                     {isUserDiscarded(step) ? (
                       <Button variant="outline" size="sm" onClick={() => onRestore(step.id)}>
                         <ArrowCounterClockwiseIcon data-icon="inline-start" />

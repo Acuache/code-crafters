@@ -46,11 +46,11 @@ type Phase = "loading" | "answering" | "submitting" | "result" | "error";
 
 function describeQuiz(quiz: SafeQuiz | null): string {
   if (!quiz) {
-    return "Poné a prueba lo que aprendiste";
+    return "Pon a prueba lo que aprendiste";
   }
 
   const kindLabel = quiz.kind === "chapter" ? "de práctica" : "del curso";
-  return `${quiz.questions.length} preguntas ${kindLabel} · aprobás con ${quiz.passPercentage} %`;
+  return `${quiz.questions.length} preguntas ${kindLabel} · apruebas con ${quiz.passPercentage} %`;
 }
 
 export function QuizDialog({

@@ -23,7 +23,7 @@ describe("assessmentAnswersSchema", () => {
     if (!result.success) {
       // El mensaje por defecto de zod para z.enum() lista las 19 opciones de GOALS
       // ("Invalid option: expected one of ..."); acá se verifica que no vuelva a filtrarse.
-      expect(result.error.issues[0]?.message).toBe("Elegí una meta para continuar.");
+      expect(result.error.issues[0]?.message).toBe("Elige una meta para continuar.");
     }
   });
 

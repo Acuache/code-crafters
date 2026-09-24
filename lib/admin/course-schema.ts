@@ -55,7 +55,7 @@ function linesToArray(value: string | string[]): string[] {
 
 const slugSchema = z
   .string()
-  .regex(SLUG_PATTERN, { error: "Usá minúsculas, números y guiones (ej. react-avanzado)." });
+  .regex(SLUG_PATTERN, { error: "Usa minúsculas, números y guiones (ej. react-avanzado)." });
 
 const lineListSchema = z.preprocess(linesToArray, z.array(z.string()));
 
@@ -65,7 +65,7 @@ export const courseSchema = z.object({
   slug: slugSchema,
   title: z.string().trim().min(1, { error: "El título es obligatorio." }),
   summary: optionalTextSchema,
-  url: z.url({ protocol: /^https$/, error: "Pegá una URL https válida." }),
+  url: z.url({ protocol: /^https$/, error: "Pega una URL https válida." }),
   imageUrl: z.preprocess(
     blankToNull,
     z
@@ -78,11 +78,11 @@ export const courseSchema = z.object({
   ),
   instructor: optionalTextSchema,
   hours: z
-    .number({ error: "Indicá las horas del curso." })
+    .number({ error: "Indica las horas del curso." })
     .positive({ error: "Las horas tienen que ser mayores que 0." })
     .max(9999.9, { error: "Como máximo 9999,9 horas." }),
   lessons: z
-    .number({ error: "Indicá la cantidad de lecciones." })
+    .number({ error: "Indica la cantidad de lecciones." })
     .int({ error: "Las lecciones son un número entero." })
     .nonnegative({ error: "Las lecciones no pueden ser negativas." }),
   price: z.preprocess(
@@ -97,12 +97,12 @@ export const courseSchema = z.object({
   isPro: z.boolean(),
   isNew: z.boolean(),
   inConstruction: z.boolean(),
-  // El Select arranca vacío (""): se pasa a null para que el error sea "Elegí una dificultad.".
+  // El Select arranca vacío (""): se pasa a null para que el error sea "Elige una dificultad.".
   difficulty: z.preprocess(
     blankToNull,
-    z.enum(COURSE_DIFFICULTIES, { error: "Elegí una dificultad." }),
+    z.enum(COURSE_DIFFICULTIES, { error: "Elige una dificultad." }),
   ),
-  outcome: z.string().trim().min(1, { error: "Escribí qué logra el alumno al terminarlo." }),
+  outcome: z.string().trim().min(1, { error: "Escribe qué logra el alumno al terminarlo." }),
   areas: lineListSchema,
   prerequisites: lineListSchema,
   topics: lineListSchema,

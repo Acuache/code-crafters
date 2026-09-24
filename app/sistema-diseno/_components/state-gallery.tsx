@@ -18,7 +18,7 @@ function StateGallery() {
     <div className="flex flex-col gap-8">
       <div className="flex flex-col gap-2">
         <p className="text-sm">
-          Recorré esta fila con <kbd className="rounded border px-1 py-0.5 text-xs">Tab</kbd> para
+          Recorre esta fila con <kbd className="rounded border px-1 py-0.5 text-xs">Tab</kbd> para
           ver el anillo de foco (borde sólido + halo lavanda).
         </p>
         <div className="flex flex-wrap gap-3">

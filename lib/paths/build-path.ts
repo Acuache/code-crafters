@@ -195,7 +195,7 @@ export function dropMasteredTechnologies(
 
   for (const step of steps) {
     if (masteredCourseSlugs.has(step.courseSlug)) {
-      discarded.push({ ...step, discardReason: "ya lo dominás" });
+      discarded.push({ ...step, discardReason: "ya lo dominas" });
     } else {
       kept.push(step);
     }

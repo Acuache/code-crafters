@@ -47,7 +47,7 @@ export function TimeStep({ control }: { control: Control<AssessmentAnswers> }) {
 
   return (
     <FieldSet>
-      <FieldLegend>¿Cuánto tiempo tenés?</FieldLegend>
+      <FieldLegend>¿Cuánto tiempo tienes?</FieldLegend>
       <FieldGroup>
         <Field data-invalid={!!hoursFieldState.error}>
           <FieldLabel htmlFor="quiz-hours">Horas por semana</FieldLabel>
@@ -80,7 +80,7 @@ export function TimeStep({ control }: { control: Control<AssessmentAnswers> }) {
               className="w-full"
               aria-invalid={!!deadlineFieldState.error}
             >
-              <SelectValue placeholder="Elegí un plazo" />
+              <SelectValue placeholder="Elige un plazo" />
             </SelectTrigger>
             <SelectContent>
               <SelectGroup>
@@ -95,7 +95,7 @@ export function TimeStep({ control }: { control: Control<AssessmentAnswers> }) {
           <FieldError errors={[deadlineFieldState.error]} />
         </Field>
         <FieldDescription>
-          Las rutas oficiales completas rondan 150–280 h; con 10 h/semana y 6 meses tenés 260 h de
+          Las rutas oficiales completas rondan 150–280 h; con 10 h/semana y 6 meses tienes 260 h de
           presupuesto.
         </FieldDescription>
       </FieldGroup>

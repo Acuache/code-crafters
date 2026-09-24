@@ -18,7 +18,7 @@ import { createClient } from "@/lib/supabase/server";
 // `ok: true` porque ese camino nunca vuelve a su código.
 export type GeneratePathResult = { ok: false; message: string };
 
-const GENERIC_ERROR_MESSAGE = "No pudimos generar tu ruta. Probá de nuevo.";
+const GENERIC_ERROR_MESSAGE = "No pudimos generar tu ruta. Prueba de nuevo.";
 
 function toStepRow(
   pathId: string,
@@ -71,7 +71,7 @@ export async function generatePath(assessmentId: string): Promise<GeneratePathRe
   // igual se guarda y redirige sin error — la forma de "no funciona al clonarlo" que
   // docs/ENUNCIADO.md descalifica.
   if (catalog.length === 0 || programs.length === 0) {
-    return { ok: false, message: "El catálogo todavía no está cargado. Avisá al equipo." };
+    return { ok: false, message: "El catálogo todavía no está cargado. Avisa al equipo." };
   }
 
   // Spec 11: con key y texto libre, la IA traduce ese texto a ajustes de meta, intereses y

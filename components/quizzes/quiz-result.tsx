@@ -15,7 +15,7 @@ type QuizResultProps = {
 
 function describeOutcome(kind: QuizKind, result: AttemptResult): string {
   if (!result.passed) {
-    return "Repasá las explicaciones y volvé a intentarlo.";
+    return "Repasa las explicaciones y vuelve a intentarlo.";
   }
 
   if (result.stepCompleted) {
@@ -38,7 +38,7 @@ export function QuizResult({ kind, questions, result, onRetry, onClose }: QuizRe
         {/* Decorativa: el título de abajo ya dice si aprobó (CLAUDE.md §Marca). */}
         <Image src={mascotSrc} alt="" width={128} height={128} />
         <h3 className="font-heading text-2xl font-semibold">
-          {result.passed ? "¡Quiz aprobado!" : "Casi, seguí practicando"}
+          {result.passed ? "¡Quiz aprobado!" : "Casi, sigue practicando"}
         </h3>
         <p className="font-heading text-4xl font-semibold tabular-nums">
           {result.scorePercentage} %

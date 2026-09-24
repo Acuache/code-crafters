@@ -17,7 +17,7 @@ export function InterestsStep({ control }: { control: Control<AssessmentAnswers>
         <Field>
           <FieldDescription>
             Son temas transversales que se agregan a tu ruta si entran en tu tiempo disponible. Está
-            bien si no marcás ninguno.
+            bien si no marcas ninguno.
           </FieldDescription>
           <ToggleGroup
             multiple

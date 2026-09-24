@@ -89,7 +89,7 @@ describe("isUserDiscarded", () => {
 
   // Los tres motivos que escribe el motor (lib/paths/build-path.ts). Si el motor agrega uno nuevo
   // que coincida con USER_DISCARD_REASON, sus descartes se volverían restaurables: sumarlo acá.
-  it.each(["ya lo dominás", "no cabía en tu tiempo", "superaba el cupo de intereses"])(
+  it.each(["ya lo dominas", "no cabía en tu tiempo", "superaba el cupo de intereses"])(
     "no considera del usuario un descarte del motor: %s",
     (engineReason) => {
       expect(isUserDiscarded({ status: "discarded", discardReason: engineReason })).toBe(false);

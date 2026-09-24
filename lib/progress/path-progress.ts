@@ -5,7 +5,7 @@ export type PathStepStatus = Enums<"path_step_status">;
 // Motivo con el que se guarda un paso que el usuario quitó a mano (la frase del ADR 0004). Es lo
 // único que lo distingue de un descarte del motor sin una columna nueva, así que restoreStep
 // filtra por este mismo valor en el servidor.
-export const USER_DISCARD_REASON = "lo quitaste vos";
+export const USER_DISCARD_REASON = "lo quitaste tú";
 
 // Forma mínima que necesita el cálculo: el spec 09 la arma desde su propia query sin depender de
 // la forma que usa la vista de una ruta.

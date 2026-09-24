@@ -23,16 +23,16 @@ const idSchema = z.number().int().positive();
 
 const COURSE_NOT_FOUND: AdminActionResult = {
   ok: false,
-  message: "No encontramos ese curso. Recargá la página.",
+  message: "No encontramos ese curso. Recarga la página.",
 };
 
 const PLACEMENT_NOT_FOUND: AdminActionResult = {
   ok: false,
-  message: "No encontramos esa ubicación. Recargá la página.",
+  message: "No encontramos esa ubicación. Recarga la página.",
 };
 
 function firstIssueMessage(error: z.ZodError): string {
-  return error.issues[0]?.message ?? "Revisá los datos del formulario.";
+  return error.issues[0]?.message ?? "Revisa los datos del formulario.";
 }
 
 // Las páginas del panel usan el slug en la URL, y hay slugs con tildes o mayúsculas: se revalida
@@ -145,7 +145,7 @@ function describeDeactivationBlockers(
 
   if (programNames.length > 0) {
     blockers.push(
-      `Está en ${programNames.length === 1 ? "el programa" : "los programas"} ${programNames.join(", ")}: quitalo primero desde «Dónde aparece este curso».`,
+      `Está en ${programNames.length === 1 ? "el programa" : "los programas"} ${programNames.join(", ")}: quítalo primero desde «Dónde aparece este curso».`,
     );
   }
 
@@ -265,7 +265,7 @@ export async function addPlacement(courseId: unknown, input: unknown): Promise<A
   }
   // Un curso inactivo en un programa rompería generatePath: loadCatalog no lo carga.
   if (!course.is_active) {
-    return { ok: false, message: "Reactivá el curso antes de ubicarlo en un programa." };
+    return { ok: false, message: "Reactiva el curso antes de ubicarlo en un programa." };
   }
 
   const position = await findNextPosition(supabase, parsedInput.data);

@@ -21,12 +21,12 @@ export const MAX_FREE_TEXT_LENGTH = 500;
 export const assessmentAnswersSchema = z.object({
   // Mensaje explícito: sin él, zod devuelve "Invalid option: expected one of \"react\"|\"vue\"|…"
   // con los 19 slugs de GOALS — un volcado interno, no un mensaje para el usuario del formulario.
-  goal: z.enum(goalSlugs, { error: "Elegí una meta para continuar." }),
+  goal: z.enum(goalSlugs, { error: "Elige una meta para continuar." }),
   // ExperienceLevel (lib/paths/types.ts) es un tipo, no un valor en runtime — el spec 04 no
   // exporta una lista de sus tres literales. Es la única excepción reconocida a "todo el
   // vocabulario se deriva de las tablas del spec 04": una copia manual, no un descuido.
   level: z.enum(["empiezo_de_cero", "tengo_bases", "intermedio"], {
-    error: "Elegí tu nivel para continuar.",
+    error: "Elige tu nivel para continuar.",
   }),
   masteredTechnologies: z.array(z.enum(technologySlugs)),
   interests: z.array(z.enum(interestSlugs)),

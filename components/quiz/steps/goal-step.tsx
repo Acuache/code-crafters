@@ -48,13 +48,13 @@ export function GoalStep({ control }: { control: Control<AssessmentAnswers> }) {
 
   return (
     <FieldSet>
-      <FieldLegend>¿Qué querés aprender?</FieldLegend>
+      <FieldLegend>¿Qué quieres aprender?</FieldLegend>
       <FieldGroup>
         <Field>
           <FieldLabel htmlFor="quiz-area">Área</FieldLabel>
           <Select items={AREA_ITEMS} value={area} onValueChange={handleAreaChange}>
             <SelectTrigger id="quiz-area" className="w-full">
-              <SelectValue placeholder="Elegí un área" />
+              <SelectValue placeholder="Elige un área" />
             </SelectTrigger>
             <SelectContent>
               <SelectGroup>
@@ -76,7 +76,7 @@ export function GoalStep({ control }: { control: Control<AssessmentAnswers> }) {
             disabled={!area}
           >
             <SelectTrigger id="quiz-goal" className="w-full" aria-invalid={!!fieldState.error}>
-              <SelectValue placeholder={area ? "Elegí una meta" : "Elegí un área primero"} />
+              <SelectValue placeholder={area ? "Elige una meta" : "Elige un área primero"} />
             </SelectTrigger>
             <SelectContent>
               <SelectGroup>

@@ -72,7 +72,7 @@ export type DiscardedStep = {
   position: number;
   origin: StepOrigin;
   reason: string; // igual que en BuiltStep: por qué este curso iba camino a la ruta
-  discardReason: string; // "ya lo dominás" | "no cabía en tu tiempo" | "superaba el cupo de intereses"
+  discardReason: string; // "ya lo dominas" | "no cabía en tu tiempo" | "superaba el cupo de intereses"
 };
 
 export type BuiltPath = {

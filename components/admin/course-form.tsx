@@ -213,7 +213,7 @@ export function CourseForm(props: CourseFormProps) {
                     aria-invalid={!!errors.difficulty}
                     onBlur={field.onBlur}
                   >
-                    <SelectValue placeholder="Elegí una dificultad" />
+                    <SelectValue placeholder="Elige una dificultad" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectGroup>

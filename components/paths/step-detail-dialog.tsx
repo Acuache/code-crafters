@@ -220,12 +220,12 @@ function QuizSection({ chapters, isDone, onOpenQuiz }: QuizSectionProps) {
       <div className="flex flex-col gap-1">
         <span className="flex items-center gap-1.5 text-sm font-medium">
           <ExamIcon className="text-primary-bright" aria-hidden="true" />
-          Poné a prueba lo que aprendiste
+          Pon a prueba lo que aprendiste
         </span>
         <span className="text-xs text-muted-foreground">
           {isDone
             ? "Ya está hecho: el quiz queda para repasar."
-            : "Aprobá el quiz del curso (60 %) y lo marcamos como hecho."}
+            : "Aprueba el quiz del curso (60 %) y lo marcamos como hecho."}
         </span>
       </div>
 

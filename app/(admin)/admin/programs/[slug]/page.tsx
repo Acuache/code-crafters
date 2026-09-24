@@ -104,7 +104,7 @@ export default async function EditProgramPage({ params }: { params: Promise<{ sl
         <CardHeader>
           <CardTitle>Cursos del programa</CardTitle>
           <CardDescription>
-            En el orden en que el motor los recorre. Para agregar, mover o quitar uno, andá a la
+            En el orden en que el motor los recorre. Para agregar, mover o quitar uno, ve a la
             página del curso.
           </CardDescription>
         </CardHeader>

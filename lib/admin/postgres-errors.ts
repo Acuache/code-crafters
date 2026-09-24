@@ -1,7 +1,7 @@
 // Traduce los errores de Postgres de las actions del panel (SPEC 10) a mensajes en español. El
 // texto crudo del error nunca llega a la UI: nombra tablas y constraints internos.
 
-export const GENERIC_SAVE_ERROR = "No se pudo guardar. Intentá de nuevo.";
+export const GENERIC_SAVE_ERROR = "No se pudo guardar. Intenta de nuevo.";
 
 const UNIQUE_VIOLATION_CODE = "23505";
 
@@ -11,7 +11,7 @@ const UNIQUE_CONSTRAINT_MESSAGES: Record<string, string> = {
   programs_slug_key: "Ya existe un programa con ese slug.",
   program_courses_program_id_course_id_key: "Este curso ya está en ese programa.",
   program_courses_program_id_stage_level_position_key:
-    "Otro cambio ocupó esa posición. Intentá de nuevo.",
+    "Otro cambio ocupó esa posición. Intenta de nuevo.",
 };
 
 export function describePostgresError(error: { code?: string; message: string }): string {

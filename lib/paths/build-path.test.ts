@@ -163,7 +163,7 @@ describe("buildPath", () => {
     const discardedReactDeCero = result.discarded.find(
       (step) => step.courseSlug === "react-de-cero",
     );
-    expect(discardedReactDeCero?.discardReason).toBe("ya lo dominás");
+    expect(discardedReactDeCero?.discardReason).toBe("ya lo dominas");
     expect(discardedReactDeCero?.origin).toBe("requerido");
 
     const remainingCourseSlugs = result.steps.map((step) => step.courseSlug).sort();

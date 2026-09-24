@@ -34,7 +34,7 @@ async function finishStepUpdate(
   rejectionMessage: string,
 ): Promise<StepActionResult> {
   if (hasError) {
-    return { ok: false, message: "No se pudo guardar el cambio. Probá de nuevo." };
+    return { ok: false, message: "No se pudo guardar el cambio. Prueba de nuevo." };
   }
 
   const updatedRow = updatedRows?.[0];
@@ -115,7 +115,7 @@ export async function discardStep(stepId: unknown): Promise<StepActionResult> {
     .eq("status", "pending")
     .select("path_id");
 
-  return finishStepUpdate(data, Boolean(error), "Sólo podés quitar pasos pendientes.");
+  return finishStepUpdate(data, Boolean(error), "Solo puedes quitar pasos pendientes.");
 }
 
 export async function restoreStep(stepId: unknown): Promise<StepActionResult> {
@@ -129,7 +129,7 @@ export async function restoreStep(stepId: unknown): Promise<StepActionResult> {
   const supabase = await createClient();
 
   // Filtrar por USER_DISCARD_REASON es lo que impide restaurar un descarte del motor ("ya lo
-  // dominás", "no cabía en tu tiempo"...): devolverlos rompería el presupuesto de horas.
+  // dominas", "no cabía en tu tiempo"...): devolverlos rompería el presupuesto de horas.
   const { data, error } = await supabase
     .from("path_steps")
     .update({ status: "pending", discard_reason: null })
@@ -138,12 +138,12 @@ export async function restoreStep(stepId: unknown): Promise<StepActionResult> {
     .eq("discard_reason", USER_DISCARD_REASON)
     .select("path_id");
 
-  return finishStepUpdate(data, Boolean(error), "Sólo podés restaurar los pasos que quitaste vos.");
+  return finishStepUpdate(data, Boolean(error), "Solo puedes restaurar los pasos que quitaste tú.");
 }
 
 export type QuizActionResult<T> = { ok: true; data: T } | { ok: false; message: string };
 
-const QUIZ_UNAVAILABLE = "No pudimos preparar el quiz. Probá de nuevo en un rato.";
+const QUIZ_UNAVAILABLE = "No pudimos preparar el quiz. Prueba de nuevo en un rato.";
 
 // Pide el quiz compartido del curso o del capítulo, o lo genera si todavía no existe. Nunca lanza:
 // cualquier falla (sin key, OpenAI caído, paso ajeno) vuelve como mensaje.
@@ -254,7 +254,7 @@ export async function submitQuizAttempt(input: unknown): Promise<QuizActionResul
   const attempt = attemptResultSchema.safeParse(data);
   if (error || !attempt.success) {
     console.error(`[quiz] submit_quiz_attempt: ${error?.message ?? "respuesta inválida"}`);
-    return { ok: false, message: "No pudimos guardar tu intento. Probá de nuevo." };
+    return { ok: false, message: "No pudimos guardar tu intento. Prueba de nuevo." };
   }
 
   revalidatePath(`/paths/${parsed.data.pathId}`);

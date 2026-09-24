@@ -58,7 +58,7 @@ import { LevelBadge } from "@/components/brand/level-badge";
 import { AiBadge } from "@/components/brand/ai-badge";
 
 const STACKS = [
-  { label: "Elegí un stack", value: null },
+  { label: "Elige un stack", value: null },
   { label: "React", value: "react" },
   { label: "Node", value: "node" },
   { label: "Flutter y Dart", value: "flutter" },
@@ -259,7 +259,7 @@ function DialogDemo() {
       <DialogContent>
         <DialogHeader>
           <DialogTitle>¿Quitar este curso de tu ruta?</DialogTitle>
-          <DialogDescription>Podés volver a agregarlo cuando quieras.</DialogDescription>
+          <DialogDescription>Puedes volver a agregarlo cuando quieras.</DialogDescription>
         </DialogHeader>
         <DialogFooter showCloseButton>
           <Button variant="destructive">
@@ -291,8 +291,8 @@ function SkeletonEmptyDemo() {
             <EmptyMedia variant="icon">
               <PlusIcon />
             </EmptyMedia>
-            <EmptyTitle>Todavía no tenés rutas</EmptyTitle>
-            <EmptyDescription>Empezá el cuestionario para generar la primera.</EmptyDescription>
+            <EmptyTitle>Todavía no tienes rutas</EmptyTitle>
+            <EmptyDescription>Empieza el cuestionario para generar la primera.</EmptyDescription>
           </EmptyHeader>
         </Empty>
       )}

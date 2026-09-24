@@ -18,11 +18,11 @@ const programUpdateSchema = programSchema.omit({ slug: true });
 
 const PROGRAM_NOT_FOUND: AdminActionResult = {
   ok: false,
-  message: "No encontramos ese programa. Recargá la página.",
+  message: "No encontramos ese programa. Recarga la página.",
 };
 
 function firstIssueMessage(error: z.ZodError): string {
-  return error.issues[0]?.message ?? "Revisá los datos del formulario.";
+  return error.issues[0]?.message ?? "Revisa los datos del formulario.";
 }
 
 function revalidateProgramPages() {

@@ -35,7 +35,7 @@ type PathPageProps = {
 const STEP_ORIGINS: readonly StepOrigin[] = ["requerido", "recomendado", "opcional", "interes"];
 
 // `path_steps.origin` es `text` en Postgres (spec 02), no un enum: el tipo generado es `string`.
-// Sólo lo escribe el motor del spec 04 con estos cuatro valores; si aparece otro es un dato roto,
+// Solo lo escribe el motor del spec 04 con estos cuatro valores; si aparece otro es un dato roto,
 // y es mejor que falle ruidosamente que mostrar un badge inventado.
 function toStepOrigin(value: string): StepOrigin {
   const origin = STEP_ORIGINS.find((knownOrigin) => knownOrigin === value);

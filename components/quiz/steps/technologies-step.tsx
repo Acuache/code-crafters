@@ -12,17 +12,17 @@ export function TechnologiesStep({ control }: { control: Control<AssessmentAnswe
 
   return (
     <FieldSet>
-      <FieldLegend>¿Qué tecnologías ya dominás?</FieldLegend>
+      <FieldLegend>¿Qué tecnologías ya dominas?</FieldLegend>
       <FieldGroup>
         <Field>
           <FieldDescription>
-            Marcá las que ya sabés usar — el motor no te vuelve a enseñar lo que ya dominás. Está
-            bien si no marcás ninguna.
+            Marca las que ya sabes usar — el motor no te vuelve a enseñar lo que ya dominas. Está
+            bien si no marcas ninguna.
           </FieldDescription>
           <ToggleGroup
             multiple
             variant="outline"
-            aria-label="Tecnologías que ya dominás"
+            aria-label="Tecnologías que ya dominas"
             className="w-full flex-wrap"
             value={field.value}
             onValueChange={field.onChange}

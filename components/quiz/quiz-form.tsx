@@ -30,10 +30,10 @@ import { saveAssessment } from "@/app/(app)/quiz/actions";
 const STEPS = [
   { title: "Tu meta", Step: GoalStep },
   { title: "Tu nivel", Step: LevelStep },
-  { title: "Ya dominás", Step: TechnologiesStep },
+  { title: "Ya dominas", Step: TechnologiesStep },
   { title: "Te interesa", Step: InterestsStep },
   { title: "Tu tiempo", Step: TimeStep },
-  { title: "Contanos más", Step: FreeTextStep },
+  { title: "Cuéntanos más", Step: FreeTextStep },
 ] as const;
 
 const LAST_STEP = STEPS.length - 1;

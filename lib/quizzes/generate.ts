@@ -62,9 +62,9 @@ async function callOpenAi({ questionCount, context }: ModelRequest): Promise<unk
     maxRetries: MAX_RETRIES,
     abortSignal: AbortSignal.timeout(QUIZ_TIMEOUT_MS),
     instructions:
-      `Generá exactamente ${questionCount} preguntas de opción múltiple en español para ` +
+      `Genera exactamente ${questionCount} preguntas de opción múltiple en español para ` +
       "comprobar lo aprendido en un curso de programación. Cada pregunta tiene cuatro opciones " +
-      "distintas, una sola correcta y una explicación breve. Usá solamente el contenido del curso " +
+      "distintas, una sola correcta y una explicación breve. Usa solamente el contenido del curso " +
       "que te paso; no inventes temas que no aparecen ahí.",
     prompt: JSON.stringify(context),
     output: Output.object({ schema: modelQuizSchema }),

@@ -12,7 +12,7 @@ const pathIdSchema = z.uuid();
 
 const PATH_NOT_FOUND: DeletePathResult = {
   ok: false,
-  message: "No encontramos esa ruta. Recargá la página.",
+  message: "No encontramos esa ruta. Recarga la página.",
 };
 
 // Endpoint público: RLS (`learning_paths` por dueño) ya descarta las rutas de otro usuario, así que
@@ -35,7 +35,7 @@ export async function deletePath(pathId: unknown): Promise<DeletePathResult> {
     .select("id");
 
   if (error) {
-    return { ok: false, message: "No se pudo eliminar la ruta. Probá de nuevo." };
+    return { ok: false, message: "No se pudo eliminar la ruta. Prueba de nuevo." };
   }
 
   if (!deletedRows || deletedRows.length === 0) {

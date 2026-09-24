@@ -115,7 +115,7 @@ async function waitForSharedQuiz(
     }
   }
 
-  throw new Error("El quiz se sigue preparando. Probá de nuevo en unos segundos.");
+  throw new Error("El quiz se sigue preparando. Prueba de nuevo en unos segundos.");
 }
 
 function fromRow(row: Database["public"]["Tables"]["quizzes"]["Row"]): QuizRecord {

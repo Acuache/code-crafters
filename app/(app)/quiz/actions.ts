@@ -27,7 +27,7 @@ export async function saveAssessment(answers: unknown): Promise<SaveAssessmentRe
     .single();
 
   if (error || !data) {
-    return { ok: false, message: "No se pudo guardar el cuestionario. Probá de nuevo." };
+    return { ok: false, message: "No se pudo guardar el cuestionario. Prueba de nuevo." };
   }
 
   return { ok: true, assessmentId: data.id };

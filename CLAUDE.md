@@ -75,6 +75,7 @@ Todo código que toque una librería o framework externo — Next.js 16, React 1
 
 **Sí hacer:**
 - Nombres descriptivos aunque sean largos. Identificadores en inglés; textos de UI y comentarios en español (el modelo de datos del `ROADMAP.md` ya usa `courses`, `learning_paths`, `path_steps`).
+- Textos de UI en español neutro y tuteando al usuario ("Prueba de nuevo", "Elige un plazo"), nunca voseo. Los prompts de la IA piden lo mismo.
 - Early returns en vez de anidar condicionales.
 - Funciones con un solo propósito y un nombre que lo diga.
 - Descomponer expresiones largas en pasos con nombre.

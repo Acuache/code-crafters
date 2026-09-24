@@ -10,24 +10,24 @@ export const PROGRAM_COURSE_LEVELS = ["requerido", "recomendado", "opcional"] as
 export const programSchema = z.object({
   slug: z
     .string()
-    .regex(SLUG_PATTERN, { error: "Usá minúsculas, números y guiones (ej. svelte)." }),
+    .regex(SLUG_PATTERN, { error: "Usa minúsculas, números y guiones (ej. svelte)." }),
   name: z.string().trim().min(1, { error: "El nombre es obligatorio." }),
   position: z
-    .number({ error: "Indicá la posición." })
+    .number({ error: "Indica la posición." })
     .int({ error: "La posición es un número entero." })
     .positive({ error: "La posición empieza en 1." }),
 });
 
 export const placementSchema = z.object({
   programId: z
-    .number({ error: "Elegí un programa." })
+    .number({ error: "Elige un programa." })
     .int()
-    .positive({ error: "Elegí un programa." }),
+    .positive({ error: "Elige un programa." }),
   stage: z
-    .number({ error: "Indicá la etapa." })
+    .number({ error: "Indica la etapa." })
     .int({ error: "La etapa es un número entero." })
     .positive({ error: "La etapa empieza en 1." }),
-  level: z.enum(PROGRAM_COURSE_LEVELS, { error: "Elegí un nivel." }),
+  level: z.enum(PROGRAM_COURSE_LEVELS, { error: "Elige un nivel." }),
   note: z.preprocess(blankToNull, z.string().trim().nullable()),
 });
 
