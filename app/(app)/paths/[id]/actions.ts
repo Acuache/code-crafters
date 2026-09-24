@@ -4,6 +4,7 @@ import { createHash } from "node:crypto";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
+import { normalizeTimezone, validateAttemptInput } from "@/lib/quizzes/action-validation";
 import { generateQuiz } from "@/lib/quizzes/generate";
 import { createSupabaseQuizStore, getOrCreateQuiz, toSafeQuiz } from "@/lib/quizzes/repository";
 import type { QuizKind, SafeQuiz } from "@/lib/quizzes/schema";
@@ -20,22 +21,6 @@ export type AttemptResult = {
 };
 
 const uuid = z.string().uuid();
-const attemptInputSchema = z.object({
-  quizId: uuid, pathId: uuid, pathStepId: uuid,
-  answers: z.array(z.number().int().min(0).max(3)).min(1).max(10),
-  timezone: z.string().max(100), idempotencyKey: uuid,
-});
-export const validateAttemptInput = (input: unknown) => attemptInputSchema.safeParse(input);
-
-export function normalizeTimezone(timezone: string): string {
-  try {
-    new Intl.DateTimeFormat("en-US", { timeZone: timezone }).format();
-    return timezone;
-  } catch {
-    return "UTC";
-  }
-}
-
 function isStoredQuestion(value: Json): value is { [key: string]: Json | undefined } & {
   id: string; correctOption: number; explanation: string;
 } {
@@ -71,14 +56,14 @@ export async function requestQuiz(input: TargetInput): Promise<ActionResult<Safe
     const targetKey = input.kind === "course" ? `course:${course.id}` :
       `chapter:${course.id}:${createHash("sha256").update(input.chapterTitle ?? "").digest("hex")}`;
     const admin = createAdminClient();
-    const model = process.env.OPENROUTER_MODEL ?? "openai/gpt-4.1-mini";
+    const model = process.env.OPENROUTER_MODEL ?? "google/gemma-4-26b-a4b-it:free";
     const record = await getOrCreateQuiz({ targetKey, title: input.chapterTitle ?? course.title, kind: input.kind }, {
       store: createSupabaseQuizStore(admin, { courseId: course.id, chapterTitle: input.chapterTitle, model }),
       generate: () => generateQuiz({ kind: input.kind, chapterTitle: input.chapterTitle, course }),
     });
     return { ok: true, data: toSafeQuiz(record) };
   } catch (error) {
-    console.error("No se pudo preparar el quiz", error);
+    console.error("No se pudo preparar el quiz:", error instanceof Error ? error.message : "Error desconocido");
     return { ok: false, message: "No pudimos preparar el quiz. Intentá de nuevo." };
   }
 }

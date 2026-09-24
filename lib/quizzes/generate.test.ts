@@ -33,4 +33,13 @@ describe("generateQuiz", () => {
     await expect(generateQuiz({ kind: "chapter", chapterTitle: "Introducción", course }, callModel))
       .rejects.toThrow();
   });
+
+  it("builds a valid deterministic quiz when every provider is unavailable", async () => {
+    const unavailable = vi.fn().mockRejectedValue(new Error("Upstream unavailable"));
+    const result = await generateQuiz({ kind: "course", chapterTitle: null, course }, unavailable);
+
+    expect(result.questions).toHaveLength(10);
+    expect(result.questions[0].prompt).toContain("TypeScript");
+    expect(new Set(result.questions[0].options).size).toBe(4);
+  });
 });

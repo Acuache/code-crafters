@@ -6,7 +6,7 @@ vi.mock("@/lib/supabase/guards", () => ({ requireUser: vi.fn() }));
 vi.mock("@/lib/supabase/server", () => ({ createClient: vi.fn() }));
 vi.mock("@/lib/supabase/admin", () => ({ createAdminClient: vi.fn() }));
 
-import { normalizeTimezone, validateAttemptInput } from "./actions";
+import { normalizeTimezone, validateAttemptInput } from "@/lib/quizzes/action-validation";
 
 describe("quiz actions input boundaries", () => {
   it("normalizes an invalid IANA timezone to UTC", () => {

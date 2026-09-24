@@ -6,10 +6,10 @@ Generador de rutas de aprendizaje sobre el catálogo real de cursos de [DevTalle
 
 | Hecho | Pendiente |
 |---|---|
-| Scaffold de Next.js 16 (App Router, TypeScript, Tailwind v4) | Cuestionario de habilidades e intereses |
-| Catálogo de DevTalles extraído y versionado (`data/`) | Motor de rutas (reglas + personalización con IA) |
-| Documentación del proyecto y decisiones (`docs/`) | Login y registro con Discord |
-| — | Guardar rutas, marcar progreso, deploy |
+| Next.js 16, Supabase, autenticación y catálogo persistente | Módulos posteriores descritos en el roadmap |
+| Cuestionario inicial y generación de rutas por reglas | Deploy y validación de producción |
+| Ruta interactiva con progreso persistente | — |
+| Quizzes compartidos, intentos privados y racha diaria | — |
 
 El detalle del plan está en [`docs/ROADMAP.md`](docs/ROADMAP.md).
 
@@ -17,11 +17,26 @@ El detalle del plan está en [`docs/ROADMAP.md`](docs/ROADMAP.md).
 
 - Node.js **20.9.0 o superior** (lo exige Next.js 16).
 - npm.
+- Docker, para Supabase local.
+
+## Variables de entorno
+
+Copiá `.env.example` a `.env.local` y completá las variables de Supabase. Para generar quizzes también necesitás:
+
+```dotenv
+OPENROUTER_API_KEY=tu_clave_de_servidor
+OPENROUTER_MODEL=google/gemma-4-26b-a4b-it:free
+SUPABASE_SECRET_KEY=tu_clave_secreta_de_supabase
+```
+
+`OPENROUTER_MODEL` es opcional y usa `google/gemma-4-26b-a4b-it:free` por defecto porque admite salida estructurada. Si ese endpoint está limitado, OpenRouter intenta otro modelo gratuito compatible y aplica reparación de JSON antes de la validación Zod. La disponibilidad y los límites de los modelos gratuitos dependen de OpenRouter. `OPENROUTER_API_KEY` y `SUPABASE_SECRET_KEY` son secretos exclusivos del servidor: nunca uses el prefijo `NEXT_PUBLIC_` para ellos ni los expongas al navegador.
 
 ## Cómo levantarlo
 
 ```bash
 npm install
+npx supabase start
+npx supabase migration up
 npm run dev
 ```
 
@@ -33,7 +48,17 @@ Otros comandos:
 npm run build   # build de producción
 npm run start   # correr un build de producción
 npm run lint    # ESLint
+npm test        # Vitest
+npx supabase test db # pruebas pgTAP
 ```
+
+## Quizzes, progreso y racha
+
+- Cada curso tiene una evaluación de 10 preguntas y cada capítulo una práctica de 3 preguntas.
+- Un quiz generado se reutiliza entre todos los usuarios para el mismo curso o capítulo; los intentos, resultados y progreso siguen siendo privados mediante RLS.
+- Se aprueba con 60%. Aprobar un capítulo registra actividad, pero solo aprobar el quiz de curso completa el paso y desbloquea el siguiente.
+- La racha suma como máximo una vez por fecha local, usando la zona IANA del navegador. El servidor deriva la fecha efectiva y no confía en una fecha enviada por el cliente.
+- Si falta `OPENROUTER_API_KEY` o el proveedor falla, la ruta permanece disponible y el diálogo permite reintentar sin alterar el progreso.
 
 ## Estructura del repo
 
