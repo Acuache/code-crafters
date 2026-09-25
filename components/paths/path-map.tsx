@@ -22,16 +22,19 @@ type PathMapProps = {
   groups: PathStepGroup[];
   stepNumbers: Map<string, number>;
   totalSteps: number;
-  onOpenStep: (stepId: string, trigger: HTMLButtonElement) => void;
+  // Sin él, el mapa es de solo lectura (ruta compartida, spec 15): sin próximo paso ni avance.
+  onOpenStep?: (stepId: string, trigger: HTMLButtonElement) => void;
 };
 
-// Sin "use client" a propósito: recibe callbacks y solo se importa desde path-steps-view.tsx.
+// Sin "use client" a propósito: recibe callbacks y solo se importa desde componentes cliente.
 export function PathMap({ groups, stepNumbers, totalSteps, onOpenStep }: PathMapProps) {
   const nodeButtons = useRef(new Map<string, HTMLButtonElement>());
+  const isReadOnly = onOpenStep === undefined;
 
   // El mismo próximo paso que muestra el dashboard para esta ruta.
   const activeSteps = groups.flatMap((group) => group.steps);
-  const nextStepId = findNextStep(activeSteps)?.id ?? null;
+  const nextStep = isReadOnly ? null : findNextStep(activeSteps);
+  const nextStepId = nextStep?.id ?? null;
 
   // Cuando cambia el próximo paso, la página acompaña a la mascota hasta el nuevo. Se compara con
   // el render anterior y no con un ref mutado en el efecto: en Strict Mode el efecto corre dos
@@ -81,7 +84,7 @@ export function PathMap({ groups, stepNumbers, totalSteps, onOpenStep }: PathMap
 
         return (
           <section key={group.key} className="flex flex-col gap-2">
-            <UnitBanner group={group} />
+            <UnitBanner group={group} showProgress={!isReadOnly} />
 
             <div
               className="relative mx-auto"
@@ -103,7 +106,7 @@ export function PathMap({ groups, stepNumbers, totalSteps, onOpenStep }: PathMap
                       position={positions[index]}
                       isNext={step.id === nextStepId}
                       entranceIndex={stepNumber - 1}
-                      onOpen={(trigger) => onOpenStep(step.id, trigger)}
+                      onOpen={onOpenStep ? (trigger) => onOpenStep(step.id, trigger) : undefined}
                       buttonRef={(element) => registerNodeButton(step.id, element)}
                     />
                   );
@@ -117,16 +120,23 @@ export function PathMap({ groups, stepNumbers, totalSteps, onOpenStep }: PathMap
   );
 }
 
-function UnitBanner({ group }: { group: PathStepGroup }) {
+type UnitBannerProps = {
+  group: PathStepGroup;
+  showProgress: boolean;
+};
+
+function UnitBanner({ group, showProgress }: UnitBannerProps) {
   const groupProgress = summarizeStepsProgress(group.steps, null);
 
   return (
     <div className="flex flex-col gap-3 rounded-3xl border brand-gradient-soft p-5 shadow-brand">
-      <StepGroupHeading group={group} progress={groupProgress} />
-      <Progress
-        value={groupProgress.percentDone}
-        aria-label={`Avance en ${group.title}: ${groupProgress.percentDone} %`}
-      />
+      <StepGroupHeading group={group} progress={groupProgress} showDoneCount={showProgress} />
+      {showProgress ? (
+        <Progress
+          value={groupProgress.percentDone}
+          aria-label={`Avance en ${group.title}: ${groupProgress.percentDone} %`}
+        />
+      ) : null}
     </div>
   );
 }

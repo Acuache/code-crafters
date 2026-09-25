@@ -31,6 +31,24 @@ export type PathStepGroup = StepGroup<PathStepView>;
 // La ruta se ve como mapa (por defecto) o como lista.
 export type PathView = "mapa" | "lista";
 
+export function isPathView(value: unknown): value is PathView {
+  return value === "mapa" || value === "lista";
+}
+
+// La vista vive en la URL para que recargar o compartir el link la conserve. replaceState y no
+// router.replace: la página es dinámica y router.replace volvería a pedir el Server Component solo
+// para cambiar de pestaña. Next sincroniza replaceState con su router.
+export function writeViewToUrl(view: PathView) {
+  const url = new URL(window.location.href);
+  if (view === "lista") {
+    url.searchParams.set("vista", "lista");
+  } else {
+    url.searchParams.delete("vista");
+  }
+
+  window.history.replaceState(null, "", url);
+}
+
 export function summarizeStepsProgress(
   steps: PathStepView[],
   budgetHours: number | null,

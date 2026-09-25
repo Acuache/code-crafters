@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { createClient } from "@/lib/supabase/server";
 import { signInWithProvider, type OAuthProvider } from "@/lib/supabase/actions";
+import { parseNextPath } from "@/lib/supabase/next-path";
 import { ProviderButton } from "./provider-button";
 
 const providers: { id: OAuthProvider; label: string }[] = [
@@ -31,18 +32,21 @@ const errorMessages: Record<string, { title: string; description: string }> = {
 };
 
 type LoginPageProps = {
-  searchParams: Promise<{ error?: string }>;
+  searchParams: Promise<{ error?: string; next?: string | string[] }>;
 };
 
 export default async function LoginPage({ searchParams }: LoginPageProps) {
+  const { error, next } = await searchParams;
+  // A dónde volver después del login, por ejemplo al link de una ruta compartida (spec 15).
+  const nextPath = parseNextPath(next);
+
   const supabase = await createClient();
   const { data } = await supabase.auth.getClaims();
 
   if (data?.claims) {
-    redirect("/dashboard");
+    redirect(nextPath ?? "/dashboard");
   }
 
-  const { error } = await searchParams;
   const errorMessage = error ? errorMessages[error] : undefined;
 
   return (
@@ -70,7 +74,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
           ) : null}
 
           {providers.map((provider) => (
-            <form key={provider.id} action={signInWithProvider.bind(null, provider.id)}>
+            <form key={provider.id} action={signInWithProvider.bind(null, provider.id, nextPath)}>
               <ProviderButton provider={provider.id} label={provider.label} />
             </form>
           ))}

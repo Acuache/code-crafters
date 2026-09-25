@@ -17,7 +17,9 @@ type PathsAndActivity = Omit<GamificationInput, "today">;
 // Un error se lanza: cada llamador decide si la gamificación es accesoria.
 async function fetchPathsAndActivity(supabase: ServerSupabase): Promise<PathsAndActivity> {
   const [pathsResult, activityResult] = await Promise.all([
-    supabase.from("learning_paths").select("id, path_steps(id, course_id, status, courses(hours))"),
+    supabase
+      .from("learning_paths")
+      .select("id, assessment_id, path_steps(id, course_id, status, courses(hours))"),
     supabase.from("streak_activities").select("activity_date"),
   ]);
 
@@ -31,6 +33,7 @@ async function fetchPathsAndActivity(supabase: ServerSupabase): Promise<PathsAnd
 
   const paths: GamificationPath[] = pathsResult.data.map((path) => ({
     id: path.id,
+    fromQuestionnaire: path.assessment_id !== null,
     steps: path.path_steps.map((step) => ({
       id: step.id,
       courseId: step.course_id,

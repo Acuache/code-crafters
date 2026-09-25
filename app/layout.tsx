@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { DM_Sans, Geist_Mono, Space_Grotesk } from "next/font/google";
 import "./globals.css";
+import { getSiteUrl } from "@/lib/site-url";
 import { cn } from "@/lib/utils";
 import { ThemeProvider } from "@/components/theme-provider";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -12,6 +13,8 @@ const spaceGrotesk = Space_Grotesk({ subsets: ["latin"], variable: "--font-headi
 const geistMono = Geist_Mono({ subsets: ["latin"], variable: "--font-mono" });
 
 export const metadata: Metadata = {
+  // Base de las URLs absolutas de la metadata, como la tarjeta OG de /shared/[slug].
+  metadataBase: new URL(getSiteUrl()),
   title: "DevPathlles",
   description: "Generador de rutas de aprendizaje sobre el catálogo de cursos de DevTalles.",
 };

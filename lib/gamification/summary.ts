@@ -13,6 +13,9 @@ export type GamificationStep = {
 
 export type GamificationPath = {
   id: string;
+  // Generada con el cuestionario propio (tiene assessment_id). Una copia de una ruta compartida
+  // no la tiene y no cuenta para "Explorador" (spec 15).
+  fromQuestionnaire: boolean;
   steps: GamificationStep[];
 };
 
@@ -102,7 +105,7 @@ export function summarizeGamification(input: GamificationInput): GamificationSum
     hasAnyActivity: input.activityDays.length > 0,
     completedCourses: hoursByCourse.size,
     completedPaths: completedPathIds.length,
-    createdPaths: input.paths.length,
+    createdPaths: input.paths.filter((path) => path.fromQuestionnaire).length,
     bestStreak: streak.best,
     completedHours: roundToOneDecimal(completedHours),
   };

@@ -24,8 +24,8 @@ function step(
   return { id, courseId, status, hours };
 }
 
-function path(id: string, steps: GamificationStep[]): GamificationPath {
-  return { id, steps };
+function path(id: string, steps: GamificationStep[], fromQuestionnaire = true): GamificationPath {
+  return { id, fromQuestionnaire, steps };
 }
 
 function input(paths: GamificationPath[], activityDays: string[] = []): GamificationInput {
@@ -123,6 +123,14 @@ describe("summarizeGamification", () => {
     expect(summary.stats.createdPaths).toBe(3);
     expect(summary.stats.bestStreak).toBe(7);
     expect(summary.earned).toEqual(["first-step", "explorer", "consistency"]);
+  });
+
+  it("tres copias de rutas compartidas no suman rutas creadas ni dan Explorador", () => {
+    const copies = [path("a", [], false), path("b", [], false), path("c", [], false)];
+    const summary = summarizeGamification(input(copies, [TODAY]));
+
+    expect(summary.stats.createdPaths).toBe(0);
+    expect(summary.earned).not.toContain("explorer");
   });
 });
 

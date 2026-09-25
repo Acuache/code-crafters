@@ -152,10 +152,13 @@ export type Database = {
           ai_title: string | null
           assessment_id: string | null
           budget_hours: number | null
+          copied_from_path_id: string | null
           created_at: string
           goal: string
           id: string
+          is_public: boolean
           personalized_at: string | null
+          share_slug: string
           summary: string | null
           title: string
           user_id: string
@@ -166,10 +169,13 @@ export type Database = {
           ai_title?: string | null
           assessment_id?: string | null
           budget_hours?: number | null
+          copied_from_path_id?: string | null
           created_at?: string
           goal: string
           id?: string
+          is_public?: boolean
           personalized_at?: string | null
+          share_slug?: string
           summary?: string | null
           title: string
           user_id: string
@@ -180,10 +186,13 @@ export type Database = {
           ai_title?: string | null
           assessment_id?: string | null
           budget_hours?: number | null
+          copied_from_path_id?: string | null
           created_at?: string
           goal?: string
           id?: string
+          is_public?: boolean
           personalized_at?: string | null
+          share_slug?: string
           summary?: string | null
           title?: string
           user_id?: string
@@ -194,6 +203,13 @@ export type Database = {
             columns: ["assessment_id"]
             isOneToOne: false
             referencedRelation: "assessments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "learning_paths_copied_from_path_id_fkey"
+            columns: ["copied_from_path_id"]
+            isOneToOne: false
+            referencedRelation: "learning_paths"
             referencedColumns: ["id"]
           },
         ]
@@ -532,6 +548,24 @@ export type Database = {
           p_title: string
         }
         Returns: undefined
+      }
+      copy_shared_path: {
+        Args: {
+          p_slug: string
+        }
+        Returns: string
+      }
+      get_path_origin: {
+        Args: {
+          p_path_id: string
+        }
+        Returns: string
+      }
+      get_shared_path: {
+        Args: {
+          p_slug: string
+        }
+        Returns: Json
       }
       record_step_activity: {
         Args: {
