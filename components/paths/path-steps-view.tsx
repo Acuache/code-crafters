@@ -23,7 +23,13 @@ import { USER_DISCARD_REASON } from "@/lib/progress/path-progress";
 import { BudgetCard } from "./budget-card";
 import { DiscardedSteps } from "./discarded-steps";
 import { PathMap } from "./path-map";
-import { summarizeStepsProgress, type PathStepView, type PathView } from "./path-step";
+import {
+  isPathView,
+  summarizeStepsProgress,
+  writeViewToUrl,
+  type PathStepView,
+  type PathView,
+} from "./path-step";
 import { PathStepsList } from "./path-steps-list";
 import { StepDetailDialog } from "./step-detail-dialog";
 import type { SelectableStepStatus } from "./step-status-toggle";
@@ -49,24 +55,6 @@ function applyChange(steps: PathStepView[], change: OptimisticChange): PathStepV
 
     return { ...step, status: "pending", discardReason: null };
   });
-}
-
-function isPathView(value: unknown): value is PathView {
-  return value === "mapa" || value === "lista";
-}
-
-// La vista vive en la URL para que recargar o compartir el link la conserve. replaceState y no
-// router.replace: la página es dinámica y router.replace volvería a pedir el Server Component solo
-// para cambiar de pestaña. Next sincroniza replaceState con su router.
-function writeViewToUrl(view: PathView) {
-  const url = new URL(window.location.href);
-  if (view === "lista") {
-    url.searchParams.set("vista", "lista");
-  } else {
-    url.searchParams.delete("vista");
-  }
-
-  window.history.replaceState(null, "", url);
 }
 
 type PathStepsViewProps = {
@@ -249,9 +237,11 @@ export function PathStepsView({ pathId, steps, budgetHours, initialView }: PathS
             <PathStepsList
               groups={groups}
               stepNumbers={stepNumbers}
-              onStatusChange={handleStatusChange}
-              onDiscard={handleDiscard}
-              onOpenQuiz={openQuiz}
+              ownerActions={{
+                onStatusChange: handleStatusChange,
+                onDiscard: handleDiscard,
+                onOpenQuiz: openQuiz,
+              }}
             />
           </TabsContent>
         </Tabs>

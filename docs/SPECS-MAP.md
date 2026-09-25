@@ -55,7 +55,7 @@ Decisiones de base para todo el mapa:
 | 12 | `visual-path-map` | Mapa de la ruta en zigzag estilo Duolingo (CSS + SVG, sin React Flow), por defecto en `/paths/[id]`, con modal de detalle por nodo | 08, 09 | Semana 2 |
 | 13 | `course-quizzes` | Un quiz por curso escrito por el admin desde `/admin` (sin IA), con 3 preguntas de ejemplo por curso, feedback al instante, y aprobarlo marca el paso como hecho y suma racha (ADR 0005) | 08, 10, 12 | Semana 2 |
 | 14 | `gamification` | XP por curso (10 por hora), niveles, 6 insignias como medallas en `/profile`, resumen en el dashboard y celebración (toast o modal con confetti) al completar; "Hecho" exige aprobar el quiz del curso (ADR 0007) | 02, 03, 08, 09, 12, 13 | Semana 2 |
-| 15 | `path-sharing` | Ruta pública en `/r/[slug]` con tarjeta OG para pegar en Discord | 08 | Semana 2 |
+| 15 | `path-sharing` | Ruta pública en `/shared/[slug]` con tarjeta OG para pegar en Discord, y "Hacer esta ruta": con sesión, otra persona la copia a su cuenta con el progreso en cero | 02, 03, 08, 11, 12, 14 | Semana 2 |
 | 16 | `path-recalculation` | Botón "Ajustar mi ruta": cuestionario prellenado con las respuestas anteriores; con IA, un texto libre se traduce a cambios de chips (nunca de cursos) antes de confirmar; sin IA, se editan los chips a mano. Genera una ruta nueva, no pisa la anterior (COULD, primero en recortarse) | 08, 11 | Semana 2 |
 
 Ramas resultantes: `spec-01-catalog-enrichment`, `spec-02-supabase-schema`, … (las deriva `/spec-impl`
@@ -80,7 +80,7 @@ del nombre del archivo).
                                                  │
                 ┌────────────────────────────────┼───────────────────────┐
                 ▼                                ▼                       ▼
-         12 visual-path-map ──► 13 course-quizzes ──► 14 gamification      15 path-sharing
+         12 visual-path-map ──► 13 course-quizzes ──► 14 gamification ──► 15 path-sharing
 
  05 landing             (sin dependencias)
  10 admin-catalog       (depende de 02 + 03; agendado después del Hito 1)
@@ -93,7 +93,8 @@ del nombre del archivo).
 
 **Qué corre en paralelo:** 04 con 03 (el motor es una función pura, no toca la DB; solo necesita el
 vocabulario de 15 `programs.slug` que fija el 02, no sus migraciones ni su RLS); 05 con cualquiera de
-los anteriores (no depende de nada); y 11, 12 y 15 entre sí una vez cerrado el 08 (13 va después de 12, y 14 después de 13).
+los anteriores (no depende de nada); y 11 y 12 entre sí una vez cerrado el 08 (13 va después de 12,
+14 después de 13, y 15 después de 11 y 14: copia los textos de la IA y cambia cómo cuenta "Explorador").
 
 **Tres puntos de sincronización que hay que escribir dentro de los specs, no descubrirlos después:**
 
@@ -190,6 +191,19 @@ los anteriores (no depende de nada); y 11, 12 y 15 entre sí una vez cerrado el 
    color de marca; en `app/(app)/dashboard/page.tsx` (del 09), la fila de XP y racha y el link al
    perfil en la cabecera; en `proxy.ts` (del 03), `/profile` entre las rutas privadas; y en
    `app/globals.css`, solo la regla que sube el `ToastViewport` sobre los diálogos.
+   **Excepciones explícitas del spec 15 (rutas compartidas):** es dueño de `lib/sharing/*`,
+   `components/sharing/*`, `app/shared/[slug]/*`, `app/(app)/paths/[id]/share-actions{,.test}.ts`,
+   `lib/supabase/next-path{,.test}.ts`, `lib/site-url.ts` y `public/og-logo.png` (el logo en PNG,
+   porque la tarjeta OG no lee WebP). Fuera de eso, del 03: `next` en `app/login/page.tsx`,
+   `signInWithProvider` (`lib/supabase/actions.ts`) y `app/auth/callback/route.ts`, y el patrón
+   `/auth/callback**` en `supabase/config.toml`; en `app/layout.tsx`, solo el `metadataBase`. Del 08:
+   en `app/(app)/paths/[id]/page.tsx`, `share_slug`/`is_public`, el botón "Compartir" y la línea
+   "Basada en la ruta de nombre_apellido"; en `components/paths/{step-row,path-steps-list,step-group-heading}.tsx`,
+   el modo de solo lectura (`ownerActions` opcional y `showDoneCount`); y `isPathView`/`writeViewToUrl`,
+   que pasan de `path-steps-view.tsx` a `path-step.ts` para que los reuse la página pública. Del 12:
+   `onOpenStep`/`onOpen` opcionales en `components/paths/{path-map,path-map-node}.tsx`. Del 14:
+   `fromQuestionnaire` en `lib/gamification/{summary,load-gamification}.ts`, para que "Explorador" no
+   cuente las copias.
 6. **Migraciones nuevas solo en 02, 11, 13, 14 y 15**, y esos cinco no se implementan en paralelo entre sí:
    el orden de los archivos de migración depende del orden de merge, y ramas simultáneas lo rompen. El
    02 crea el esquema base —incluye `profiles.role` y las tablas `programs`/`program_courses`—; 11, 13
@@ -200,6 +214,8 @@ los anteriores (no depende de nada); y 11, 12 y 15 entre sí una vez cerrado el 
    simplifica con `20260925130000_course_quizzes.sql` y siembra los quizzes con
    `20260925140000_seed_course_quizzes.sql`. El 14 solo cambia un FK
    (`20260925150000_keep_streak_days_on_path_delete.sql`: borrar una ruta ya no borra días de racha).
+   El 15 agrega `is_public`, `share_slug` y `copied_from_path_id` a `learning_paths` y tres funciones
+   `security definer` acotadas por slug (`20260925160000_path_sharing.sql`).
 7. **Antes de cada `/spec-impl`:** estar en `master`, con el árbol limpio y actualizado. La fase 3 del
    skill se detiene si `git status` no está vacío.
 8. **Lo que aparezca fuera de alcance durante un `/spec-impl` va al spec que le toca según el mapa**, no
@@ -466,10 +482,13 @@ quiz abre el quiz. Migración chica: borrar una ruta ya no borra días de racha.
 
 ### 15 · `path-sharing`
 
-Una versión pública y de solo lectura de una ruta en `/r/[slug]`, más una tarjeta OG
-(`opengraph-image.tsx`) para que se vea bien al pegar el link en Discord. Su RLS debe garantizar que solo
-las rutas con `is_public = true` sean legibles por terceros; las privadas siguen protegidas igual que en
-el 08.
+El dueño publica su ruta desde `/paths/[id]` ("Compartir") y obtiene un link `/shared/[slug]` con tarjeta
+OG (`opengraph-image.tsx`) para pegarlo en Discord. La página pública muestra título, resumen, autor y
+los cursos en Mapa y Lista de solo lectura, sin el avance del autor. Con sesión, "Hacer esta ruta" la
+copia a la cuenta de quien la mira (mismos cursos, orden y descartados, con el progreso en cero); sin
+sesión, el login vuelve al link gracias a `next`. Las RLS no cambian: `anon` sigue sin leer
+`learning_paths` ni `path_steps`, y lo que lee o copia una ruta ajena pasa por tres funciones
+`security definer` acotadas por slug. Las copias no cuentan para "Explorador".
 
 ### 16 · `path-recalculation`
 

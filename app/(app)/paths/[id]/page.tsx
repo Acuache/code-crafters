@@ -10,6 +10,7 @@ import { Eyebrow } from "@/components/brand/eyebrow";
 import { StreakCard } from "@/components/gamification/streak-card";
 import type { PathStepView, PathView } from "@/components/paths/path-step";
 import { PathStepsView } from "@/components/paths/path-steps-view";
+import { SharePathDialog } from "@/components/sharing/share-path-dialog";
 import { Button } from "@/components/ui/button";
 import { assessmentAnswersSchema } from "@/components/quiz/quiz-schema";
 import { remainingPersonalizations } from "@/lib/ai/daily-limit";
@@ -22,6 +23,7 @@ import { computeStreak, todayInTimeZone } from "@/lib/gamification/streak";
 import { isStepOrigin } from "@/lib/paths/levels";
 import type { StepOrigin } from "@/lib/paths/types";
 import { storedQuestionsSchema, type CourseQuiz } from "@/lib/quizzes/schema";
+import { authorHandle } from "@/lib/sharing/shared-path";
 import { requireUser } from "@/lib/supabase/guards";
 import { createClient } from "@/lib/supabase/server";
 
@@ -85,6 +87,25 @@ async function loadStreak(supabase: Awaited<ReturnType<typeof createClient>>, us
   return { streak: computeStreak(activityDates, today), activityDates, today };
 }
 
+// Username del autor de la ruta de la que salió esta copia (spec 15). El tipo generado dice
+// `string`, pero la función devuelve null si no es una copia o si el original ya no existe.
+async function loadPathOrigin(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  pathId: string,
+): Promise<string | null> {
+  const { data: originUsername, error } = await supabase.rpc("get_path_origin", {
+    p_path_id: pathId,
+  });
+
+  // Sin la línea de atribución la ruta funciona igual.
+  if (error) {
+    console.error(`[sharing] loadPathOrigin: ${error.message}`);
+    return null;
+  }
+
+  return originUsername ?? null;
+}
+
 // El quiz de cada curso de la ruta viaja con la página, así abrirlo no espera a nadie (spec 13).
 // El filtro por is_active no sobra: la RLS le deja ver los desactivados al admin.
 async function loadActiveQuizzes(
@@ -139,7 +160,7 @@ export default async function PathPage({ params, searchParams }: PathPageProps) 
   const { data: path } = await supabase
     .from("learning_paths")
     .select(
-      "id, title, summary, budget_hours, ai_title, ai_summary, personalized_at, ai_adjustments, assessments(answers)",
+      "id, title, summary, budget_hours, ai_title, ai_summary, personalized_at, ai_adjustments, share_slug, is_public, assessments(answers)",
     )
     .eq("id", id)
     .single();
@@ -166,7 +187,7 @@ export default async function PathPage({ params, searchParams }: PathPageProps) 
   const title = path.ai_title ?? path.title;
   const summary = path.ai_summary ?? path.summary;
   const isPersonalized = path.personalized_at !== null;
-  const [autoPersonalize, streakView, quizzesByCourse] = await Promise.all([
+  const [autoPersonalize, streakView, quizzesByCourse, originUsername] = await Promise.all([
     shouldAutoPersonalize(supabase, {
       pathId: path.id,
       isPersonalized,
@@ -174,7 +195,9 @@ export default async function PathPage({ params, searchParams }: PathPageProps) 
     }),
     loadStreak(supabase, user.userId),
     loadActiveQuizzes(supabase, courseIds),
+    loadPathOrigin(supabase, path.id),
   ]);
+  const originAuthor = authorHandle(originUsername);
 
   const steps: PathStepView[] = stepRows.map((row) => ({
     id: row.id,
@@ -216,10 +239,20 @@ export default async function PathPage({ params, searchParams }: PathPageProps) 
             {isPersonalized ? <AiBadge /> : null}
           </div>
           <h1 className="text-title text-balance">{title}</h1>
+          {originAuthor ? (
+            <p className="text-sm text-muted-foreground">Basada en la ruta de {originAuthor}</p>
+          ) : null}
           {summary ? (
             <p className="max-w-prose text-pretty text-muted-foreground">{summary}</p>
           ) : null}
           {autoPersonalize ? <AutoPersonalizer pathId={path.id} /> : null}
+          <div>
+            <SharePathDialog
+              pathId={path.id}
+              shareSlug={path.share_slug}
+              isPublic={path.is_public}
+            />
+          </div>
         </div>
         {/* Decorativa: el título de la ruta ya está al lado. */}
         <Image

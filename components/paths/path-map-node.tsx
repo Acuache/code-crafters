@@ -28,7 +28,8 @@ type PathMapNodeProps = {
   isNext: boolean;
   // Posición en el orden de aparición del mapa completo, para la entrada escalonada.
   entranceIndex: number;
-  onOpen: (trigger: HTMLButtonElement) => void;
+  // Sin él, el nodo no se abre: la ruta compartida es de solo lectura (spec 15).
+  onOpen?: (trigger: HTMLButtonElement) => void;
   buttonRef: (element: HTMLButtonElement | null) => void;
 };
 
@@ -54,8 +55,19 @@ export function PathMapNode({
 
   const isDone = step.status === "done";
   const isInProgress = step.status === "in_progress";
-  const accessibleName = `Paso ${stepNumber} de ${totalSteps}: ${step.courseTitle}, ${STATUS_LABELS[step.status]}. Abrir detalle`;
+  const stepLabel = `Paso ${stepNumber} de ${totalSteps}: ${step.courseTitle}`;
+  const accessibleName = `${stepLabel}, ${STATUS_LABELS[step.status]}. Abrir detalle`;
   const bubbleText = isInProgress ? "Continuar" : "Empezar";
+  const circleClassName = cn(
+    "relative flex size-16 items-center justify-center rounded-full border-2 font-heading text-xl font-bold tabular-nums shadow-md",
+    stepNodeClassName(step.status),
+    shouldPop && "motion-safe:animate-step-pop",
+  );
+  const circleContent = isDone ? (
+    <CheckIcon weight="bold" aria-hidden="true" className="size-7" />
+  ) : (
+    stepNumber
+  );
 
   const placement: CSSProperties = {
     left: position.x - LABEL_WIDTH / 2,
@@ -85,37 +97,43 @@ export function PathMapNode({
           </span>
         ) : null}
 
-        <button
-          type="button"
-          ref={buttonRef}
-          aria-label={accessibleName}
-          onClick={(event) => onOpen(event.currentTarget)}
-          className={cn(
-            "relative flex size-16 items-center justify-center rounded-full border-2 font-heading text-xl font-bold tabular-nums shadow-md transition-[transform,box-shadow] duration-150 outline-none hover:scale-105 focus-visible:ring-4 focus-visible:ring-ring/60 active:scale-95",
-            stepNodeClassName(step.status),
-            shouldPop && "motion-safe:animate-step-pop",
-          )}
-        >
-          {isNext ? (
-            // Dentro del botón: tocar el globo es tocar el nodo, sin una segunda parada de Tab. Dos
-            // capas: la de afuera centra con translate y la de adentro anima su entrada, porque la
-            // animación también usa transform y pisaría el centrado.
-            <span
-              aria-hidden="true"
-              className="absolute bottom-full left-1/2 mb-3 -translate-x-1/2"
-            >
+        {onOpen ? (
+          <button
+            type="button"
+            ref={buttonRef}
+            aria-label={accessibleName}
+            onClick={(event) => onOpen(event.currentTarget)}
+            className={cn(
+              circleClassName,
+              "transition-[transform,box-shadow] duration-150 outline-none hover:scale-105 focus-visible:ring-4 focus-visible:ring-ring/60 active:scale-95",
+            )}
+          >
+            {isNext ? (
+              // Dentro del botón: tocar el globo es tocar el nodo, sin una segunda parada de Tab. Dos
+              // capas: la de afuera centra con translate y la de adentro anima su entrada, porque la
+              // animación también usa transform y pisaría el centrado.
               <span
-                className="relative block rounded-full bg-primary-bright px-3 py-1 font-heading text-xs font-bold tracking-wide whitespace-nowrap text-primary-bright-foreground uppercase shadow-md motion-safe:animate-in motion-safe:duration-300 motion-safe:fill-mode-both motion-safe:zoom-in-75 motion-safe:fade-in motion-safe:slide-in-from-bottom-2"
-                style={arrivalDelay}
+                aria-hidden="true"
+                className="absolute bottom-full left-1/2 mb-3 -translate-x-1/2"
               >
-                {bubbleText}
-                <span className="absolute top-full left-1/2 size-2 -translate-x-1/2 -translate-y-1 rotate-45 bg-primary-bright" />
+                <span
+                  className="relative block rounded-full bg-primary-bright px-3 py-1 font-heading text-xs font-bold tracking-wide whitespace-nowrap text-primary-bright-foreground uppercase shadow-md motion-safe:animate-in motion-safe:duration-300 motion-safe:fill-mode-both motion-safe:zoom-in-75 motion-safe:fade-in motion-safe:slide-in-from-bottom-2"
+                  style={arrivalDelay}
+                >
+                  {bubbleText}
+                  <span className="absolute top-full left-1/2 size-2 -translate-x-1/2 -translate-y-1 rotate-45 bg-primary-bright" />
+                </span>
               </span>
-            </span>
-          ) : null}
+            ) : null}
 
-          {isDone ? <CheckIcon weight="bold" aria-hidden="true" className="size-7" /> : stepNumber}
-        </button>
+            {circleContent}
+          </button>
+        ) : (
+          // role="img": un span genérico no puede llevar nombre accesible.
+          <span role="img" aria-label={stepLabel} className={circleClassName}>
+            {circleContent}
+          </span>
+        )}
       </div>
 
       <span

@@ -10,16 +10,21 @@ import { CourseDuration, StepOriginBadge } from "./step-meta";
 import { stepNodeClassName } from "./step-node-style";
 import { StepStatusToggle, type SelectableStepStatus } from "./step-status-toggle";
 
-type StepRowProps = {
-  step: PathStepView;
-  // Número dentro de toda la ruta, no dentro del grupo.
-  stepNumber: number;
+export type StepRowOwnerActions = {
   onStatusChange: (status: SelectableStepStatus) => void;
   onDiscard: () => void;
   onOpenQuiz: () => void;
 };
 
-export function StepRow({ step, stepNumber, onStatusChange, onDiscard, onOpenQuiz }: StepRowProps) {
+type StepRowProps = {
+  step: PathStepView;
+  // Número dentro de toda la ruta, no dentro del grupo.
+  stepNumber: number;
+  // Sin ellas, la fila es de solo lectura (ruta compartida, spec 15): solo "Ver curso".
+  ownerActions?: StepRowOwnerActions;
+};
+
+export function StepRow({ step, stepNumber, ownerActions }: StepRowProps) {
   // Un descartado nunca llega acá, pero el tipo lo admite y el toggle no tiene opción para él.
   if (step.status === "discarded") {
     return null;
@@ -86,20 +91,22 @@ export function StepRow({ step, stepNumber, onStatusChange, onDiscard, onOpenQui
           </div>
 
           <div className="mt-auto flex flex-wrap items-center justify-between gap-2">
-            <StepStatusToggle
-              value={step.status}
-              onValueChange={onStatusChange}
-              courseTitle={step.courseTitle}
-            />
+            {ownerActions ? (
+              <StepStatusToggle
+                value={step.status}
+                onValueChange={ownerActions.onStatusChange}
+                courseTitle={step.courseTitle}
+              />
+            ) : null}
             <div className="flex flex-wrap items-center gap-1">
-              {step.quiz ? (
-                <Button variant="outline" size="sm" onClick={onOpenQuiz}>
+              {ownerActions && step.quiz ? (
+                <Button variant="outline" size="sm" onClick={ownerActions.onOpenQuiz}>
                   <ExamIcon data-icon="inline-start" />
                   Rendir quiz del curso
                 </Button>
               ) : null}
-              {canBeDiscarded ? (
-                <Button variant="ghost" size="sm" onClick={onDiscard}>
+              {ownerActions && canBeDiscarded ? (
+                <Button variant="ghost" size="sm" onClick={ownerActions.onDiscard}>
                   <TrashIcon data-icon="inline-start" />
                   Quitar
                 </Button>
