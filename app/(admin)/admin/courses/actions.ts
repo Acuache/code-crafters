@@ -9,11 +9,13 @@ import {
   courseUpdateSchema,
   type CourseUpdateInput,
 } from "@/lib/admin/course-schema";
-import type { ActionFailure, ActionResult } from "@/lib/action-result";
+import type { ActionFailure, ActionResult, ActionResultWithData } from "@/lib/action-result";
 import { findEngineReferences, type EngineReference } from "@/lib/admin/engine-references";
 import { GENERIC_SAVE_ERROR, describePostgresError } from "@/lib/admin/postgres-errors";
 import { placementSchema, type PlacementInput } from "@/lib/admin/program-schema";
 import { databaseIdSchema, firstIssueMessage } from "@/lib/admin/validation";
+import { assignQuestionIds } from "@/lib/quizzes/question-ids";
+import { courseQuizDraftSchema, type QuizQuestion } from "@/lib/quizzes/schema";
 import { requireAdmin } from "@/lib/supabase/guards";
 import { createClient } from "@/lib/supabase/server";
 
@@ -29,6 +31,11 @@ const PLACEMENT_NOT_FOUND: ActionFailure = {
   message: "No encontramos esa ubicación. Recarga la página.",
 };
 
+const QUIZ_NOT_FOUND: ActionFailure = {
+  ok: false,
+  message: "No encontramos ese quiz. Recarga la página.",
+};
+
 // Las páginas del panel usan el slug en la URL, y hay slugs con tildes o mayúsculas: se revalida
 // el patrón de la ruta (todas las páginas de cursos / programas) en vez de armar cada URL literal.
 function revalidateCatalogPages() {
@@ -36,6 +43,13 @@ function revalidateCatalogPages() {
   revalidatePath("/admin/courses/[slug]", "page");
   revalidatePath("/admin/programs", "page");
   revalidatePath("/admin/programs/[slug]", "page");
+}
+
+// La lista de cursos y la edición del curso muestran si tiene quiz y si está activo.
+function revalidateQuizPages() {
+  revalidatePath("/admin");
+  revalidatePath("/admin/courses/[slug]", "page");
+  revalidatePath("/admin/courses/[slug]/quiz", "page");
 }
 
 // Columnas de `courses` que escribe el formulario, en snake_case. Sin `slug` (fijo tras crear) ni
@@ -373,5 +387,103 @@ export async function removePlacement(placementId: unknown): Promise<ActionResul
   }
 
   revalidateCatalogPages();
+  return { ok: true };
+}
+
+// Crea el quiz del curso o reemplaza sus preguntas y su porcentaje (spec 13). Se edita en el lugar,
+// sin versiones: los intentos viejos conservan su puntaje. En un quiz que ya existe, `is_active`
+// solo lo cambia setCourseQuizActive, así guardar no pisa una desactivación hecha en el panel.
+// Devuelve las preguntas con sus ids para que el formulario los conserve en el próximo guardado.
+export async function saveCourseQuiz(
+  courseId: unknown,
+  input: unknown,
+): Promise<ActionResultWithData<QuizQuestion[]>> {
+  await requireAdmin();
+
+  const parsedId = databaseIdSchema.safeParse(courseId);
+  if (!parsedId.success) {
+    return COURSE_NOT_FOUND;
+  }
+
+  const parsedInput = courseQuizDraftSchema.safeParse(input);
+  if (!parsedInput.success) {
+    return { ok: false, message: firstIssueMessage(parsedInput.error) };
+  }
+
+  const questions = assignQuestionIds(parsedInput.data.questions, () => crypto.randomUUID());
+  const supabase = await createClient();
+
+  const { data: existingQuiz, error: loadError } = await supabase
+    .from("quizzes")
+    .select("id")
+    .eq("course_id", parsedId.data)
+    .maybeSingle();
+
+  if (loadError) {
+    return { ok: false, message: GENERIC_SAVE_ERROR };
+  }
+
+  if (existingQuiz) {
+    const { data: updatedRows, error } = await supabase
+      .from("quizzes")
+      .update({
+        questions,
+        pass_percentage: parsedInput.data.passPercentage,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", existingQuiz.id)
+      .select("id");
+
+    if (error) {
+      return { ok: false, message: describePostgresError(error) };
+    }
+    if (!updatedRows || updatedRows.length === 0) {
+      return QUIZ_NOT_FOUND;
+    }
+  } else {
+    const { error } = await supabase.from("quizzes").insert({
+      course_id: parsedId.data,
+      questions,
+      pass_percentage: parsedInput.data.passPercentage,
+      is_active: parsedInput.data.isActive,
+    });
+
+    if (error) {
+      return { ok: false, message: describePostgresError(error) };
+    }
+  }
+
+  revalidateQuizPages();
+  return { ok: true, data: questions };
+}
+
+// Desactivar en vez de borrar: los intentos guardados referencian el quiz (`on delete restrict`).
+export async function setCourseQuizActive(
+  quizId: unknown,
+  isActive: unknown,
+): Promise<ActionResult> {
+  await requireAdmin();
+
+  const parsedId = z.uuid().safeParse(quizId);
+  const parsedIsActive = z.boolean().safeParse(isActive);
+  if (!parsedId.success || !parsedIsActive.success) {
+    return QUIZ_NOT_FOUND;
+  }
+
+  const supabase = await createClient();
+  const { data: updatedRows, error } = await supabase
+    .from("quizzes")
+    .update({ is_active: parsedIsActive.data, updated_at: new Date().toISOString() })
+    .eq("id", parsedId.data)
+    .select("id");
+
+  if (error) {
+    return { ok: false, message: describePostgresError(error) };
+  }
+  if (!updatedRows || updatedRows.length === 0) {
+    return QUIZ_NOT_FOUND;
+  }
+
+  revalidateQuizPages();
   return { ok: true };
 }

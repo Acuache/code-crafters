@@ -1,7 +1,9 @@
 # 0005: Quizzes con IA y una sola racha, integrados en la ruta del spec 12
 
 - **Fecha:** 2026-09-24
-- **Estado:** aceptada
+- **Estado:** aceptada; la generación con IA y la práctica por capítulo las reemplaza el
+  [ADR 0006](0006-quizzes-de-curso-escritos-por-el-admin.md) (quizzes escritos por el admin). La
+  racha y la integración con el mapa siguen vigentes.
 
 ## Contexto
 

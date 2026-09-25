@@ -1,17 +1,11 @@
 "use server";
 
-import { createHash } from "node:crypto";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
 import type { ActionFailure, ActionResult, ActionResultWithData } from "@/lib/action-result";
-import { PERSONALIZATION_MODEL } from "@/lib/ai/personalize-path";
 import { USER_DISCARD_REASON } from "@/lib/progress/path-progress";
-import { quizTargetSchema, validateAttemptInput } from "@/lib/quizzes/action-validation";
-import { generateQuiz, isQuizConfigured } from "@/lib/quizzes/generate";
-import { createSupabaseQuizStore, getOrCreateQuiz, toSafeQuiz } from "@/lib/quizzes/repository";
-import type { SafeQuiz } from "@/lib/quizzes/schema";
-import { createAdminClient } from "@/lib/supabase/admin";
+import { validateAttemptInput } from "@/lib/quizzes/action-validation";
 import { requireUser } from "@/lib/supabase/guards";
 import { createClient } from "@/lib/supabase/server";
 
@@ -140,72 +134,6 @@ export async function restoreStep(stepId: unknown): Promise<ActionResult> {
   return finishStepUpdate(data, Boolean(error), "Solo puedes restaurar los pasos que quitaste tú.");
 }
 
-const QUIZ_UNAVAILABLE = "No pudimos preparar el quiz. Prueba de nuevo en un rato.";
-
-// Pide el quiz compartido del curso o del capítulo, o lo genera si todavía no existe. Nunca lanza:
-// cualquier falla (sin key, OpenAI caído, paso ajeno) vuelve como mensaje.
-export async function requestQuiz(target: unknown): Promise<ActionResultWithData<SafeQuiz>> {
-  const parsedTarget = quizTargetSchema.safeParse(target);
-  if (!parsedTarget.success || !isQuizConfigured()) {
-    return { ok: false, message: QUIZ_UNAVAILABLE };
-  }
-
-  const { pathId, pathStepId, kind, chapterTitle } = parsedTarget.data;
-
-  try {
-    await requireUser();
-    const supabase = await createClient();
-
-    // RLS (`path_steps_owner_all`) solo devuelve pasos de rutas propias.
-    const { data: step } = await supabase
-      .from("path_steps")
-      .select("status, courses(id, title, summary, topics, prerequisites, outcomes, chapters)")
-      .eq("id", pathStepId)
-      .eq("path_id", pathId)
-      .maybeSingle();
-
-    if (!step || step.status === "discarded") {
-      return { ok: false, message: "Este paso no tiene quiz disponible." };
-    }
-
-    const course = step.courses;
-    const quizChapter = kind === "chapter" ? chapterTitle : null;
-
-    const record = await getOrCreateQuiz(
-      {
-        targetKey: buildTargetKey(course.id, quizChapter),
-        title: quizChapter ?? course.title,
-        kind,
-      },
-      {
-        store: createSupabaseQuizStore(createAdminClient(), {
-          courseId: course.id,
-          chapterTitle: quizChapter,
-          model: PERSONALIZATION_MODEL,
-        }),
-        generate: () => generateQuiz({ kind, chapterTitle: quizChapter, course }),
-      },
-    );
-
-    return { ok: true, data: toSafeQuiz(record) };
-  } catch (error) {
-    const message = error instanceof Error ? error.message : "Error desconocido";
-    console.error(`[quiz] requestQuiz: ${message}`);
-    return { ok: false, message: QUIZ_UNAVAILABLE };
-  }
-}
-
-// Identifica el quiz compartido sin depender de NULL en un índice único. El título del capítulo
-// va hasheado porque puede ser largo y tener cualquier carácter.
-function buildTargetKey(courseId: number, chapterTitle: string | null): string {
-  if (!chapterTitle) {
-    return `course:${courseId}`;
-  }
-
-  const chapterHash = createHash("sha256").update(chapterTitle).digest("hex");
-  return `chapter:${courseId}:${chapterHash}`;
-}
-
 const questionResultSchema = z.object({
   questionId: z.string(),
   selectedOption: z.number(),
@@ -228,8 +156,8 @@ const attemptResultSchema = z.object({
 export type QuizQuestionResult = z.infer<typeof questionResultSchema>;
 export type AttemptResult = z.infer<typeof attemptResultSchema>;
 
-// Corrige en Postgres, guarda el intento, suma la racha si aprobó y, si es el quiz del curso,
-// marca el paso como hecho. La corrección por pregunta llega recién acá, nunca antes.
+// Vuelve a corregir en Postgres (el diálogo ya mostró el feedback con las respuestas del quiz),
+// guarda el intento y, si aprobó, suma la racha y marca el paso como hecho.
 export async function submitQuizAttempt(
   input: unknown,
 ): Promise<ActionResultWithData<AttemptResult>> {

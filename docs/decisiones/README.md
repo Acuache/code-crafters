@@ -10,4 +10,5 @@ Para debatir una decisión nueva antes de cerrarla, usar `/critique <idea>` (age
 | [0002](0002-sistema-de-diseno-devtalles.md) | Sistema de diseño con la paleta de DevTalles sobre los tokens de shadcn | aceptada | 2026-09-16 |
 | [0003](0003-intereses-transversales-al-catalogo.md) | Intereses transversales al catálogo (`lib/paths/interests.ts`), no taxonomía por curso en `data/` | aceptada | 2026-09-18 |
 | [0004](0004-donde-vive-la-personalizacion.md) | Dónde vive la personalización: descarte visible, plantillas parametrizadas, ajuste de ruta por chips (no por cursos) | aceptada | 2026-09-20 |
-| [0005](0005-quizzes-y-racha-unificados.md) | Quizzes con IA (aporte de Ariel) dentro del mapa del spec 12, OpenAI como único proveedor y una sola racha derivada | aceptada | 2026-09-24 |
+| [0005](0005-quizzes-y-racha-unificados.md) | Quizzes con IA (aporte de Ariel) dentro del mapa del spec 12, OpenAI como único proveedor y una sola racha derivada | aceptada; la parte de IA la reemplaza la 0006 | 2026-09-24 |
+| [0006](0006-quizzes-de-curso-escritos-por-el-admin.md) | Un quiz por curso escrito por el admin desde `/admin`, sin IA ni secret key, con feedback al instante | aceptada | 2026-09-24 |

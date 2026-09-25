@@ -6,12 +6,11 @@ import { ListBulletsIcon, MapTrifoldIcon } from "@phosphor-icons/react";
 
 import {
   discardStep,
-  requestQuiz,
   restoreStep,
   setStepStatus,
   submitQuizAttempt,
 } from "@/app/(app)/paths/[id]/actions";
-import { QuizDialog, type QuizTarget } from "@/components/quizzes/quiz-dialog";
+import { QuizDialog, type QuizSession } from "@/components/quizzes/quiz-dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast, Toaster } from "@/components/ui/toast";
 import type { ActionResult } from "@/lib/action-result";
@@ -73,16 +72,9 @@ type PathStepsViewProps = {
   steps: PathStepView[];
   budgetHours: number | null;
   initialView: PathView;
-  quizzesEnabled: boolean;
 };
 
-export function PathStepsView({
-  pathId,
-  steps,
-  budgetHours,
-  initialView,
-  quizzesEnabled,
-}: PathStepsViewProps) {
+export function PathStepsView({ pathId, steps, budgetHours, initialView }: PathStepsViewProps) {
   const router = useRouter();
   // Si una action falla, el servidor no cambió nada: al terminar la transición la vista vuelve sola
   // a lo que dicen las props, sin rollback manual.
@@ -93,9 +85,9 @@ export function PathStepsView({
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   // El nodo que abrió el modal, para devolverle el foco al cerrarlo.
   const detailTriggerRef = useRef<HTMLElement | null>(null);
-  const [quizTarget, setQuizTarget] = useState<QuizTarget | null>(null);
+  const [quizSession, setQuizSession] = useState<QuizSession | null>(null);
   // `key` del QuizDialog: cada apertura lo monta desde cero.
-  const [quizSession, setQuizSession] = useState(0);
+  const [quizDialogKey, setQuizDialogKey] = useState(0);
 
   const activeSteps = optimisticSteps.filter((step) => step.status !== "discarded");
   const discardedSteps = optimisticSteps.filter((step) => step.status === "discarded");
@@ -183,15 +175,19 @@ export function PathStepsView({
     handleDiscard(step);
   }
 
-  function openQuiz(stepId: string, chapterTitle: string | null) {
+  function openQuiz(step: PathStepView) {
+    if (!step.quiz) {
+      return;
+    }
+
     // Se cierra el detalle para no apilar dos diálogos.
     setIsDetailOpen(false);
-    setQuizSession((session) => session + 1);
-    setQuizTarget({
+    setQuizDialogKey((key) => key + 1);
+    setQuizSession({
+      quiz: step.quiz,
+      courseTitle: step.courseTitle,
       pathId,
-      pathStepId: stepId,
-      kind: chapterTitle ? "chapter" : "course",
-      chapterTitle,
+      pathStepId: step.id,
     });
   }
 
@@ -227,6 +223,7 @@ export function PathStepsView({
               stepNumbers={stepNumbers}
               onStatusChange={handleStatusChange}
               onDiscard={handleDiscard}
+              onOpenQuiz={openQuiz}
             />
           </TabsContent>
         </Tabs>
@@ -250,21 +247,19 @@ export function PathStepsView({
             discardFromDetail(selectedStep);
           }
         }}
-        quizzesEnabled={quizzesEnabled}
-        onOpenQuiz={(chapterTitle) => {
+        onOpenQuiz={() => {
           if (selectedStep) {
-            openQuiz(selectedStep.id, chapterTitle);
+            openQuiz(selectedStep);
           }
         }}
       />
 
       <QuizDialog
-        key={quizSession}
-        target={quizTarget}
-        onClose={() => setQuizTarget(null)}
+        key={quizDialogKey}
+        session={quizSession}
+        onClose={() => setQuizSession(null)}
         // El servidor pudo marcar el paso y sumar la racha.
         onAttemptSaved={() => router.refresh()}
-        requestQuizAction={requestQuiz}
         submitAttemptAction={submitQuizAttempt}
       />
     </Toaster>

@@ -1,6 +1,6 @@
 # SPEC 13 — Quizzes de curso escritos por el admin, sin IA
 
-> **Estado:** Borrador
+> **Estado:** Implementado
 > **Depende de:** SPEC 02, SPEC 08, SPEC 10, SPEC 12, ADR 0005
 > **Fecha:** 2026-09-24
 > **Objetivo:** Reemplazar los quizzes generados con IA por un quiz por curso que el admin escribe y
@@ -242,25 +242,25 @@ defecto en el seed.
 
 ## Criterios de aceptación
 
-- [ ] Al clonar y aplicar las migraciones, los 74 cursos activos tienen un quiz de 3 preguntas.
-- [ ] Abrir el quiz de un curso no hace esperar: no hay "Preparando tu quiz…" ni llamada a una IA.
-- [ ] Al elegir una opción queda fija, se ve si es correcta, cuál era la correcta y la explicación.
-- [ ] Aprobar (≥ el porcentaje del quiz, 60 % por defecto) marca el paso como "Hecho" y suma el día
+- [x] Al clonar y aplicar las migraciones, los 74 cursos activos tienen un quiz de 3 preguntas.
+- [x] Abrir el quiz de un curso no hace esperar: no hay "Preparando tu quiz…" ni llamada a una IA.
+- [x] Al elegir una opción queda fija, se ve si es correcta, cuál era la correcta y la explicación.
+- [x] Aprobar (≥ el porcentaje del quiz, 60 % por defecto) marca el paso como "Hecho" y suma el día
       a la racha; desaprobar no cambia el estado del paso.
-- [ ] El botón "Rendir quiz del curso" aparece en el modal del mapa y en la lista, solo si el curso
+- [x] El botón "Rendir quiz del curso" aparece en el modal del mapa y en la lista, solo si el curso
       tiene quiz activo.
-- [ ] El admin puede crear el quiz de un curso, agregar, editar, reordenar y borrar preguntas,
+- [x] El admin puede crear el quiz de un curso, agregar, editar, reordenar y borrar preguntas,
       cambiar el porcentaje para aprobar y desactivarlo, desde `/admin/courses/[slug]/quiz`.
-- [ ] Un usuario que no es admin no puede escribir en `quizzes` (ni por la UI ni por la API de
+- [x] Un usuario que no es admin no puede escribir en `quizzes` (ni por la UI ni por la API de
       Supabase) ni ver quizzes inactivos.
-- [ ] No quedan quizzes por capítulo, `lib/quizzes/generate.ts`, `lib/supabase/admin.ts` ni
+- [x] No quedan quizzes por capítulo, `lib/quizzes/generate.ts`, `lib/supabase/admin.ts` ni
       `SUPABASE_SECRET_KEY` en el repo.
-- [ ] La app funciona sin `OPENAI_API_KEY`, incluidos los quizzes.
-- [ ] Si la entrega falla por red, el diálogo muestra el error y deja reintentar (no se queda en
+- [x] La app funciona sin `OPENAI_API_KEY`, incluidos los quizzes.
+- [x] Si la entrega falla por red, el diálogo muestra el error y deja reintentar (no se queda en
       "Corrigiendo…").
-- [ ] Los textos que mencionan el porcentaje para aprobar usan el `pass_percentage` del quiz, no
+- [x] Los textos que mencionan el porcentaje para aprobar usan el `pass_percentage` del quiz, no
       un 60 fijo.
-- [ ] `npm run test`, `npm run lint` y `npm run build` pasan.
+- [x] `npm run test`, `npm run lint` y `npm run build` pasan.
 
 ## Decisiones
 

@@ -1,7 +1,11 @@
 import Link from "next/link";
 import { MagnifyingGlassIcon, PlusIcon } from "@phosphor-icons/react/ssr";
 
-import { CoursesTable, type AdminCourseRow } from "@/components/admin/courses-table";
+import {
+  CoursesTable,
+  type AdminCourseRow,
+  type CourseQuizStatus,
+} from "@/components/admin/courses-table";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Empty, EmptyContent, EmptyHeader, EmptyTitle } from "@/components/ui/empty";
@@ -17,7 +21,15 @@ type LoadedCourseRow = {
   difficulty: AdminCourseRow["difficulty"];
   is_active: boolean;
   program_courses: { count: number }[];
+  quizzes: { is_active: boolean } | null;
 };
+
+function toQuizStatus(quiz: LoadedCourseRow["quizzes"]): CourseQuizStatus {
+  if (!quiz) {
+    return "none";
+  }
+  return quiz.is_active ? "active" : "inactive";
+}
 
 function toAdminCourseRow(row: LoadedCourseRow): AdminCourseRow {
   return {
@@ -28,6 +40,7 @@ function toAdminCourseRow(row: LoadedCourseRow): AdminCourseRow {
     difficulty: row.difficulty,
     isActive: row.is_active,
     programCount: row.program_courses[0]?.count ?? 0,
+    quizStatus: toQuizStatus(row.quizzes),
   };
 }
 
@@ -51,7 +64,9 @@ export default async function AdminCoursesPage({
   const supabase = await createClient();
   let query = supabase
     .from("courses")
-    .select("id, slug, title, hours, difficulty, is_active, program_courses(count)")
+    .select(
+      "id, slug, title, hours, difficulty, is_active, program_courses(count), quizzes(is_active)",
+    )
     .order("title");
 
   if (searchTerm) {

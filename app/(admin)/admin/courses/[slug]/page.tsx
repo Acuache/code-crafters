@@ -1,4 +1,6 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
+import { ExamIcon } from "@phosphor-icons/react/ssr";
 
 import { CourseForm, type CourseFormFields } from "@/components/admin/course-form";
 import {
@@ -7,7 +9,16 @@ import {
   type ProgramOption,
 } from "@/components/admin/course-placements";
 import { CourseStatusCard } from "@/components/admin/course-status-card";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardAction,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { decodeSlugParam } from "@/lib/admin/route-params";
 import { PROGRAM_LEVEL_ORDER } from "@/lib/paths/levels";
 import { requireAdmin } from "@/lib/supabase/guards";
@@ -28,7 +39,7 @@ export default async function EditCoursePage({ params }: { params: Promise<{ slu
     supabase
       .from("courses")
       .select(
-        "*, program_courses(id, stage, level, position, note, programs(id, slug, name, position))",
+        "*, program_courses(id, stage, level, position, note, programs(id, slug, name, position)), quizzes(is_active)",
       )
       .eq("slug", slug)
       .maybeSingle(),
@@ -90,10 +101,35 @@ export default async function EditCoursePage({ params }: { params: Promise<{ slu
   }));
 
   const programs: ProgramOption[] = programsResult.data ?? [];
+  const quiz = course.quizzes;
 
   return (
     <div className="flex flex-col gap-6">
       <CourseStatusCard courseId={course.id} isActive={course.is_active} />
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            Quiz
+            {quiz?.is_active ? <Badge>Activo</Badge> : null}
+            {quiz && !quiz.is_active ? <Badge variant="secondary">Inactivo</Badge> : null}
+            {quiz ? null : <Badge variant="outline">Sin quiz</Badge>}
+          </CardTitle>
+          <CardDescription>
+            Aprobarlo marca el curso como hecho en la ruta del alumno, igual que el botón «Hecho».
+          </CardDescription>
+          <CardAction>
+            <Button
+              variant="outline"
+              render={<Link href={`/admin/courses/${encodeURIComponent(course.slug)}/quiz`} />}
+              nativeButton={false}
+            >
+              <ExamIcon data-icon="inline-start" />
+              {quiz ? "Editar quiz" : "Crear quiz"}
+            </Button>
+          </CardAction>
+        </CardHeader>
+      </Card>
 
       <CoursePlacements
         courseId={course.id}

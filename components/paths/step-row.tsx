@@ -1,4 +1,4 @@
-import { ArrowSquareOutIcon, CheckIcon, TrashIcon } from "@phosphor-icons/react";
+import { ArrowSquareOutIcon, CheckIcon, ExamIcon, TrashIcon } from "@phosphor-icons/react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -16,9 +16,10 @@ type StepRowProps = {
   stepNumber: number;
   onStatusChange: (status: SelectableStepStatus) => void;
   onDiscard: () => void;
+  onOpenQuiz: () => void;
 };
 
-export function StepRow({ step, stepNumber, onStatusChange, onDiscard }: StepRowProps) {
+export function StepRow({ step, stepNumber, onStatusChange, onDiscard, onOpenQuiz }: StepRowProps) {
   // Un descartado nunca llega acá, pero el tipo lo admite y el toggle no tiene opción para él.
   if (step.status === "discarded") {
     return null;
@@ -90,7 +91,13 @@ export function StepRow({ step, stepNumber, onStatusChange, onDiscard }: StepRow
               onValueChange={onStatusChange}
               courseTitle={step.courseTitle}
             />
-            <div className="flex items-center gap-1">
+            <div className="flex flex-wrap items-center gap-1">
+              {step.quiz ? (
+                <Button variant="outline" size="sm" onClick={onOpenQuiz}>
+                  <ExamIcon data-icon="inline-start" />
+                  Rendir quiz del curso
+                </Button>
+              ) : null}
               {canBeDiscarded ? (
                 <Button variant="ghost" size="sm" onClick={onDiscard}>
                   <TrashIcon data-icon="inline-start" />
