@@ -54,7 +54,7 @@ Decisiones de base para todo el mapa:
 | 11 | `ai-personalization` | Capa 2: título, resumen y razones escritas por IA sobre la ruta ya guardada, con límite diario | 07 | Semana 2 |
 | 12 | `visual-path-map` | Mapa de la ruta en zigzag estilo Duolingo (CSS + SVG, sin React Flow), por defecto en `/paths/[id]`, con modal de detalle por nodo | 08, 09 | Semana 2 |
 | 13 | `course-quizzes` | Un quiz por curso escrito por el admin desde `/admin` (sin IA), con 3 preguntas de ejemplo por curso, feedback al instante, y aprobarlo marca el paso como hecho y suma racha (ADR 0005) | 08, 10, 12 | Semana 2 |
-| 14 | `gamification` | XP por curso, niveles, insignias y celebración al completar, sobre la racha y los quizzes del 13 | 08, 12, 13 | Semana 2 |
+| 14 | `gamification` | XP por curso (10 por hora), niveles, 6 insignias como medallas en `/profile`, resumen en el dashboard y celebración (toast o modal con confetti) al completar; "Hecho" exige aprobar el quiz del curso (ADR 0007) | 02, 03, 08, 09, 12, 13 | Semana 2 |
 | 15 | `path-sharing` | Ruta pública en `/r/[slug]` con tarjeta OG para pegar en Discord | 08 | Semana 2 |
 | 16 | `path-recalculation` | Botón "Ajustar mi ruta": cuestionario prellenado con las respuestas anteriores; con IA, un texto libre se traduce a cambios de chips (nunca de cursos) antes de confirmar; sin IA, se editan los chips a mano. Genera una ruta nueva, no pisa la anterior (COULD, primero en recortarse) | 08, 11 | Semana 2 |
 
@@ -179,7 +179,18 @@ los anteriores (no depende de nada); y 11, 12 y 15 entre sí una vez cerrado el 
    `app/(admin)/admin/courses/actions.ts`, la tarjeta "Quiz" de la edición del curso, la columna "Quiz"
    de `components/admin/courses-table.tsx` y el mensaje de `quizzes_course_id_key` en
    `lib/admin/postgres-errors.ts`.
-6. **Migraciones nuevas solo en 02, 11, 13 y 15**, y esos cuatro no se implementan en paralelo entre sí:
+   **Excepciones explícitas del spec 14 (gamificación):** es dueño de
+   `lib/gamification/{xp,achievements,summary,load-gamification}` (con sus tests),
+   `components/gamification/{streak-indicator,achievement-grid,celebration-dialog,celebrate,use-celebration}`
+   y `app/(app)/profile/*`; `xp-bar.tsx`, `streak.ts` y `streak-card.tsx` se usan sin cambios. Fuera
+   de eso, en `app/(app)/paths/[id]/actions.ts` (del 08), `gamification` en `setStepStatus` y
+   `submitQuizAttempt` y el rechazo de "Hecho" en un curso con quiz activo (ADR 0007); en
+   `components/paths/path-steps-view.tsx` (del 08), el hook de celebración, el modal y abrir el quiz
+   al pedir "Hecho"; en `components/paths/step-status-toggle.tsx` (del 08), el estado activo con el
+   color de marca; en `app/(app)/dashboard/page.tsx` (del 09), la fila de XP y racha y el link al
+   perfil en la cabecera; en `proxy.ts` (del 03), `/profile` entre las rutas privadas; y en
+   `app/globals.css`, solo la regla que sube el `ToastViewport` sobre los diálogos.
+6. **Migraciones nuevas solo en 02, 11, 13, 14 y 15**, y esos cinco no se implementan en paralelo entre sí:
    el orden de los archivos de migración depende del orden de merge, y ramas simultáneas lo rompen. El
    02 crea el esquema base —incluye `profiles.role` y las tablas `programs`/`program_courses`—; 11, 13
    y 15 añaden cada uno sus columnas o tablas para poder recortarse sin dejar tablas muertas. El 10
@@ -187,14 +198,16 @@ los anteriores (no depende de nada); y 11, 12 y 15 entre sí una vez cerrado el 
    de la numeración, los quizzes y la racha de Ariel (`20260923120000_quizzes_progress_streak.sql`)
    y su integración (`20260924130000_unify_streak.sql`, ADR 0005) ya están en el repo. El 13 los
    simplifica con `20260925130000_course_quizzes.sql` y siembra los quizzes con
-   `20260925140000_seed_course_quizzes.sql`.
+   `20260925140000_seed_course_quizzes.sql`. El 14 solo cambia un FK
+   (`20260925150000_keep_streak_days_on_path_delete.sql`: borrar una ruta ya no borra días de racha).
 7. **Antes de cada `/spec-impl`:** estar en `master`, con el árbol limpio y actualizado. La fase 3 del
    skill se detiene si `git status` no está vacío.
 8. **Lo que aparezca fuera de alcance durante un `/spec-impl` va al spec que le toca según el mapa**, no
    a la rama actual. Si no le toca a ninguno, es un spec nuevo al final de la numeración.
 9. **Toda pantalla nueva compone el sistema de diseño ya construido, no crea piezas visuales nuevas.**
-   La regla completa vive en `CLAUDE.md` §"UI: componer, no crear" (specs 03, 05, 06, 08, 09, 10, 12);
-   no se duplica acá.
+   La regla completa vive en `CLAUDE.md` §"UI: componer, no crear" (specs 03, 05, 06, 08, 09, 10, 12,
+   14); no se duplica acá. La única composición visual nueva del 14 es la medalla de las insignias
+   (`AchievementMedal`, solo tokens), justificada en sus Decisiones.
 
 ## 4. Decisiones abiertas, asignadas al spec que las cierra
 
@@ -240,7 +253,9 @@ convencional.
   diseño ya construido, documentado en `/sistema-diseno` y en el ADR 0002. Entrada de 03, 05, 06, 08,
   09, 10 y 12. La regla general ("componer, no crear") vive en `CLAUDE.md` §"UI: componer, no crear";
   no se repite acá.
-- `components/gamification/xp-bar.tsx` — **ya existe**; el spec 14 lo conecta, no lo crea.
+- `components/gamification/xp-bar.tsx` — lo conectó el spec 14 (dashboard y `/profile`) sin cambiarlo.
+- `lib/gamification/summary.ts` y `load-gamification.ts` (spec 14) — XP, nivel, racha e insignias
+  derivados al leer. Un spec que necesite mostrar el avance del usuario (p. ej. el 15) los reusa.
 - `lib/supabase/{client,server}.ts` y `proxy.ts` — clientes SSR ya escritos con `getAll`/`setAll` y
   refresh con `getClaims()`. Entrada del 03; el 03 añade login/callback y el rol en sesión, no reescribe
   esto.
@@ -441,12 +456,13 @@ Decisión registrada en el [ADR 0006](decisiones/0006-quizzes-de-curso-escritos-
 
 ### 14 · `gamification`
 
-XP por curso completado (según las horas del curso), niveles, insignias y una celebración (confetti)
-al completar un paso o una ruta, también cuando se completa aprobando el quiz del curso. La racha y
-los quizzes ya existen (aporte de Ariel, integrado según [ADR 0005](decisiones/0005-quizzes-y-racha-unificados.md)):
-este spec usa `streak_activities` y `lib/gamification/streak.ts` en vez de crear su propia racha. El
-componente `components/gamification/xp-bar.tsx` **ya existe** — este spec lo conecta a datos reales.
-XP, nivel e insignias se derivan al leer, sin columnas nuevas en `profiles`.
+10 XP por hora de cada curso distinto hecho, niveles con curva 100 × n, la racha del
+[ADR 0005](decisiones/0005-quizzes-y-racha-unificados.md) y 6 insignias como medallas, todo derivado
+al leer (sin columnas nuevas en `profiles`). Resumen en la cabecera del dashboard y detalle en
+`/profile`. En `/paths/[id]`, un curso hecho da un toast de XP, y un logro mayor (ruta, nivel o
+insignia) abre un solo modal con la pose de la mascota y confetti, que nunca tapa el quiz ni el
+detalle. Con el [ADR 0007](decisiones/0007-done-requires-course-quiz.md), "Hecho" en un curso con
+quiz abre el quiz. Migración chica: borrar una ruta ya no borra días de racha.
 
 ### 15 · `path-sharing`
 

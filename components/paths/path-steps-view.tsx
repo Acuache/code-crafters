@@ -10,6 +10,8 @@ import {
   setStepStatus,
   submitQuizAttempt,
 } from "@/app/(app)/paths/[id]/actions";
+import { CelebrationDialog } from "@/components/gamification/celebration-dialog";
+import { useCelebration } from "@/components/gamification/use-celebration";
 import { QuizDialog, type QuizSession } from "@/components/quizzes/quiz-dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast, Toaster } from "@/components/ui/toast";
@@ -88,6 +90,9 @@ export function PathStepsView({ pathId, steps, budgetHours, initialView }: PathS
   const [quizSession, setQuizSession] = useState<QuizSession | null>(null);
   // `key` del QuizDialog: cada apertura lo monta desde cero.
   const [quizDialogKey, setQuizDialogKey] = useState(0);
+  const { celebrate, celebrationDialogProps } = useCelebration(
+    isDetailOpen || quizSession !== null,
+  );
 
   const activeSteps = optimisticSteps.filter((step) => step.status !== "discarded");
   const discardedSteps = optimisticSteps.filter((step) => step.status === "discarded");
@@ -116,9 +121,32 @@ export function PathStepsView({ pathId, steps, budgetHours, initialView }: PathS
   }
 
   function handleStatusChange(stepId: string, status: SelectableStepStatus) {
-    runStepAction({ type: "status", stepId, status }, () =>
-      setStepStatus(stepId, status, browserTimeZone()),
-    );
+    const step = optimisticSteps.find((candidate) => candidate.id === stepId);
+    if (!step) {
+      return;
+    }
+
+    // ADR 0007: con quiz, "Hecho" se gana aprobándolo.
+    if (status === "done" && step.quiz) {
+      openQuiz(step);
+      return;
+    }
+
+    // El modal de logro espera la coreografía del mapa, que arranca con el cambio optimista.
+    const mapChoreographyStartedAt = status === "done" && view === "mapa" ? Date.now() : null;
+
+    runStepAction({ type: "status", stepId, status }, async () => {
+      const result = await setStepStatus(stepId, status, browserTimeZone());
+      if (result.ok && result.gamification) {
+        celebrate({
+          events: result.gamification,
+          courseTitle: step.courseTitle,
+          mapChoreographyStartedAt,
+        });
+      }
+
+      return result;
+    });
   }
 
   function handleRestore(stepId: string) {
@@ -259,9 +287,20 @@ export function PathStepsView({ pathId, steps, budgetHours, initialView }: PathS
         session={quizSession}
         onClose={() => setQuizSession(null)}
         // El servidor pudo marcar el paso y sumar la racha.
-        onAttemptSaved={() => router.refresh()}
+        onAttemptSaved={(result) => {
+          router.refresh();
+          if (result.gamification && quizSession) {
+            celebrate({
+              events: result.gamification,
+              courseTitle: quizSession.courseTitle,
+              mapChoreographyStartedAt: null,
+            });
+          }
+        }}
         submitAttemptAction={submitQuizAttempt}
       />
+
+      <CelebrationDialog {...celebrationDialogProps} />
     </Toaster>
   );
 }
