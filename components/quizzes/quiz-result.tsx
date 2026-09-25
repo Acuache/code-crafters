@@ -3,34 +3,50 @@ import { CheckCircleIcon, FireIcon, XCircleIcon } from "@phosphor-icons/react";
 
 import type { AttemptResult } from "@/app/(app)/paths/[id]/actions";
 import { Button } from "@/components/ui/button";
-import type { QuizKind, SafeQuizQuestion } from "@/lib/quizzes/schema";
+import type { QuizQuestion } from "@/lib/quizzes/schema";
 
 type QuizResultProps = {
-  kind: QuizKind;
-  questions: SafeQuizQuestion[];
+  questions: QuizQuestion[];
+  passPercentage: number;
   result: AttemptResult;
   onRetry: () => void;
   onClose: () => void;
 };
 
-function describeOutcome(kind: QuizKind, result: AttemptResult): string {
+function describeOutcome(result: AttemptResult, passPercentage: number): string {
   if (!result.passed) {
-    return "Repasa las explicaciones y vuelve a intentarlo.";
+    return `Necesitas ${passPercentage} % para aprobar. Repasa las explicaciones y vuelve a intentarlo.`;
   }
 
   if (result.stepCompleted) {
     return "Marcamos el curso como hecho en tu ruta.";
   }
 
-  if (kind === "chapter") {
-    return "Buen repaso. El curso sigue como estaba en tu ruta.";
-  }
-
   return "Aprobaste el quiz del curso.";
 }
 
-export function QuizResult({ kind, questions, result, onRetry, onClose }: QuizResultProps) {
+// La racha suma como máximo un día por fecha: aprobar dos veces el mismo día no la mueve.
+function describeStreak(result: AttemptResult): string | null {
+  if (result.streakIncreased) {
+    return "Sumaste un día a tu racha";
+  }
+
+  if (result.passed) {
+    return "Tu racha ya tenía sumado el día de hoy";
+  }
+
+  return null;
+}
+
+export function QuizResult({
+  questions,
+  passPercentage,
+  result,
+  onRetry,
+  onClose,
+}: QuizResultProps) {
   const mascotSrc = result.passed ? "/streak/celebration-1.webp" : "/astronauta.webp";
+  const streakMessage = describeStreak(result);
 
   return (
     <div className="flex flex-col gap-6">
@@ -43,13 +59,14 @@ export function QuizResult({ kind, questions, result, onRetry, onClose }: QuizRe
         <p className="font-heading text-4xl font-semibold tabular-nums">
           {result.scorePercentage} %
         </p>
-        <p className="text-muted-foreground">
-          {result.correctCount} de {questions.length} correctas · {describeOutcome(kind, result)}
+        <p className="text-pretty text-muted-foreground">
+          {result.correctCount} de {questions.length} correctas ·{" "}
+          {describeOutcome(result, passPercentage)}
         </p>
-        {result.streakIncreased ? (
+        {streakMessage ? (
           <p className="flex items-center gap-2 text-sm font-medium">
             <FireIcon weight="fill" className="text-primary-bright" aria-hidden="true" />
-            Sumaste un día a tu racha
+            {streakMessage}
           </p>
         ) : null}
       </div>

@@ -1,6 +1,6 @@
 // Sin "use client" a propósito, mismo criterio que step-status-toggle.tsx: recibe callbacks y solo
 // se importa desde path-steps-view.tsx, que ya es cliente.
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 
 import type { AttemptResult } from "@/app/(app)/paths/[id]/actions";
 import { Button } from "@/components/ui/button";
@@ -16,71 +16,81 @@ import { Progress } from "@/components/ui/progress";
 import { Spinner } from "@/components/ui/spinner";
 import type { ActionResultWithData } from "@/lib/action-result";
 import { browserTimeZone } from "@/lib/gamification/streak";
-import type { QuizKind, SafeQuiz } from "@/lib/quizzes/schema";
+import type { CourseQuiz } from "@/lib/quizzes/schema";
 
 import { QuizQuestion } from "./quiz-question";
 import { QuizResult } from "./quiz-result";
 
-export type QuizTarget = {
+// El quiz llega ya cargado con la página: abrirlo no espera a nadie.
+export type QuizSession = {
+  quiz: CourseQuiz;
+  courseTitle: string;
   pathId: string;
   pathStepId: string;
-  kind: QuizKind;
-  chapterTitle: string | null;
 };
 
-type RequestQuizAction = (target: QuizTarget) => Promise<ActionResultWithData<SafeQuiz>>;
 type SubmitAttemptAction = (input: unknown) => Promise<ActionResultWithData<AttemptResult>>;
 
 type QuizDialogProps = {
-  // null = cerrado. El padre le pone una `key` nueva en cada apertura, así el estado arranca
-  // limpio (fase "loading") sin tener que reiniciarlo desde un efecto.
-  target: QuizTarget | null;
+  // null = cerrado. El padre le pone una `key` nueva en cada apertura, así cada intento arranca
+  // limpio sin reiniciar el estado desde un efecto.
+  session: QuizSession | null;
   onClose: () => void;
   // Se llama después de guardar un intento, para que la ruta refleje el paso hecho y la racha.
   onAttemptSaved: (result: AttemptResult) => void;
-  // Las actions se inyectan para poder probar el diálogo sin servidor.
-  requestQuizAction: RequestQuizAction;
+  // La action se inyecta para poder probar el diálogo sin servidor.
   submitAttemptAction: SubmitAttemptAction;
 };
 
-type Phase = "loading" | "answering" | "submitting" | "result" | "error";
+type Phase = "answering" | "submitting" | "result" | "error";
 
 // Una action rechaza (en vez de devolver ok: false) cuando se corta la conexión.
 const CONNECTION_ERROR = "Se perdió la conexión. Revisa tu internet e intenta de nuevo.";
 
-function describeQuiz(quiz: SafeQuiz | null): string {
-  if (!quiz) {
-    return "Pon a prueba lo que aprendiste";
-  }
+function describeQuiz(quiz: CourseQuiz): string {
+  const questionCount = quiz.questions.length;
+  const questionsLabel = questionCount === 1 ? "pregunta" : "preguntas";
+  return `${questionCount} ${questionsLabel} · apruebas con ${quiz.passPercentage} %`;
+}
 
-  const kindLabel = quiz.kind === "chapter" ? "de práctica" : "del curso";
-  return `${quiz.questions.length} preguntas ${kindLabel} · apruebas con ${quiz.passPercentage} %`;
+function emptyAnswers(session: QuizSession | null): (number | undefined)[] {
+  const questionCount = session?.quiz.questions.length ?? 0;
+  return Array.from({ length: questionCount }, () => undefined);
 }
 
 export function QuizDialog({
-  target,
+  session,
   onClose,
   onAttemptSaved,
-  requestQuizAction,
   submitAttemptAction,
 }: QuizDialogProps) {
-  const [phase, setPhase] = useState<Phase>("loading");
-  const [quiz, setQuiz] = useState<SafeQuiz | null>(null);
+  // La sesión con la que se abrió: sigue visible mientras el diálogo se anima al cerrarse, cuando
+  // el padre ya pasó `null`.
+  const [openedSession] = useState(session);
+  const [phase, setPhase] = useState<Phase>("answering");
   const [questionIndex, setQuestionIndex] = useState(0);
-  const [answers, setAnswers] = useState<(number | undefined)[]>([]);
+  const [answers, setAnswers] = useState(() => emptyAnswers(session));
   const [result, setResult] = useState<AttemptResult | null>(null);
   const [errorMessage, setErrorMessage] = useState("");
-  // Una clave por intento: si el envío se repite (doble click, red lenta), Postgres devuelve el
-  // mismo resultado en vez de guardar dos intentos.
-  const idempotencyKey = useRef("");
+  // Una clave por intento: si el envío se repite (doble click, reintento tras un corte), Postgres
+  // devuelve el mismo resultado en vez de guardar dos intentos.
+  const [idempotencyKey, setIdempotencyKey] = useState(() => crypto.randomUUID());
 
-  function startAttempt(loadedQuiz: SafeQuiz) {
-    idempotencyKey.current = crypto.randomUUID();
-    setQuiz(loadedQuiz);
-    setAnswers(Array.from({ length: loadedQuiz.questions.length }, () => undefined));
-    setQuestionIndex(0);
-    setResult(null);
-    setPhase("answering");
+  function handleOpenChange(nextOpen: boolean) {
+    if (!nextOpen) {
+      onClose();
+    }
+  }
+
+  function selectOption(optionIndex: number) {
+    // Una vez elegida, la respuesta queda fija.
+    if (answers[questionIndex] !== undefined) {
+      return;
+    }
+
+    setAnswers((current) =>
+      current.map((answer, index) => (index === questionIndex ? optionIndex : answer)),
+    );
   }
 
   function showError(message: string) {
@@ -88,54 +98,13 @@ export function QuizDialog({
     setPhase("error");
   }
 
-  function applyQuizResponse(response: ActionResultWithData<SafeQuiz>) {
-    if (!response.ok) {
-      showError(response.message);
-      return;
-    }
-
-    startAttempt(response.data);
-  }
-
-  // Pide el quiz al abrir. El estado solo cambia cuando responde el servidor; si el diálogo se
-  // cierra antes, la respuesta se descarta.
-  useEffect(() => {
-    if (!target) {
-      return;
-    }
-
-    let isActive = true;
-    requestQuizAction(target)
-      .then((response) => {
-        if (isActive) {
-          applyQuizResponse(response);
-        }
-      })
-      .catch(() => {
-        if (isActive) {
-          showError(CONNECTION_ERROR);
-        }
-      });
-
-    return () => {
-      isActive = false;
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- cada apertura monta un diálogo nuevo (key)
-  }, [target]);
-
-  function selectOption(optionIndex: number) {
-    setAnswers((current) =>
-      current.map((answer, index) => (index === questionIndex ? optionIndex : answer)),
-    );
-  }
-
   async function submitAttempt() {
-    if (!quiz || !target) {
+    if (!openedSession) {
       return;
     }
 
     const completeAnswers = answers.filter((answer) => answer !== undefined);
-    if (completeAnswers.length !== quiz.questions.length) {
+    if (completeAnswers.length !== openedSession.quiz.questions.length) {
       return;
     }
 
@@ -144,12 +113,12 @@ export function QuizDialog({
     try {
       // Reintentar tras un corte reusa la misma clave: si el intento sí se guardó, vuelve ese.
       response = await submitAttemptAction({
-        quizId: quiz.id,
-        pathId: target.pathId,
-        pathStepId: target.pathStepId,
+        quizId: openedSession.quiz.id,
+        pathId: openedSession.pathId,
+        pathStepId: openedSession.pathStepId,
         answers: completeAnswers,
         timezone: browserTimeZone(),
-        idempotencyKey: idempotencyKey.current,
+        idempotencyKey,
       });
     } catch {
       showError(CONNECTION_ERROR);
@@ -166,75 +135,49 @@ export function QuizDialog({
     onAttemptSaved(response.data);
   }
 
-  function retryAfterError() {
-    if (quiz) {
-      setPhase("answering");
-      return;
-    }
-
-    if (!target) {
-      return;
-    }
-
-    setPhase("loading");
-    requestQuizAction(target)
-      .then(applyQuizResponse)
-      .catch(() => showError(CONNECTION_ERROR));
+  function startNewAttempt() {
+    setIdempotencyKey(crypto.randomUUID());
+    setAnswers(emptyAnswers(openedSession));
+    setQuestionIndex(0);
+    setResult(null);
+    setPhase("answering");
   }
 
-  function handleOpenChange(nextOpen: boolean) {
-    if (!nextOpen) {
-      onClose();
-    }
+  if (!openedSession) {
+    return null;
   }
 
-  const currentQuestion = quiz?.questions[questionIndex];
-  const isLastQuestion = quiz !== null && questionIndex === quiz.questions.length - 1;
+  const { quiz, courseTitle } = openedSession;
+  const questionCount = quiz.questions.length;
+  const currentQuestion = quiz.questions[questionIndex];
+  const isLastQuestion = questionIndex === questionCount - 1;
   const hasCurrentAnswer = answers[questionIndex] !== undefined;
-  const progressPercent = quiz
-    ? Math.round(((questionIndex + 1) / quiz.questions.length) * 100)
-    : 0;
+  const progressPercent = Math.round(((questionIndex + 1) / questionCount) * 100);
 
   return (
-    <Dialog open={target !== null} onOpenChange={handleOpenChange}>
+    <Dialog open={session !== null} onOpenChange={handleOpenChange}>
       <DialogContent className="max-h-[90dvh] overflow-y-auto sm:max-w-xl">
         <DialogHeader>
-          <DialogTitle className="text-xl font-semibold">{quiz?.title ?? "Quiz"}</DialogTitle>
+          <DialogTitle className="text-xl font-semibold text-pretty">
+            Quiz: {courseTitle}
+          </DialogTitle>
           <DialogDescription>{describeQuiz(quiz)}</DialogDescription>
         </DialogHeader>
 
-        {phase === "loading" ? (
-          <p className="flex items-center gap-2 text-muted-foreground">
-            <Spinner /> Preparando tu quiz…
-          </p>
-        ) : null}
-
-        {phase === "error" ? (
-          <div className="flex flex-col items-start gap-3">
-            <p role="alert">{errorMessage}</p>
-            <Button variant="outline" onClick={retryAfterError}>
-              Intentar de nuevo
-            </Button>
-          </div>
-        ) : null}
-
-        {phase === "answering" && quiz && currentQuestion ? (
+        {phase === "answering" && currentQuestion ? (
           <>
             <Progress
               value={progressPercent}
-              aria-label={`Pregunta ${questionIndex + 1} de ${quiz.questions.length}`}
+              aria-label={`Pregunta ${questionIndex + 1} de ${questionCount}`}
             />
             <QuizQuestion
+              // Cada pregunta monta su propio grupo de opciones: el foco no arrastra a la siguiente.
+              key={currentQuestion.id}
               question={currentQuestion}
               selectedOption={answers[questionIndex]}
               onSelect={selectOption}
             />
             <DialogFooter>
-              {questionIndex > 0 ? (
-                <Button variant="ghost" onClick={() => setQuestionIndex(questionIndex - 1)}>
-                  Anterior
-                </Button>
-              ) : null}
               {isLastQuestion ? (
                 <Button variant="brand" disabled={!hasCurrentAnswer} onClick={submitAttempt}>
                   Entregar
@@ -253,16 +196,26 @@ export function QuizDialog({
 
         {phase === "submitting" ? (
           <p className="flex items-center gap-2 text-muted-foreground">
-            <Spinner /> Corrigiendo tus respuestas…
+            <Spinner /> Guardando tu intento…
           </p>
         ) : null}
 
-        {phase === "result" && quiz && result ? (
+        {phase === "error" ? (
+          <div className="flex flex-col items-start gap-3">
+            <p role="alert">{errorMessage}</p>
+            {/* Vuelve a la última pregunta con sus respuestas: "Entregar" reusa la misma clave. */}
+            <Button variant="outline" onClick={() => setPhase("answering")}>
+              Intentar de nuevo
+            </Button>
+          </div>
+        ) : null}
+
+        {phase === "result" && result ? (
           <QuizResult
-            kind={quiz.kind}
             questions={quiz.questions}
+            passPercentage={quiz.passPercentage}
             result={result}
-            onRetry={() => startAttempt(quiz)}
+            onRetry={startNewAttempt}
             onClose={onClose}
           />
         ) : null}

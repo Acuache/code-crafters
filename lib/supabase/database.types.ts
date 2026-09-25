@@ -448,61 +448,37 @@ export type Database = {
       }
       quizzes: {
         Row: {
-          chapter_title: string | null
           course_id: number
           created_at: string
-          failure_message: string | null
           id: string
           is_active: boolean
-          kind: Database["public"]["Enums"]["quiz_kind"]
-          model: string | null
           pass_percentage: number
-          questions: Json | null
-          status: Database["public"]["Enums"]["quiz_generation_status"]
-          target_key: string
-          title: string
+          questions: Json
           updated_at: string
-          version: number
         }
         Insert: {
-          chapter_title?: string | null
           course_id: number
           created_at?: string
-          failure_message?: string | null
           id?: string
           is_active?: boolean
-          kind: Database["public"]["Enums"]["quiz_kind"]
-          model?: string | null
           pass_percentage?: number
-          questions?: Json | null
-          status?: Database["public"]["Enums"]["quiz_generation_status"]
-          target_key: string
-          title: string
+          questions: Json
           updated_at?: string
-          version?: number
         }
         Update: {
-          chapter_title?: string | null
           course_id?: number
           created_at?: string
-          failure_message?: string | null
           id?: string
           is_active?: boolean
-          kind?: Database["public"]["Enums"]["quiz_kind"]
-          model?: string | null
           pass_percentage?: number
-          questions?: Json | null
-          status?: Database["public"]["Enums"]["quiz_generation_status"]
-          target_key?: string
-          title?: string
+          questions?: Json
           updated_at?: string
-          version?: number
         }
         Relationships: [
           {
             foreignKeyName: "quizzes_course_id_fkey"
             columns: ["course_id"]
-            isOneToOne: false
+            isOneToOne: true
             referencedRelation: "courses"
             referencedColumns: ["id"]
           },
@@ -580,8 +556,6 @@ export type Database = {
       course_difficulty: "principiante" | "intermedio" | "avanzado"
       path_step_status: "pending" | "in_progress" | "done" | "discarded"
       program_course_level: "requerido" | "recomendado" | "opcional"
-      quiz_generation_status: "generating" | "ready" | "failed"
-      quiz_kind: "course" | "chapter"
       user_role: "user" | "admin"
     }
     CompositeTypes: {
@@ -713,8 +687,6 @@ export const Constants = {
       course_difficulty: ["principiante", "intermedio", "avanzado"],
       path_step_status: ["pending", "in_progress", "done", "discarded"],
       program_course_level: ["requerido", "recomendado", "opcional"],
-      quiz_generation_status: ["generating", "ready", "failed"],
-      quiz_kind: ["course", "chapter"],
       user_role: ["user", "admin"],
     },
   },

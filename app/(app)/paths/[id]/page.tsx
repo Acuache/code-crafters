@@ -21,7 +21,7 @@ import {
 import { computeStreak, todayInTimeZone } from "@/lib/gamification/streak";
 import { isStepOrigin } from "@/lib/paths/levels";
 import type { StepOrigin } from "@/lib/paths/types";
-import { isQuizConfigured } from "@/lib/quizzes/generate";
+import { storedQuestionsSchema, type CourseQuiz } from "@/lib/quizzes/schema";
 import { requireUser } from "@/lib/supabase/guards";
 import { createClient } from "@/lib/supabase/server";
 
@@ -85,6 +85,47 @@ async function loadStreak(supabase: Awaited<ReturnType<typeof createClient>>, us
   return { streak: computeStreak(activityDates, today), activityDates, today };
 }
 
+// El quiz de cada curso de la ruta viaja con la página, así abrirlo no espera a nadie (spec 13).
+// El filtro por is_active no sobra: la RLS le deja ver los desactivados al admin.
+async function loadActiveQuizzes(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  courseIds: number[],
+): Promise<Map<number, CourseQuiz>> {
+  const quizzesByCourse = new Map<number, CourseQuiz>();
+  if (courseIds.length === 0) {
+    return quizzesByCourse;
+  }
+
+  const { data: rows, error } = await supabase
+    .from("quizzes")
+    .select("id, course_id, pass_percentage, questions")
+    .in("course_id", courseIds)
+    .eq("is_active", true);
+
+  // Sin quizzes la ruta funciona igual: el paso se sigue marcando con el toggle.
+  if (error) {
+    console.error(`[quiz] loadActiveQuizzes: ${error.message}`);
+    return quizzesByCourse;
+  }
+
+  for (const row of rows) {
+    const questions = storedQuestionsSchema.safeParse(row.questions);
+    if (!questions.success) {
+      console.error(`[quiz] loadActiveQuizzes: preguntas inválidas en el quiz ${row.id}`);
+      continue;
+    }
+
+    quizzesByCourse.set(row.course_id, {
+      id: row.id,
+      courseId: row.course_id,
+      passPercentage: row.pass_percentage,
+      questions: questions.data,
+    });
+  }
+
+  return quizzesByCourse;
+}
+
 export default async function PathPage({ params, searchParams }: PathPageProps) {
   const { id } = await params;
   // El mapa es la vista por defecto.
@@ -112,13 +153,30 @@ export default async function PathPage({ params, searchParams }: PathPageProps) 
   const { data: rawSteps } = await supabase
     .from("path_steps")
     .select(
-      "id, stage, position, origin, reason, ai_reason, status, discard_reason, courses(title, hours, url, image_url, chapters), programs(slug, name)",
+      "id, stage, position, origin, reason, ai_reason, status, discard_reason, courses(id, title, hours, url, image_url), programs(slug, name)",
     )
     .eq("path_id", path.id)
     .order("stage", { ascending: true })
     .order("position", { ascending: true });
 
-  const steps: PathStepView[] = (rawSteps ?? []).map((row) => ({
+  const stepRows = rawSteps ?? [];
+  const courseIds = stepRows.map((row) => row.courses.id);
+
+  // El texto de la IA reemplaza al de plantilla solo en pantalla; el original sigue en la base.
+  const title = path.ai_title ?? path.title;
+  const summary = path.ai_summary ?? path.summary;
+  const isPersonalized = path.personalized_at !== null;
+  const [autoPersonalize, streakView, quizzesByCourse] = await Promise.all([
+    shouldAutoPersonalize(supabase, {
+      pathId: path.id,
+      isPersonalized,
+      answers: path.assessments?.answers,
+    }),
+    loadStreak(supabase, user.userId),
+    loadActiveQuizzes(supabase, courseIds),
+  ]);
+
+  const steps: PathStepView[] = stepRows.map((row) => ({
     id: row.id,
     stage: row.stage,
     position: row.position,
@@ -131,26 +189,13 @@ export default async function PathPage({ params, searchParams }: PathPageProps) 
     courseHours: Number(row.courses.hours),
     courseUrl: row.courses.url,
     courseImageUrl: row.courses.image_url,
-    courseChapters: row.courses.chapters,
+    quiz: quizzesByCourse.get(row.courses.id) ?? null,
     // null para un curso que entró por interés sin pertenecer a un programa de la ruta.
     programSlug: row.programs?.slug ?? null,
     programName: row.programs?.name ?? null,
   }));
 
   const budgetHours = path.budget_hours === null ? null : Number(path.budget_hours);
-
-  // El texto de la IA reemplaza al de plantilla solo en pantalla; el original sigue en la base.
-  const title = path.ai_title ?? path.title;
-  const summary = path.ai_summary ?? path.summary;
-  const isPersonalized = path.personalized_at !== null;
-  const [autoPersonalize, streakView] = await Promise.all([
-    shouldAutoPersonalize(supabase, {
-      pathId: path.id,
-      isPersonalized,
-      answers: path.assessments?.answers,
-    }),
-    loadStreak(supabase, user.userId),
-  ]);
 
   return (
     <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-6 px-4 py-10 sm:px-6">
@@ -199,7 +244,6 @@ export default async function PathPage({ params, searchParams }: PathPageProps) 
         steps={steps}
         budgetHours={budgetHours}
         initialView={initialView}
-        quizzesEnabled={isQuizConfigured()}
       />
     </div>
   );

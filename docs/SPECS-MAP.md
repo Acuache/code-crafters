@@ -169,13 +169,25 @@ los anteriores (no depende de nada); y 11, 12 y 15 entre sí una vez cerrado el 
    las pestañas "Mapa"/"Lista", el paso seleccionado, el modal de detalle, `isInterestGroup` en
    `StepGroup` y cerrar el modal al marcar "Hecho"; en `app/(app)/paths/[id]/page.tsx` (del 08), leer
    `searchParams.vista`; y en `app/globals.css`, solo el token `--animate-step-pop`.
+   **Excepciones explícitas del spec 13 (quizzes de curso):** es dueño de `lib/quizzes/*`,
+   `components/quizzes/*`, `components/admin/quiz-form.tsx`, `app/(admin)/admin/courses/[slug]/quiz/*`
+   y `data/quizzes.json`. Fuera de eso, en `app/(app)/paths/[id]/page.tsx` y `actions.ts` (del 08),
+   cargar los quizzes activos con la página y sacar `requestQuiz`; en
+   `components/paths/{path-step,step-row,path-steps-list,path-steps-view}.ts(x)` (del 08) y
+   `step-detail-dialog.tsx` (del 12), el campo `quiz` del paso y el botón "Rendir quiz del curso"; y en
+   el panel del 10, las actions `saveCourseQuiz`/`setCourseQuizActive` en
+   `app/(admin)/admin/courses/actions.ts`, la tarjeta "Quiz" de la edición del curso, la columna "Quiz"
+   de `components/admin/courses-table.tsx` y el mensaje de `quizzes_course_id_key` en
+   `lib/admin/postgres-errors.ts`.
 6. **Migraciones nuevas solo en 02, 11, 13 y 15**, y esos cuatro no se implementan en paralelo entre sí:
    el orden de los archivos de migración depende del orden de merge, y ramas simultáneas lo rompen. El
    02 crea el esquema base —incluye `profiles.role` y las tablas `programs`/`program_courses`—; 11, 13
    y 15 añaden cada uno sus columnas o tablas para poder recortarse sin dejar tablas muertas. El 10
    (`admin-catalog`) **no crea ninguna migración propia**: usa el esquema que ya dejó el 02. Fuera
    de la numeración, los quizzes y la racha de Ariel (`20260923120000_quizzes_progress_streak.sql`)
-   y su integración (`20260924130000_unify_streak.sql`, ADR 0005) ya están en el repo.
+   y su integración (`20260924130000_unify_streak.sql`, ADR 0005) ya están en el repo. El 13 los
+   simplifica con `20260925130000_course_quizzes.sql` y siembra los quizzes con
+   `20260925140000_seed_course_quizzes.sql`.
 7. **Antes de cada `/spec-impl`:** estar en `master`, con el árbol limpio y actualizado. La fase 3 del
    skill se detiene si `git status` no está vacío.
 8. **Lo que aparezca fuera de alcance durante un `/spec-impl` va al spec que le toca según el mapa**, no
@@ -425,6 +437,7 @@ edita en `/admin/courses/[slug]/quiz` (spec 10). El seed trae 3 preguntas sencil
 de los 74 cursos. Al elegir una opción se ve al instante si es correcta y por qué; aprobar marca el
 paso como "Hecho" y suma a la racha. Saca la práctica por capítulo, la generación con IA y
 `SUPABASE_SECRET_KEY`. Crea migración (simplifica `quizzes` y le da RLS solo-admin) y el seed.
+Decisión registrada en el [ADR 0006](decisiones/0006-quizzes-de-curso-escritos-por-el-admin.md).
 
 ### 14 · `gamification`
 

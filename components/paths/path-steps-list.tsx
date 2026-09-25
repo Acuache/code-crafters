@@ -8,6 +8,7 @@ type PathStepsListProps = {
   stepNumbers: Map<string, number>;
   onStatusChange: (stepId: string, status: SelectableStepStatus) => void;
   onDiscard: (step: PathStepView) => void;
+  onOpenQuiz: (step: PathStepView) => void;
 };
 
 // Sin "use client" a propósito: recibe callbacks y solo se importa desde path-steps-view.tsx.
@@ -16,6 +17,7 @@ export function PathStepsList({
   stepNumbers,
   onStatusChange,
   onDiscard,
+  onOpenQuiz,
 }: PathStepsListProps) {
   return (
     <div className="flex flex-col gap-10">
@@ -34,6 +36,7 @@ export function PathStepsList({
                 stepNumber={stepNumbers.get(step.id) ?? 0}
                 onStatusChange={(status) => onStatusChange(step.id, status)}
                 onDiscard={() => onDiscard(step)}
+                onOpenQuiz={() => onOpenQuiz(step)}
               />
             ))}
           </ol>

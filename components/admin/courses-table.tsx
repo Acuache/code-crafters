@@ -10,6 +10,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
+export type CourseQuizStatus = "active" | "inactive" | "none";
+
 export type AdminCourseRow = {
   id: number;
   slug: string;
@@ -18,7 +20,18 @@ export type AdminCourseRow = {
   difficulty: "principiante" | "intermedio" | "avanzado";
   isActive: boolean;
   programCount: number;
+  quizStatus: CourseQuizStatus;
 };
+
+function QuizStatusBadge({ status }: { status: CourseQuizStatus }) {
+  if (status === "active") {
+    return <Badge>Activo</Badge>;
+  }
+  if (status === "inactive") {
+    return <Badge variant="secondary">Inactivo</Badge>;
+  }
+  return <Badge variant="outline">Sin quiz</Badge>;
+}
 
 function formatHours(hours: number): string {
   return `${hours.toLocaleString("es-ES")} h`;
@@ -34,6 +47,7 @@ export function CoursesTable({ courses }: { courses: AdminCourseRow[] }) {
           <TableHead className="text-right">Horas</TableHead>
           <TableHead>Dificultad</TableHead>
           <TableHead>Programas</TableHead>
+          <TableHead>Quiz</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -62,6 +76,11 @@ export function CoursesTable({ courses }: { courses: AdminCourseRow[] }) {
                 // Sin ubicación en un programa el motor solo lo propone si un interés lo nombra.
                 <Badge variant="destructive">Sin programa</Badge>
               )}
+            </TableCell>
+            <TableCell>
+              <Link href={`/admin/courses/${encodeURIComponent(course.slug)}/quiz`}>
+                <QuizStatusBadge status={course.quizStatus} />
+              </Link>
             </TableCell>
           </TableRow>
         ))}

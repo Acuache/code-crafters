@@ -1,12 +1,6 @@
 import type { RefObject } from "react";
 import { ArrowSquareOutIcon, ExamIcon, TrashIcon, XIcon } from "@phosphor-icons/react";
 
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -33,9 +27,7 @@ type StepDetailDialogProps = {
   onClose: () => void;
   onStatusChange: (status: SelectableStepStatus) => void;
   onDiscard: () => void;
-  quizzesEnabled: boolean;
-  // null = quiz del curso; un título = práctica de ese capítulo.
-  onOpenQuiz: (chapterTitle: string | null) => void;
+  onOpenQuiz: () => void;
 };
 
 // Sin "use client" a propósito: recibe callbacks y solo se importa desde path-steps-view.tsx.
@@ -47,7 +39,6 @@ export function StepDetailDialog({
   onClose,
   onStatusChange,
   onDiscard,
-  quizzesEnabled,
   onOpenQuiz,
 }: StepDetailDialogProps) {
   function handleOpenChange(nextOpen: boolean) {
@@ -69,7 +60,6 @@ export function StepDetailDialog({
             stepNumber={stepNumber}
             onStatusChange={onStatusChange}
             onDiscard={onDiscard}
-            quizzesEnabled={quizzesEnabled}
             onOpenQuiz={onOpenQuiz}
           />
         ) : null}
@@ -83,18 +73,10 @@ type StepDetailProps = {
   stepNumber: number;
   onStatusChange: (status: SelectableStepStatus) => void;
   onDiscard: () => void;
-  quizzesEnabled: boolean;
-  onOpenQuiz: (chapterTitle: string | null) => void;
+  onOpenQuiz: () => void;
 };
 
-function StepDetail({
-  step,
-  stepNumber,
-  onStatusChange,
-  onDiscard,
-  quizzesEnabled,
-  onOpenQuiz,
-}: StepDetailProps) {
+function StepDetail({ step, stepNumber, onStatusChange, onDiscard, onOpenQuiz }: StepDetailProps) {
   // Mismo guard que step-row.tsx: el toggle no tiene opción para un paso descartado.
   if (step.status === "discarded") {
     return null;
@@ -155,8 +137,12 @@ function StepDetail({
           />
         </div>
 
-        {quizzesEnabled ? (
-          <QuizSection chapters={step.courseChapters} isDone={isDone} onOpenQuiz={onOpenQuiz} />
+        {step.quiz ? (
+          <QuizSection
+            passPercentage={step.quiz.passPercentage}
+            isDone={isDone}
+            onOpenQuiz={onOpenQuiz}
+          />
         ) : null}
 
         <DialogFooter>
@@ -180,13 +166,13 @@ function StepDetail({
 }
 
 type QuizSectionProps = {
-  chapters: string[];
+  passPercentage: number;
   isDone: boolean;
-  onOpenQuiz: (chapterTitle: string | null) => void;
+  onOpenQuiz: () => void;
 };
 
-// Aprobar el quiz del curso también lo marca "Hecho"; los de capítulo son práctica.
-function QuizSection({ chapters, isDone, onOpenQuiz }: QuizSectionProps) {
+// Aprobar el quiz también marca el curso "Hecho", la otra forma además del toggle.
+function QuizSection({ passPercentage, isDone, onOpenQuiz }: QuizSectionProps) {
   return (
     <div className="flex flex-col gap-3 rounded-xl bg-muted/50 p-4">
       <div className="flex flex-col gap-1">
@@ -197,38 +183,13 @@ function QuizSection({ chapters, isDone, onOpenQuiz }: QuizSectionProps) {
         <span className="text-xs text-muted-foreground">
           {isDone
             ? "Ya está hecho: el quiz queda para repasar."
-            : "Aprueba el quiz del curso (60 %) y lo marcamos como hecho."}
+            : `Aprueba el quiz del curso (${passPercentage} %) y lo marcamos como hecho.`}
         </span>
       </div>
 
-      <Button variant="outline" onClick={() => onOpenQuiz(null)}>
+      <Button variant="outline" onClick={onOpenQuiz}>
         Rendir quiz del curso
       </Button>
-
-      {chapters.length > 0 ? (
-        <Accordion>
-          <AccordionItem value="chapters">
-            <AccordionTrigger className="py-2">Practicar por capítulo</AccordionTrigger>
-            <AccordionContent>
-              <ul className="flex flex-col gap-1">
-                {chapters.map((chapter) => (
-                  <li key={chapter} className="flex items-center justify-between gap-3">
-                    <span className="min-w-0 text-pretty">{chapter}</span>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => onOpenQuiz(chapter)}
-                      aria-label={`Practicar el capítulo ${chapter}`}
-                    >
-                      Practicar
-                    </Button>
-                  </li>
-                ))}
-              </ul>
-            </AccordionContent>
-          </AccordionItem>
-        </Accordion>
-      ) : null}
     </div>
   );
 }

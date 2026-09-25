@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
-import { quizTargetSchema, validateAttemptInput } from "@/lib/quizzes/action-validation";
+import { validateAttemptInput } from "@/lib/quizzes/action-validation";
+import { MAX_QUIZ_QUESTIONS } from "@/lib/quizzes/schema";
 
 const QUIZ_ID = "550e8400-e29b-41d4-a716-446655440000";
 const PATH_ID = "550e8400-e29b-41d4-a716-446655440001";
@@ -34,10 +35,23 @@ describe("límites de entrada de las actions de quiz", () => {
     expect(result.success).toBe(true);
   });
 
-  it("exige título de capítulo solo como texto no vacío", () => {
-    const base = { pathId: PATH_ID, pathStepId: STEP_ID, kind: "chapter" };
+  it("acepta tantas respuestas como preguntas puede tener un quiz, y no más", () => {
+    const attempt = {
+      quizId: QUIZ_ID,
+      pathId: PATH_ID,
+      pathStepId: STEP_ID,
+      timezone: "UTC",
+      idempotencyKey: IDEMPOTENCY_KEY,
+    };
+    const answersFor = (count: number) => Array.from({ length: count }, () => 0);
 
-    expect(quizTargetSchema.safeParse({ ...base, chapterTitle: "Genéricos" }).success).toBe(true);
-    expect(quizTargetSchema.safeParse({ ...base, chapterTitle: "  " }).success).toBe(false);
+    const fullQuiz = validateAttemptInput({ ...attempt, answers: answersFor(MAX_QUIZ_QUESTIONS) });
+    const tooManyAnswers = validateAttemptInput({
+      ...attempt,
+      answers: answersFor(MAX_QUIZ_QUESTIONS + 1),
+    });
+
+    expect(fullQuiz.success).toBe(true);
+    expect(tooManyAnswers.success).toBe(false);
   });
 });

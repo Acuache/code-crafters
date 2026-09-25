@@ -23,6 +23,9 @@ describe("describePostgresError", () => {
     expect(
       describePostgresError(uniqueViolation("program_courses_program_id_stage_level_position_key")),
     ).toBe("Otro cambio ocupó esa posición. Intenta de nuevo.");
+    expect(describePostgresError(uniqueViolation("quizzes_course_id_key"))).toBe(
+      "Este curso ya tiene un quiz. Recarga la página para editarlo.",
+    );
   });
 
   it("un unique desconocido o cualquier otro error da el mensaje genérico", () => {
