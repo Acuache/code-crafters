@@ -39,7 +39,12 @@ export function StepStatusToggle({ value, onValueChange, courseTitle }: StepStat
       aria-label={`Estado de ${courseTitle}`}
     >
       {STATUS_OPTIONS.map((option) => (
-        <ToggleGroupItem key={option.value} value={option.value}>
+        <ToggleGroupItem
+          key={option.value}
+          value={option.value}
+          // El bg-muted de toggle.tsx casi no se ve en tema oscuro.
+          className="aria-pressed:bg-primary aria-pressed:text-primary-foreground aria-pressed:hover:bg-primary/90 aria-pressed:hover:text-primary-foreground"
+        >
           {option.label}
         </ToggleGroupItem>
       ))}

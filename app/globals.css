@@ -224,6 +224,11 @@
   background-image: var(--brand-gradient);
 }
 
+/* Spec 14: el toast por encima de los diálogos. Sin capa para ganarle al z-50 de utilities. */
+[data-slot="toast-viewport"] {
+  z-index: 60;
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;

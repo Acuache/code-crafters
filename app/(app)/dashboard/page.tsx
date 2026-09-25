@@ -4,6 +4,8 @@ import { PlusIcon, ShieldCheckIcon, SignOutIcon } from "@phosphor-icons/react/ss
 
 import { Eyebrow } from "@/components/brand/eyebrow";
 import { PathCard, type DashboardPath } from "@/components/dashboard/path-card";
+import { StreakIndicator } from "@/components/gamification/streak-indicator";
+import { XpBar } from "@/components/gamification/xp-bar";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -14,6 +16,8 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "@/components/ui/empty";
+import { loadGamification } from "@/lib/gamification/load-gamification";
+import type { GamificationSummary } from "@/lib/gamification/summary";
 import { findNextStep } from "@/lib/progress/next-step";
 import { summarizePathProgress, type PathStepStatus } from "@/lib/progress/path-progress";
 import { signOut } from "@/lib/supabase/actions";
@@ -61,6 +65,21 @@ function formatPathCount(count: number): string {
   return count === 1 ? "1 ruta" : `${count} rutas`;
 }
 
+// Accesoria: si falla, la cabecera no muestra XP ni racha y las rutas se ven igual.
+async function loadGamificationSummary(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  userId: string,
+): Promise<GamificationSummary | null> {
+  try {
+    const { summary } = await loadGamification(supabase, userId);
+    return summary;
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    console.error(`[gamification] dashboard: ${message}`);
+    return null;
+  }
+}
+
 export default async function DashboardPage() {
   const user = await requireUser();
   const displayName = user.username ?? user.email ?? "Sin nombre";
@@ -70,12 +89,15 @@ export default async function DashboardPage() {
 
   // Una sola query para todas las rutas, con sus pasos embebidos: una por tarjeta serían N+1 viajes.
   // RLS filtra al dueño. Los pasos no se ordenan acá: findNextStep los ordena por (stage, position).
-  const { data: rows } = await supabase
-    .from("learning_paths")
-    .select(
-      "id, title, ai_title, created_at, budget_hours, path_steps(status, stage, position, courses(title, hours))",
-    )
-    .order("created_at", { ascending: false });
+  const [{ data: rows }, gamification] = await Promise.all([
+    supabase
+      .from("learning_paths")
+      .select(
+        "id, title, ai_title, created_at, budget_hours, path_steps(status, stage, position, courses(title, hours))",
+      )
+      .order("created_at", { ascending: false }),
+    loadGamificationSummary(supabase, user.userId),
+  ]);
 
   const paths = (rows ?? []).map(toDashboardPath);
   const hasPaths = paths.length > 0;
@@ -83,14 +105,23 @@ export default async function DashboardPage() {
   return (
     <div className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-8 px-4 py-10 sm:px-6">
       <header className="flex flex-wrap items-center gap-4 rounded-3xl border brand-gradient-soft p-6 shadow-brand sm:p-8">
-        <Avatar size="lg">
-          {user.avatarUrl ? <AvatarImage src={user.avatarUrl} alt="" /> : null}
-          <AvatarFallback>{initials}</AvatarFallback>
-        </Avatar>
-        <div className="flex min-w-0 flex-1 flex-col gap-1">
-          <Eyebrow>Tu panel</Eyebrow>
-          <h1 className="truncate text-title">Hola, {displayName}</h1>
-        </div>
+        {/* Excepción a la regla 5 del mapa (spec 14): el link al perfil. */}
+        <Link
+          href="/profile"
+          className="group flex min-w-0 flex-1 basis-full items-center gap-4 rounded-2xl outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 sm:basis-0"
+        >
+          <Avatar size="lg">
+            {user.avatarUrl ? <AvatarImage src={user.avatarUrl} alt="" /> : null}
+            <AvatarFallback>{initials}</AvatarFallback>
+          </Avatar>
+          <div className="flex min-w-0 flex-col gap-1">
+            <Eyebrow>Tu panel</Eyebrow>
+            <h1 className="truncate text-title decoration-primary-bright underline-offset-4 group-hover:underline">
+              Hola, {displayName}
+            </h1>
+            <span className="sr-only">Ver tu perfil</span>
+          </div>
+        </Link>
         {/* Excepción a la regla 5 del mapa: el spec 10 agrega solo este link para el admin. */}
         {user.role === "admin" ? (
           <Button variant="outline" render={<Link href="/admin" />} nativeButton={false}>
@@ -104,6 +135,18 @@ export default async function DashboardPage() {
             Cerrar sesión
           </Button>
         </form>
+        {gamification ? (
+          <div className="flex basis-full flex-wrap items-center gap-x-8 gap-y-4 border-t pt-4">
+            <div className="min-w-48 flex-1">
+              <XpBar
+                level={gamification.level.level}
+                currentXp={gamification.level.xpIntoLevel}
+                nextLevelXp={gamification.level.xpForNextLevel}
+              />
+            </div>
+            <StreakIndicator streak={gamification.streak} />
+          </div>
+        ) : null}
       </header>
 
       {hasPaths ? (

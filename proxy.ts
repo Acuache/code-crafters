@@ -2,7 +2,7 @@ import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
 // La landing, el login y /sistema-diseno son públicos.
-const PRIVATE_PATH_PREFIXES = ["/dashboard", "/quiz", "/paths", "/admin"];
+const PRIVATE_PATH_PREFIXES = ["/dashboard", "/quiz", "/paths", "/admin", "/profile"];
 
 function isPrivatePath(pathname: string): boolean {
   return PRIVATE_PATH_PREFIXES.some(
