@@ -45,7 +45,7 @@ Decisiones de base para todo el mapa:
 | 02 | `supabase-schema` | Migraciones, RLS, trigger de `profiles` (con `role`), tablas `programs`/`program_courses` (15 rutas oficiales), un lugar en `path_steps` para el curso que el motor o el usuario descartan (con motivo), y seed del catálogo enriquecido | 01 (solo el paso de seed) | Semana 1 |
 | 03 | `discord-auth` | Login y logout con Discord de punta a punta, rol en sesión, sesión refrescada en `proxy.ts` y deploy en Vercel | 02 | Semana 1 |
 | 04 | `path-engine` | `lib/paths/build-path.ts` + `lib/paths/interests.ts`: función pura que arma la ruta con presupuesto de horas, intereses transversales al catálogo y procedencia por paso, recibiendo catálogo y programas por parámetro | 02 | Semana 1 |
-| 05 | `landing` | Página pública `app/(marketing)/page.tsx` sobre el sistema de diseño ya construido | — | Semana 1 |
+| 05 | `landing` | Página pública `app/(marketing)/page.tsx`: un recorrido "Cómo funciona" que se anima con el scroll (la mascota viaja de estación en estación: cuestionario, motor, IA, progreso y compartir), hero con easter egg, preguntas frecuentes y tarjeta OG | 03, 04, 12, 14, 15 (solo reusa piezas) | Semana 2 |
 | 06 | `assessment-quiz` | Cuestionario multi-step validado con zod que guarda el `assessment` | 02, 03, 04 | Semana 1 |
 | 07 | `path-generation` | Server action que corre el motor, persiste `learning_paths` + `path_steps` y redirige a `/paths/[id]` | 02, 04, 06 | Semana 1 |
 | 08 | `path-progress-view` | Vista de la ruta en lista con chips de procedencia, acordeón "Qué quitamos y por qué", cambio de estado de cada paso y botón para descartar un paso pendiente (con deshacer) | 07 | Semana 1 |
@@ -82,7 +82,7 @@ del nombre del archivo).
                 ▼                                ▼                       ▼
          12 visual-path-map ──► 13 course-quizzes ──► 14 gamification ──► 15 path-sharing
 
- 05 landing             (sin dependencias)
+ 05 landing             (se escribió al final: reusa piezas de 03, 04, 12, 14 y 15, no bloquea a nadie)
  10 admin-catalog       (depende de 02 + 03; agendado después del Hito 1)
  11 ai-personalization  (depende de 07)
  13 course-quizzes      (también depende de 10: el editor vive en /admin)
@@ -131,7 +131,8 @@ los anteriores (no depende de nada); y 11 y 12 entre sí una vez cerrado el 08 (
    El 03 es dueño de `app/login/*`, `app/auth/callback/route.ts` y `lib/supabase/{actions,guards}.ts`
    (su placeholder `app/dashboard/page.tsx` ya no existe: el 09 lo movió y lo reescribió); el 04 es dueño
    de `lib/paths/*` (incluye `interests.ts`, la tabla de intereses transversales al catálogo — no vive
-   en `data/` ni en `components/quiz/*`), el 05 de `app/(marketing)/*`, el 06 de `components/quiz/*` y
+   en `data/` ni en `components/quiz/*`), el 05 de `app/(marketing)/*`, `components/landing/*`,
+   `lib/landing/*` y `public/code-quest.webp`, el 06 de `components/quiz/*` y
    `app/(app)/quiz/*`, el 07 de `lib/catalog/*` y de `app/(app)/paths/` en su raíz (`actions.ts`) y,
    **temporalmente**, de `app/(app)/paths/[id]/*` (placeholder mínimo de sólo lectura: título, resumen y
    la lista de cursos vigentes, sin chips de procedencia ni acordeón de descartes), el 08 de
@@ -204,6 +205,16 @@ los anteriores (no depende de nada); y 11 y 12 entre sí una vez cerrado el 08 (
    `onOpenStep`/`onOpen` opcionales en `components/paths/{path-map,path-map-node}.tsx`. Del 14:
    `fromQuestionnaire` en `lib/gamification/{summary,load-gamification}.ts`, para que "Explorador" no
    cuente las copias.
+   **Excepciones explícitas del spec 05 (landing):** borra `app/page.tsx` (el placeholder del
+   scaffold, sin dueño), porque `app/(marketing)/page.tsx` resuelve `/` y no pueden coexistir. En
+   `app/globals.css`, los tokens `--animate-float`, `--animate-marquee` y `--animate-twinkle`, la
+   utilidad `starfield` y, en el tema claro, `--level-required`, `--level-recommended` y `--ai` más
+   oscuros: los badges pintan el texto sobre el mismo token al 15 % y quedaban en 3.9–4.0:1 (ahora
+   4.6:1, en toda la app). Del 03: el rediseño solo visual de `app/login/{page,provider-button}.tsx`
+   (panel de marca en desktop, Discord como botón principal, "Volver al inicio"), sin tocar el OAuth,
+   `next` ni los errores. Todo lo demás de otros specs (`step-meta`, `step-node-style`, `XpBar`,
+   `AchievementMedal`, `StreakIndicator`, `launchConfetti`, `lib/path-map/motion.ts`,
+   `lib/gamification/xp.ts`, `TECHNOLOGIES`) se importa sin cambios.
 6. **Migraciones nuevas solo en 02, 11, 13, 14 y 15**, y esos cinco no se implementan en paralelo entre sí:
    el orden de los archivos de migración depende del orden de merge, y ramas simultáneas lo rompen. El
    02 crea el esquema base —incluye `profiles.role` y las tablas `programs`/`program_courses`—; 11, 13
@@ -289,9 +300,10 @@ convencional.
 - `related` en `data/courses.json` (221 aristas entre los 74 cursos, 70 cruzan de programa) — tagging
   ya publicado por DevTalles, hoy sin uso ni spec dueño. Insumo disponible, no asignado.
 - `public/logo.webp`, `public/astronauta.webp`, `public/streak/*.webp` — assets de marca ya
-  optimizados, catalogados en `CLAUDE.md` §"Marca y assets". El logo es entrada de 05 (hero de la
+  optimizados, catalogados en `CLAUDE.md` §"Marca y assets". El logo es entrada de 05 (cabecera de la
   landing) y 15 (tarjeta OG); la mascota sola, de 07 (pantalla de "generando ruta"); las 5 imágenes de
-  `streak/` (cuatro celebraciones + recordatorio de racha), del 14.
+  `streak/` (cuatro celebraciones + recordatorio de racha), del 14. El 05 reusa las 6 poses: una por
+  estación del recorrido, el cohete en el hero y el CTA final, y el ciclo del easter egg.
 
 ## 7. Qué construye cada spec
 
@@ -368,12 +380,19 @@ horas que pueden sumar los intereses y cuándo el motor descarta un interés por
 
 ### 05 · `landing`
 
+> **Implementado distinto de lo que planeaba este mapa** — manda `specs/05-landing.md`. Se escribió
+> después del 15, así que muestra el producto real en vez de describirlo.
+
 La página pública `app/(marketing)/page.tsx`: presenta DevPathlles a alguien que todavía no inició
-sesión, con un botón/link a `/login` (del spec 03) — no repite ahí el formulario de OAuth. Se apoya
-enteramente en el sistema de diseño ya construido
-(`components/ui/*`, `components/brand/*`, documentados en `/sistema-diseno` y el ADR 0002) — no crea
-componentes de UI nuevos, los compone. No depende de ningún otro spec: puede escribirse el día 1 en
-paralelo con todo lo demás, tal como ya lo asigna `ROADMAP.md` a P3.
+sesión, con botones a `/login` (del spec 03; el principal lleva `next=/quiz`, del 15) — no repite ahí
+el formulario de OAuth. Con sesión, los botones pasan a "Ir a mi panel" y no hay redirect. El centro
+es un recorrido "Cómo funciona" de 5 estaciones (cuestionario, motor, IA, progreso y compartir) que se
+anima con el scroll: la estación que cruza el centro de la pantalla se enciende y el astronauta viaja
+hasta ella, con los tiempos y los estilos de nodo del mapa del 12; cada estación tiene su pose y un
+mockup con una ruta de ejemplo fija (cursos reales, verificados contra `data/courses.json`). Además:
+hero con estrellas y una mascota que cambia de pose y lanza confetti al tocarla, franja con las 15
+tecnologías de `TECHNOLOGIES`, preguntas frecuentes, footer con Code Quest 2026 y tarjeta OG solo
+para `/`. Sin JS o con "reducir movimiento" todo se ve terminado. No agrega dependencias.
 
 ### 06 · `assessment-quiz`
 
