@@ -1,10 +1,10 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { PlusIcon, TrashIcon } from "@phosphor-icons/react"
+import { useState } from "react";
+import { PlusIcon, TrashIcon } from "@phosphor-icons/react";
 
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import {
   Card,
   CardHeader,
@@ -12,9 +12,9 @@ import {
   CardDescription,
   CardContent,
   CardFooter,
-} from "@/components/ui/card"
-import { Field, FieldGroup, FieldLabel, FieldDescription } from "@/components/ui/field"
-import { Input } from "@/components/ui/input"
+} from "@/components/ui/card";
+import { Field, FieldGroup, FieldLabel, FieldDescription } from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -22,20 +22,20 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
+} from "@/components/ui/select";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import {
   Accordion,
   AccordionItem,
   AccordionTrigger,
   AccordionContent,
-} from "@/components/ui/accordion"
-import { Progress } from "@/components/ui/progress"
-import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Separator } from "@/components/ui/separator"
-import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip"
+} from "@/components/ui/accordion";
+import { Progress } from "@/components/ui/progress";
+import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Separator } from "@/components/ui/separator";
+import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 import {
   Dialog,
   DialogTrigger,
@@ -44,19 +44,25 @@ import {
   DialogTitle,
   DialogDescription,
   DialogFooter,
-} from "@/components/ui/dialog"
-import { Skeleton } from "@/components/ui/skeleton"
-import { Spinner } from "@/components/ui/spinner"
-import { Empty, EmptyHeader, EmptyMedia, EmptyTitle, EmptyDescription } from "@/components/ui/empty"
-import { LevelBadge } from "@/components/brand/level-badge"
-import { AiBadge } from "@/components/brand/ai-badge"
+} from "@/components/ui/dialog";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Spinner } from "@/components/ui/spinner";
+import {
+  Empty,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+  EmptyDescription,
+} from "@/components/ui/empty";
+import { LevelBadge } from "@/components/brand/level-badge";
+import { AiBadge } from "@/components/brand/ai-badge";
 
 const STACKS = [
-  { label: "Elegí un stack", value: null },
+  { label: "Elige un stack", value: null },
   { label: "React", value: "react" },
   { label: "Node", value: "node" },
   { label: "Flutter y Dart", value: "flutter" },
-] as const
+] as const;
 
 const BUTTON_VARIANTS = [
   "default",
@@ -66,7 +72,7 @@ const BUTTON_VARIANTS = [
   "ghost",
   "destructive",
   "link",
-] as const
+] as const;
 
 function ButtonsDemo() {
   return (
@@ -99,7 +105,7 @@ function ButtonsDemo() {
         </Button>
       </div>
     </div>
-  )
+  );
 }
 
 function BadgesDemo() {
@@ -109,12 +115,12 @@ function BadgesDemo() {
       <Badge variant="secondary">secondary</Badge>
       <Badge variant="outline">outline</Badge>
       <Badge variant="destructive">destructive</Badge>
-      <LevelBadge nivel="requerido" />
-      <LevelBadge nivel="recomendado" />
-      <LevelBadge nivel="opcional" />
+      <LevelBadge level="requerido" />
+      <LevelBadge level="recomendado" />
+      <LevelBadge level="opcional" />
       <AiBadge />
     </div>
-  )
+  );
 }
 
 function CardDemo() {
@@ -125,7 +131,7 @@ function CardDemo() {
         <CardDescription>18 cursos · 64 h de video</CardDescription>
       </CardHeader>
       <CardContent>
-        <p className="text-muted-foreground text-sm">
+        <p className="text-sm text-muted-foreground">
           Ruta oficial de DevTalles para quien ya sabe HTML y CSS.
         </p>
       </CardContent>
@@ -138,7 +144,7 @@ function CardDemo() {
         </Button>
       </CardFooter>
     </Card>
-  )
+  );
 }
 
 function FormDemo() {
@@ -181,7 +187,7 @@ function FormDemo() {
         </ToggleGroup>
       </Field>
     </FieldGroup>
-  )
+  );
 }
 
 function TabsDemo() {
@@ -192,13 +198,13 @@ function TabsDemo() {
         <TabsTrigger value="mapa">Mapa</TabsTrigger>
       </TabsList>
       <TabsContent value="lista">
-        <p className="text-muted-foreground text-sm">Vista en lista de la ruta.</p>
+        <p className="text-sm text-muted-foreground">Vista en lista de la ruta.</p>
       </TabsContent>
       <TabsContent value="mapa">
-        <p className="text-muted-foreground text-sm">Vista en mapa (React Flow).</p>
+        <p className="text-sm text-muted-foreground">Vista en mapa (React Flow).</p>
       </TabsContent>
     </Tabs>
-  )
+  );
 }
 
 function AccordionDemo() {
@@ -213,7 +219,7 @@ function AccordionDemo() {
         <AccordionContent>Recomendado por DevTalles dentro de la ruta.</AccordionContent>
       </AccordionItem>
     </Accordion>
-  )
+  );
 }
 
 function ProgressAlertDemo() {
@@ -227,7 +233,7 @@ function ProgressAlertDemo() {
         </AlertDescription>
       </Alert>
     </div>
-  )
+  );
 }
 
 function AvatarTooltipDemo() {
@@ -239,13 +245,11 @@ function AvatarTooltipDemo() {
       </Avatar>
       <Separator orientation="vertical" className="h-8" />
       <Tooltip>
-        <TooltipTrigger render={<Button variant="outline" size="sm" />}>
-          Con tooltip
-        </TooltipTrigger>
+        <TooltipTrigger render={<Button variant="outline" size="sm" />}>Con tooltip</TooltipTrigger>
         <TooltipContent>Racha de 7 días</TooltipContent>
       </Tooltip>
     </div>
-  )
+  );
 }
 
 function DialogDemo() {
@@ -255,7 +259,7 @@ function DialogDemo() {
       <DialogContent>
         <DialogHeader>
           <DialogTitle>¿Quitar este curso de tu ruta?</DialogTitle>
-          <DialogDescription>Podés volver a agregarlo cuando quieras.</DialogDescription>
+          <DialogDescription>Puedes volver a agregarlo cuando quieras.</DialogDescription>
         </DialogHeader>
         <DialogFooter showCloseButton>
           <Button variant="destructive">
@@ -265,11 +269,11 @@ function DialogDemo() {
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  )
+  );
 }
 
 function SkeletonEmptyDemo() {
-  const [isLoading, setIsLoading] = useState(true)
+  const [isLoading, setIsLoading] = useState(true);
 
   return (
     <div className="flex flex-col gap-4">
@@ -287,13 +291,13 @@ function SkeletonEmptyDemo() {
             <EmptyMedia variant="icon">
               <PlusIcon />
             </EmptyMedia>
-            <EmptyTitle>Todavía no tenés rutas</EmptyTitle>
-            <EmptyDescription>Empezá el cuestionario para generar la primera.</EmptyDescription>
+            <EmptyTitle>Todavía no tienes rutas</EmptyTitle>
+            <EmptyDescription>Empieza el cuestionario para generar la primera.</EmptyDescription>
           </EmptyHeader>
         </Empty>
       )}
     </div>
-  )
+  );
 }
 
 /**
@@ -305,49 +309,51 @@ function ComponentGallery() {
   return (
     <div className="flex flex-col gap-10">
       <div>
-        <h3 className="font-heading mb-4 text-lg font-medium">Button</h3>
+        <h3 className="mb-4 font-heading text-lg font-medium">Button</h3>
         <ButtonsDemo />
       </div>
       <div>
-        <h3 className="font-heading mb-4 text-lg font-medium">Badge</h3>
+        <h3 className="mb-4 font-heading text-lg font-medium">Badge</h3>
         <BadgesDemo />
       </div>
       <div>
-        <h3 className="font-heading mb-4 text-lg font-medium">Card</h3>
+        <h3 className="mb-4 font-heading text-lg font-medium">Card</h3>
         <CardDemo />
       </div>
       <div>
-        <h3 className="font-heading mb-4 text-lg font-medium">Field + Input + Select + ToggleGroup</h3>
+        <h3 className="mb-4 font-heading text-lg font-medium">
+          Field + Input + Select + ToggleGroup
+        </h3>
         <FormDemo />
       </div>
       <div className="grid grid-cols-1 gap-10 sm:grid-cols-2">
         <div>
-          <h3 className="font-heading mb-4 text-lg font-medium">Tabs</h3>
+          <h3 className="mb-4 font-heading text-lg font-medium">Tabs</h3>
           <TabsDemo />
         </div>
         <div>
-          <h3 className="font-heading mb-4 text-lg font-medium">Accordion</h3>
+          <h3 className="mb-4 font-heading text-lg font-medium">Accordion</h3>
           <AccordionDemo />
         </div>
       </div>
       <div>
-        <h3 className="font-heading mb-4 text-lg font-medium">Progress + Alert</h3>
+        <h3 className="mb-4 font-heading text-lg font-medium">Progress + Alert</h3>
         <ProgressAlertDemo />
       </div>
       <div>
-        <h3 className="font-heading mb-4 text-lg font-medium">Avatar + Separator + Tooltip</h3>
+        <h3 className="mb-4 font-heading text-lg font-medium">Avatar + Separator + Tooltip</h3>
         <AvatarTooltipDemo />
       </div>
       <div>
-        <h3 className="font-heading mb-4 text-lg font-medium">Dialog</h3>
+        <h3 className="mb-4 font-heading text-lg font-medium">Dialog</h3>
         <DialogDemo />
       </div>
       <div>
-        <h3 className="font-heading mb-4 text-lg font-medium">Skeleton + Empty</h3>
+        <h3 className="mb-4 font-heading text-lg font-medium">Skeleton + Empty</h3>
         <SkeletonEmptyDemo />
       </div>
     </div>
-  )
+  );
 }
 
-export { ComponentGallery }
+export { ComponentGallery };

@@ -3,13 +3,7 @@
 import { type Control, useController } from "react-hook-form";
 
 import type { AssessmentAnswers } from "@/components/quiz/quiz-schema";
-import {
-  Field,
-  FieldDescription,
-  FieldGroup,
-  FieldLegend,
-  FieldSet,
-} from "@/components/ui/field";
+import { Field, FieldDescription, FieldGroup, FieldLegend, FieldSet } from "@/components/ui/field";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { INTERESTS } from "@/lib/paths/interests";
 
@@ -22,8 +16,8 @@ export function InterestsStep({ control }: { control: Control<AssessmentAnswers>
       <FieldGroup>
         <Field>
           <FieldDescription>
-            Son temas transversales que se agregan a tu ruta si entran en tu tiempo disponible.
-            Está bien si no marcás ninguno.
+            Son temas transversales que se agregan a tu ruta si entran en tu tiempo disponible. Está
+            bien si no marcas ninguno.
           </FieldDescription>
           <ToggleGroup
             multiple

@@ -73,6 +73,53 @@
   --text-display--line-height: 1.05;
   --text-display--letter-spacing: -0.02em;
   --text-display--font-weight: 700;
+  /* Spec 12: rebote corto del nodo del mapa al marcar un paso como hecho. */
+  --animate-step-pop: step-pop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  @keyframes step-pop {
+    0% {
+      transform: scale(1);
+    }
+    40% {
+      transform: scale(1.18);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+  /* Spec 05: la mascota del hero flota, la franja de tecnologías se desplaza y las estrellas
+     titilan. Siempre con motion-safe. */
+  --animate-float: float 6s ease-in-out infinite;
+  --animate-marquee: marquee 45s linear infinite;
+  --animate-twinkle: twinkle 5s ease-in-out infinite alternate;
+
+  @keyframes float {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-12px);
+    }
+  }
+  /* La franja lleva la lista dos veces: correr la mitad deja la segunda copia donde estaba la
+     primera y el bucle no se nota. */
+  @keyframes marquee {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-50%);
+    }
+  }
+  @keyframes twinkle {
+    from {
+      opacity: 0.35;
+    }
+    to {
+      opacity: 1;
+    }
+  }
 }
 
 /*
@@ -85,7 +132,7 @@
  */
 :root {
   color-scheme: light;
-  --background: oklch(0.9800 0.0120 291.37);
+  --background: oklch(0.98 0.012 291.37);
   --foreground: oklch(0.1954 0.0456 295.93);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.1954 0.0456 295.93);
@@ -93,48 +140,51 @@
   --popover-foreground: oklch(0.1954 0.0456 295.93);
   --surface: oklch(0.9556 0.0228 291.37);
   --surface-foreground: oklch(0.1954 0.0456 295.93);
-  --primary: oklch(0.4061 0.2370 277.33);
-  --primary-foreground: oklch(0.9800 0.0120 291.37);
+  --primary: oklch(0.4061 0.237 277.33);
+  --primary-foreground: oklch(0.98 0.012 291.37);
   --primary-end: oklch(0.4336 0.2291 290.82);
-  --primary-bright: oklch(0.4061 0.2370 277.33);
-  --primary-bright-foreground: oklch(0.9800 0.0120 291.37);
-  --secondary: oklch(0.9300 0.0300 291.37);
+  --primary-bright: oklch(0.4061 0.237 277.33);
+  --primary-bright-foreground: oklch(0.98 0.012 291.37);
+  --secondary: oklch(0.93 0.03 291.37);
   --secondary-foreground: oklch(0.1954 0.0456 295.93);
   --muted: oklch(0.9556 0.0228 291.37);
-  --muted-foreground: oklch(0.4500 0.0700 291.34);
-  --accent: oklch(0.9300 0.0300 291.37);
+  --muted-foreground: oklch(0.45 0.07 291.34);
+  --accent: oklch(0.93 0.03 291.37);
   --accent-foreground: oklch(0.1954 0.0456 295.93);
   --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.4061 0.2370 277.33 / 18%);
-  --input: oklch(0.4061 0.2370 277.33 / 45%);
-  --ring: oklch(0.4061 0.2370 277.33);
-  --chart-1: oklch(0.4061 0.2370 277.33);
-  --chart-2: oklch(0.5600 0.1171 287.57);
-  --chart-3: oklch(0.5450 0.1500 116.50);
-  --chart-4: oklch(0.5500 0.1300 87.22);
-  --chart-5: oklch(0.5700 0.1500 29.01);
-  --level-required: oklch(0.5700 0.1500 29.01);
-  --level-required-foreground: oklch(0.9800 0.0120 291.37);
-  --level-recommended: oklch(0.5500 0.1300 87.22);
-  --level-recommended-foreground: oklch(0.9800 0.0120 291.37);
-  --level-optional: oklch(0.5550 0.0600 291.00);
-  --level-optional-foreground: oklch(0.9800 0.0120 291.37);
-  --ai: oklch(0.5450 0.1500 116.50);
-  --ai-foreground: oklch(0.9800 0.0120 291.37);
+  --border: oklch(0.4061 0.237 277.33 / 18%);
+  --input: oklch(0.4061 0.237 277.33 / 45%);
+  --ring: oklch(0.4061 0.237 277.33);
+  --chart-1: oklch(0.4061 0.237 277.33);
+  --chart-2: oklch(0.56 0.1171 287.57);
+  --chart-3: oklch(0.545 0.15 116.5);
+  --chart-4: oklch(0.55 0.13 87.22);
+  --chart-5: oklch(0.57 0.15 29.01);
+  /* Spec 05: más oscuros que sus pares --chart-* porque los badges pintan el texto sobre el mismo
+     token al 15 %; así llegan a 4.6:1 (antes 3.9–4.0:1). */
+  --level-required: oklch(0.525 0.15 29.01);
+  --level-required-foreground: oklch(0.98 0.012 291.37);
+  --level-recommended: oklch(0.515 0.13 87.22);
+  --level-recommended-foreground: oklch(0.98 0.012 291.37);
+  --level-optional: oklch(0.555 0.06 291);
+  --level-optional-foreground: oklch(0.98 0.012 291.37);
+  --ai: oklch(0.505 0.15 116.5);
+  --ai-foreground: oklch(0.98 0.012 291.37);
   --radius: 0.875rem;
   --sidebar: oklch(0.9556 0.0228 291.37);
   --sidebar-foreground: oklch(0.1954 0.0456 295.93);
-  --sidebar-primary: oklch(0.4061 0.2370 277.33);
-  --sidebar-primary-foreground: oklch(0.9800 0.0120 291.37);
-  --sidebar-accent: oklch(0.9300 0.0300 291.37);
+  --sidebar-primary: oklch(0.4061 0.237 277.33);
+  --sidebar-primary-foreground: oklch(0.98 0.012 291.37);
+  --sidebar-accent: oklch(0.93 0.03 291.37);
   --sidebar-accent-foreground: oklch(0.1954 0.0456 295.93);
-  --sidebar-border: oklch(0.4061 0.2370 277.33 / 18%);
-  --sidebar-ring: oklch(0.4061 0.2370 277.33);
-  --brand-shadow: 0 1px 2px oklch(0.4061 0.2370 277.33 / 8%), 0 8px 24px oklch(0.4061 0.2370 277.33 / 10%);
-  --brand-glow: 0 4px 14px oklch(0.4061 0.2370 277.33 / 28%);
+  --sidebar-border: oklch(0.4061 0.237 277.33 / 18%);
+  --sidebar-ring: oklch(0.4061 0.237 277.33);
+  --brand-shadow:
+    0 1px 2px oklch(0.4061 0.237 277.33 / 8%), 0 8px 24px oklch(0.4061 0.237 277.33 / 10%);
+  --brand-glow: 0 4px 14px oklch(0.4061 0.237 277.33 / 28%);
   --brand-gradient: linear-gradient(
     145deg,
-    oklch(0.4061 0.2370 277.33 / 10%) 0%,
+    oklch(0.4061 0.237 277.33 / 10%) 0%,
     oklch(1 0 0 / 80%) 60%,
     oklch(0.4089 0.2003 284.53 / 8%) 100%
   );
@@ -152,18 +202,18 @@
   color-scheme: dark;
   --background: oklch(0.1954 0.0456 295.93);
   --foreground: oklch(0.9556 0.0228 291.37);
-  --card: oklch(0.2223 0.0330 294.36);
+  --card: oklch(0.2223 0.033 294.36);
   --card-foreground: oklch(0.9556 0.0228 291.37);
   --popover: oklch(0.2606 0.0724 290.87);
   --popover-foreground: oklch(0.9556 0.0228 291.37);
   --surface: oklch(0.2305 0.0635 291.45);
   --surface-foreground: oklch(0.9556 0.0228 291.37);
-  --primary: oklch(0.4061 0.2370 277.33);
+  --primary: oklch(0.4061 0.237 277.33);
   --primary-foreground: oklch(0.9556 0.0228 291.37);
   --primary-end: oklch(0.4336 0.2291 290.82);
   --primary-bright: oklch(0.6279 0.1972 283.78);
   --primary-bright-foreground: oklch(0.1796 0.0498 293.68);
-  --secondary: oklch(0.3520 0.0638 294.06);
+  --secondary: oklch(0.352 0.0638 294.06);
   --secondary-foreground: oklch(0.9556 0.0228 291.37);
   --muted: oklch(0.2606 0.0724 290.87);
   --muted-foreground: oklch(0.6894 0.0775 291.14);
@@ -175,37 +225,55 @@
   --ring: oklch(0.8151 0.0938 288.92);
   --chart-1: oklch(0.6279 0.1972 283.78);
   --chart-2: oklch(0.8151 0.0938 288.92);
-  --chart-3: oklch(0.8523 0.1945 116.50);
-  --chart-4: oklch(0.8680 0.1441 87.22);
+  --chart-3: oklch(0.8523 0.1945 116.5);
+  --chart-4: oklch(0.868 0.1441 87.22);
   --chart-5: oklch(0.8141 0.0843 29.01);
   --level-required: oklch(0.8141 0.0843 29.01);
   --level-required-foreground: oklch(0.1796 0.0498 293.68);
-  --level-recommended: oklch(0.8680 0.1441 87.22);
+  --level-recommended: oklch(0.868 0.1441 87.22);
   --level-recommended-foreground: oklch(0.1796 0.0498 293.68);
-  --level-optional: oklch(0.6445 0.0760 293.14);
+  --level-optional: oklch(0.6445 0.076 293.14);
   --level-optional-foreground: oklch(0.1796 0.0498 293.68);
-  --ai: oklch(0.8523 0.1945 116.50);
+  --ai: oklch(0.8523 0.1945 116.5);
   --ai-foreground: oklch(0.1796 0.0498 293.68);
   --sidebar: oklch(0.1796 0.0498 293.68);
   --sidebar-foreground: oklch(0.9556 0.0228 291.37);
-  --sidebar-primary: oklch(0.4061 0.2370 277.33);
+  --sidebar-primary: oklch(0.4061 0.237 277.33);
   --sidebar-primary-foreground: oklch(0.9556 0.0228 291.37);
   --sidebar-accent: oklch(0.2606 0.0724 290.87);
   --sidebar-accent-foreground: oklch(0.9556 0.0228 291.37);
   --sidebar-border: oklch(0.8151 0.0938 288.92 / 12%);
   --sidebar-ring: oklch(0.8151 0.0938 288.92);
-  --brand-shadow: 0 0 0 1px oklch(0.8151 0.0938 288.92 / 6%), 0 8px 32px oklch(0.4061 0.2370 277.33 / 18%);
-  --brand-glow: 0 4px 16px oklch(0.4061 0.2370 277.33 / 50%);
+  --brand-shadow:
+    0 0 0 1px oklch(0.8151 0.0938 288.92 / 6%), 0 8px 32px oklch(0.4061 0.237 277.33 / 18%);
+  --brand-glow: 0 4px 16px oklch(0.4061 0.237 277.33 / 50%);
   --brand-gradient: linear-gradient(
     145deg,
-    oklch(0.4061 0.2370 277.33 / 18%) 0%,
-    oklch(0.2223 0.0330 294.36 / 70%) 60%,
+    oklch(0.4061 0.237 277.33 / 18%) 0%,
+    oklch(0.2223 0.033 294.36 / 70%) 60%,
     oklch(0.4089 0.2003 284.53 / 12%) 100%
   );
 }
 
 @utility brand-gradient-soft {
   background-image: var(--brand-gradient);
+}
+
+/* Spec 05: el fondo de estrellas del hero de la landing, solo con tokens del tema. */
+@utility starfield {
+  background-image:
+    radial-gradient(1.5px 1.5px at 24px 36px, var(--foreground), transparent),
+    radial-gradient(2px 2px at 96px 128px, var(--chart-2), transparent),
+    radial-gradient(1.5px 1.5px at 168px 64px, var(--foreground), transparent),
+    radial-gradient(2.5px 2.5px at 236px 176px, var(--primary-bright), transparent),
+    radial-gradient(1.5px 1.5px at 304px 96px, var(--chart-2), transparent),
+    radial-gradient(1px 1px at 140px 200px, var(--foreground), transparent);
+  background-size: 320px 224px;
+}
+
+/* Spec 14: el toast por encima de los diálogos. Sin capa para ganarle al z-50 de utilities. */
+[data-slot="toast-viewport"] {
+  z-index: 60;
 }
 
 @layer base {
@@ -215,13 +283,17 @@
   body {
     @apply bg-background text-foreground;
   }
-  button:not(:disabled), [role="button"]:not(:disabled) {
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
     cursor: pointer;
   }
   html {
     @apply font-sans;
   }
-  h1, h2, h3, h4 {
+  h1,
+  h2,
+  h3,
+  h4 {
     @apply font-heading;
   }
 }

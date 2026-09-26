@@ -14,6 +14,35 @@ export type Database = {
   }
   public: {
     Tables: {
+      ai_personalizations: {
+        Row: {
+          created_at: string
+          id: number
+          path_id: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: never
+          path_id?: string | null
+          user_id?: string
+        }
+        Update: {
+          created_at?: string
+          id?: never
+          path_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_personalizations_path_id_fkey"
+            columns: ["path_id"]
+            isOneToOne: false
+            referencedRelation: "learning_paths"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       assessments: {
         Row: {
           answers: Json
@@ -118,31 +147,52 @@ export type Database = {
       }
       learning_paths: {
         Row: {
+          ai_adjustments: Json | null
+          ai_summary: string | null
+          ai_title: string | null
           assessment_id: string | null
           budget_hours: number | null
+          copied_from_path_id: string | null
           created_at: string
           goal: string
           id: string
+          is_public: boolean
+          personalized_at: string | null
+          share_slug: string
           summary: string | null
           title: string
           user_id: string
         }
         Insert: {
+          ai_adjustments?: Json | null
+          ai_summary?: string | null
+          ai_title?: string | null
           assessment_id?: string | null
           budget_hours?: number | null
+          copied_from_path_id?: string | null
           created_at?: string
           goal: string
           id?: string
+          is_public?: boolean
+          personalized_at?: string | null
+          share_slug?: string
           summary?: string | null
           title: string
           user_id: string
         }
         Update: {
+          ai_adjustments?: Json | null
+          ai_summary?: string | null
+          ai_title?: string | null
           assessment_id?: string | null
           budget_hours?: number | null
+          copied_from_path_id?: string | null
           created_at?: string
           goal?: string
           id?: string
+          is_public?: boolean
+          personalized_at?: string | null
+          share_slug?: string
           summary?: string | null
           title?: string
           user_id?: string
@@ -155,10 +205,18 @@ export type Database = {
             referencedRelation: "assessments"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "learning_paths_copied_from_path_id_fkey"
+            columns: ["copied_from_path_id"]
+            isOneToOne: false
+            referencedRelation: "learning_paths"
+            referencedColumns: ["id"]
+          },
         ]
       }
       path_steps: {
         Row: {
+          ai_reason: string | null
           completed_at: string | null
           course_id: number
           created_at: string
@@ -174,6 +232,7 @@ export type Database = {
           status: Database["public"]["Enums"]["path_step_status"]
         }
         Insert: {
+          ai_reason?: string | null
           completed_at?: string | null
           course_id: number
           created_at?: string
@@ -189,6 +248,7 @@ export type Database = {
           status?: Database["public"]["Enums"]["path_step_status"]
         }
         Update: {
+          ai_reason?: string | null
           completed_at?: string | null
           course_id?: number
           created_at?: string
@@ -233,6 +293,7 @@ export type Database = {
           created_at: string
           id: string
           role: Database["public"]["Enums"]["user_role"]
+          timezone: string
           username: string | null
         }
         Insert: {
@@ -240,6 +301,7 @@ export type Database = {
           created_at?: string
           id: string
           role?: Database["public"]["Enums"]["user_role"]
+          timezone?: string
           username?: string | null
         }
         Update: {
@@ -247,6 +309,7 @@ export type Database = {
           created_at?: string
           id?: string
           role?: Database["public"]["Enums"]["user_role"]
+          timezone?: string
           username?: string | null
         }
         Relationships: []
@@ -323,12 +386,205 @@ export type Database = {
         }
         Relationships: []
       }
+      quiz_attempts: {
+        Row: {
+          activity_date: string
+          answers: Json
+          correct_count: number
+          id: string
+          idempotency_key: string
+          pass_percentage: number
+          passed: boolean
+          path_id: string
+          path_step_id: string
+          quiz_id: string
+          score_percentage: number
+          started_at: string
+          submitted_at: string
+          timezone: string
+          user_id: string
+        }
+        Insert: {
+          activity_date: string
+          answers: Json
+          correct_count: number
+          id?: string
+          idempotency_key: string
+          pass_percentage: number
+          passed: boolean
+          path_id: string
+          path_step_id: string
+          quiz_id: string
+          score_percentage: number
+          started_at?: string
+          submitted_at?: string
+          timezone: string
+          user_id: string
+        }
+        Update: {
+          activity_date?: string
+          answers?: Json
+          correct_count?: number
+          id?: string
+          idempotency_key?: string
+          pass_percentage?: number
+          passed?: boolean
+          path_id?: string
+          path_step_id?: string
+          quiz_id?: string
+          score_percentage?: number
+          started_at?: string
+          submitted_at?: string
+          timezone?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quiz_attempts_path_id_fkey"
+            columns: ["path_id"]
+            isOneToOne: false
+            referencedRelation: "learning_paths"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "quiz_attempts_path_step_id_fkey"
+            columns: ["path_step_id"]
+            isOneToOne: false
+            referencedRelation: "path_steps"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "quiz_attempts_quiz_id_fkey"
+            columns: ["quiz_id"]
+            isOneToOne: false
+            referencedRelation: "quizzes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      quizzes: {
+        Row: {
+          course_id: number
+          created_at: string
+          id: string
+          is_active: boolean
+          pass_percentage: number
+          questions: Json
+          updated_at: string
+        }
+        Insert: {
+          course_id: number
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          pass_percentage?: number
+          questions: Json
+          updated_at?: string
+        }
+        Update: {
+          course_id?: number
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          pass_percentage?: number
+          questions?: Json
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quizzes_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: true
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      streak_activities: {
+        Row: {
+          activity_date: string
+          created_at: string
+          id: number
+          source_attempt_id: string | null
+          timezone: string
+          user_id: string
+        }
+        Insert: {
+          activity_date: string
+          created_at?: string
+          id?: never
+          source_attempt_id?: string | null
+          timezone: string
+          user_id: string
+        }
+        Update: {
+          activity_date?: string
+          created_at?: string
+          id?: never
+          source_attempt_id?: string | null
+          timezone?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "streak_activities_source_attempt_id_fkey"
+            columns: ["source_attempt_id"]
+            isOneToOne: true
+            referencedRelation: "quiz_attempts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      apply_ai_personalization: {
+        Args: {
+          p_path_id: string
+          p_reasons: Json
+          p_summary: string
+          p_title: string
+        }
+        Returns: undefined
+      }
+      copy_shared_path: {
+        Args: {
+          p_slug: string
+        }
+        Returns: string
+      }
+      get_path_origin: {
+        Args: {
+          p_path_id: string
+        }
+        Returns: string
+      }
+      get_shared_path: {
+        Args: {
+          p_slug: string
+        }
+        Returns: Json
+      }
+      record_step_activity: {
+        Args: {
+          p_step_id: string
+          p_time_zone: string
+        }
+        Returns: undefined
+      }
+      submit_quiz_attempt: {
+        Args: {
+          p_answers: Json
+          p_idempotency_key: string
+          p_path_id: string
+          p_path_step_id: string
+          p_quiz_id: string
+          p_timezone: string
+        }
+        Returns: Json
+      }
     }
     Enums: {
       course_difficulty: "principiante" | "intermedio" | "avanzado"

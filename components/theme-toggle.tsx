@@ -1,12 +1,12 @@
-"use client"
+"use client";
 
-import { MoonIcon, SunIcon } from "@phosphor-icons/react"
-import { useTheme } from "next-themes"
-import { useSyncExternalStore } from "react"
+import { MoonIcon, SunIcon } from "@phosphor-icons/react";
+import { useTheme } from "next-themes";
+import { useSyncExternalStore } from "react";
 
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button";
 
-const subscribeToMount = () => () => {}
+const subscribeToMount = () => () => {};
 
 /**
  * next-themes solo conoce el tema real después de montar en el cliente
@@ -18,23 +18,23 @@ function useIsMounted() {
   return useSyncExternalStore(
     subscribeToMount,
     () => true,
-    () => false
-  )
+    () => false,
+  );
 }
 
 function ThemeToggle() {
-  const { resolvedTheme, setTheme } = useTheme()
-  const isMounted = useIsMounted()
+  const { resolvedTheme, setTheme } = useTheme();
+  const isMounted = useIsMounted();
 
   if (!isMounted) {
     return (
       <Button variant="ghost" size="icon" disabled aria-label="Cambiar tema">
         <SunIcon />
       </Button>
-    )
+    );
   }
 
-  const isDarkTheme = resolvedTheme === "dark"
+  const isDarkTheme = resolvedTheme === "dark";
 
   return (
     <Button
@@ -45,7 +45,7 @@ function ThemeToggle() {
     >
       {isDarkTheme ? <SunIcon /> : <MoonIcon />}
     </Button>
-  )
+  );
 }
 
-export { ThemeToggle }
+export { ThemeToggle };

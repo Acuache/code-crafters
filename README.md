@@ -6,10 +6,10 @@ Generador de rutas de aprendizaje sobre el catálogo real de cursos de [DevTalle
 
 | Hecho | Pendiente |
 |---|---|
-| Scaffold de Next.js 16 (App Router, TypeScript, Tailwind v4) | Cuestionario de habilidades e intereses |
-| Catálogo de DevTalles extraído y versionado (`data/`) | Motor de rutas (reglas + personalización con IA) |
-| Documentación del proyecto y decisiones (`docs/`) | Login y registro con Discord |
-| — | Guardar rutas, marcar progreso, deploy |
+| Next.js 16, Supabase, autenticación y catálogo persistente | Módulos posteriores descritos en el roadmap |
+| Cuestionario inicial y generación de rutas por reglas | Deploy y validación de producción |
+| Ruta interactiva con progreso persistente | — |
+| Quizzes por curso escritos desde el panel, intentos privados y racha diaria | — |
 
 El detalle del plan está en [`docs/ROADMAP.md`](docs/ROADMAP.md).
 
@@ -17,11 +17,24 @@ El detalle del plan está en [`docs/ROADMAP.md`](docs/ROADMAP.md).
 
 - Node.js **20.9.0 o superior** (lo exige Next.js 16).
 - npm.
+- Docker, para Supabase local.
+
+## Variables de entorno
+
+Copia `.env.example` a `.env.local` y completa las variables de Supabase. La clave de OpenAI es opcional: sin ella la ruta se genera y se recorre igual, con quizzes incluidos.
+
+```dotenv
+OPENAI_API_KEY=tu_clave_de_openai          # personalización de la ruta con IA
+```
+
+Es un secreto exclusivo del servidor: nunca uses el prefijo `NEXT_PUBLIC_` para ella ni la expongas al navegador.
 
 ## Cómo levantarlo
 
 ```bash
 npm install
+npx supabase start
+npx supabase migration up
 npm run dev
 ```
 
@@ -33,7 +46,19 @@ Otros comandos:
 npm run build   # build de producción
 npm run start   # correr un build de producción
 npm run lint    # ESLint
+npm test        # Vitest
+npx supabase test db # pruebas pgTAP
 ```
+
+## Quizzes, progreso y racha
+
+Los quizzes y la racha los diseñó Ariel Tonato. Cómo se integraron con el mapa de la ruta está en [`docs/decisiones/0005-quizzes-y-racha-unificados.md`](docs/decisiones/0005-quizzes-y-racha-unificados.md), y por qué los quizzes pasaron a escribirse desde el panel, sin IA, en [`docs/decisiones/0006-quizzes-de-curso-escritos-por-el-admin.md`](docs/decisiones/0006-quizzes-de-curso-escritos-por-el-admin.md).
+
+- Cada curso tiene un quiz que el admin escribe y edita en `/admin/courses/[slug]/quiz`. Las migraciones traen 3 preguntas básicas para cada uno de los 74 cursos.
+- El quiz se abre al instante desde el detalle de cada paso del mapa o desde la lista. Al elegir una opción queda fija y se ve si es correcta, cuál era la correcta y por qué.
+- Se aprueba con el porcentaje de cada quiz (60 % por defecto). Aprobar marca el curso como hecho; también se puede marcar a mano con el selector de estado.
+- Al entregar, Postgres vuelve a corregir y guarda el intento. Los intentos y el progreso son privados mediante RLS; los quizzes los lee cualquier usuario con sesión y solo los escribe el admin.
+- La racha suma como máximo un día por fecha local (zona del navegador) al aprobar un quiz o al pasar un paso a "En curso" o "Hecho".
 
 ## Estructura del repo
 

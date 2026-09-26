@@ -1,6 +1,6 @@
-// Motor de reglas (SPEC 04): arma una ruta de aprendizaje combinando programas oficiales,
-// quitando lo que el usuario ya domina, sumando intereses transversales y recortando contra un
-// presupuesto de horas. Función pura: no lee Supabase ni data/*.json, todo entra por parámetro.
+// Motor de reglas: arma una ruta combinando programas oficiales, quitando lo que el usuario ya
+// domina, sumando intereses y recortando contra un presupuesto de horas. Es puro: todo entra por
+// parámetro, sin leer Supabase.
 
 import { GOALS, type GoalDefinition } from "./goals";
 import { INTERESTS, TECH_TO_SLUGS } from "./interests";
@@ -11,11 +11,11 @@ import type {
   DiscardedStep,
   LearnerProfile,
   ProgramInput,
+  ProgramLevel,
   StepOrigin,
 } from "./types";
 
-// Un slug de meta desconocido es un bug de quien invoca (ver types.ts), nunca un caso de negocio
-// a tolerar en silencio.
+// Una meta desconocida es un bug de quien llama, no un caso a tolerar en silencio.
 function requireGoal(goalSlug: string): GoalDefinition {
   const goal = GOALS[goalSlug];
   if (!goal) {
@@ -24,28 +24,34 @@ function requireGoal(goalSlug: string): GoalDefinition {
   return goal;
 }
 
-function courseHours(courseSlug: string, catalog: CatalogCourse[]): number {
-  return catalog.find((course) => course.slug === courseSlug)?.hours ?? 0;
+// Se arma una vez por función pública: buscar en el array en cada paso haría crecer el costo con
+// el tamaño del catálogo multiplicado por el de la ruta.
+type HoursBySlug = Map<string, number>;
+
+function indexHoursBySlug(catalog: CatalogCourse[]): HoursBySlug {
+  return new Map(catalog.map((course) => [course.slug, course.hours]));
 }
 
-function sumHours(steps: { courseSlug: string }[], catalog: CatalogCourse[]): number {
+function sumHours(steps: { courseSlug: string }[], hoursBySlug: HoursBySlug): number {
   let total = 0;
   for (const step of steps) {
-    total += courseHours(step.courseSlug, catalog);
+    total += hoursBySlug.get(step.courseSlug) ?? 0;
   }
   return total;
 }
 
 function isMarkedInterest(courseSlug: string, interests: string[]): boolean {
-  return interests.some((interestSlug) => INTERESTS[interestSlug]?.courseSlugs.includes(courseSlug));
+  return interests.some((interestSlug) =>
+    INTERESTS[interestSlug]?.courseSlugs.includes(courseSlug),
+  );
 }
 
 function isMasteredCourse(courseSlug: string, masteredTechnologies: string[]): boolean {
   return masteredTechnologies.some((technology) => TECH_TO_SLUGS[technology] === courseSlug);
 }
 
-// Los cursos "puerta de entrada" de las tecnologías que el usuario declaró dominar. Una tecnología
-// que no está en TECH_TO_SLUGS se ignora sin error (ver types.ts).
+// Los cursos "puerta de entrada" de las tecnologías que el usuario domina. Una tecnología que no
+// está en TECH_TO_SLUGS se ignora.
 function collectMasteredCourseSlugs(masteredTechnologies: string[]): Set<string> {
   const masteredCourseSlugs = new Set<string>();
 
@@ -77,7 +83,8 @@ export function resolvePrograms(profile: LearnerProfile, programs: ProgramInput[
     .filter((program): program is ProgramInput => program !== undefined);
 }
 
-const LEVEL_RANK: Record<StepOrigin, number> = {
+// Si un curso llega por dos programas, se queda con el origen más exigente.
+const ORIGIN_PRIORITY: Record<StepOrigin, number> = {
   requerido: 3,
   recomendado: 2,
   opcional: 1,
@@ -100,14 +107,14 @@ function chooseAlternative(courseSlugs: string[], profile: LearnerProfile): stri
   return slugCloseToProfile ?? courseSlugs[0];
 }
 
-const OFFICIAL_LEVEL_LABEL: Record<"requerido" | "recomendado" | "opcional", string> = {
+const OFFICIAL_LEVEL_LABEL: Record<ProgramLevel, string> = {
   requerido: "Requerido",
   recomendado: "Recomendado",
   opcional: "Opcional",
 };
 
 function composeOfficialReason(
-  level: "requerido" | "recomendado" | "opcional",
+  level: ProgramLevel,
   sourceProgramSlug: string,
   profile: LearnerProfile,
   goal: GoalDefinition,
@@ -154,7 +161,7 @@ export function mergeOfficialSteps(
       }
 
       const existing = stepsBySlug.get(chosenCourseSlug);
-      if (existing && LEVEL_RANK[existing.origin] >= LEVEL_RANK[step.level]) {
+      if (existing && ORIGIN_PRIORITY[existing.origin] >= ORIGIN_PRIORITY[step.level]) {
         continue;
       }
 
@@ -193,7 +200,7 @@ export function dropMasteredTechnologies(
 
   for (const step of steps) {
     if (masteredCourseSlugs.has(step.courseSlug)) {
-      discarded.push({ ...step, discardReason: "ya lo dominás" });
+      discarded.push({ ...step, discardReason: "ya lo dominas" });
     } else {
       kept.push(step);
     }
@@ -217,6 +224,7 @@ export function applyInterests(
   officialHours: number,
   catalog: CatalogCourse[],
 ): { steps: BuiltStep[]; discarded: DiscardedStep[] } {
+  const hoursBySlug = indexHoursBySlug(catalog);
   const takenCourseSlugs = new Set(steps.map((step) => step.courseSlug));
   const masteredCourseSlugs = collectMasteredCourseSlugs(profile.masteredTechnologies);
 
@@ -226,7 +234,7 @@ export function applyInterests(
   for (const interestSlug of profile.interests) {
     const interest = INTERESTS[interestSlug];
     if (!interest) {
-      continue; // slug de interés desconocido: se ignora sin error (ver types.ts)
+      continue; // interés desconocido: se ignora
     }
 
     const availableCourseSlug = interest.courseSlugs.find(
@@ -242,7 +250,7 @@ export function applyInterests(
     candidates.push({
       courseSlug: availableCourseSlug,
       interestSlug,
-      hours: courseHours(availableCourseSlug, catalog),
+      hours: hoursBySlug.get(availableCourseSlug) ?? 0,
     });
   }
 
@@ -291,9 +299,10 @@ export function trimToBudget(
   budgetHours: number,
   catalog: CatalogCourse[],
 ): { steps: BuiltStep[]; discarded: DiscardedStep[] } {
+  const hoursBySlug = indexHoursBySlug(catalog);
   const kept = [...steps];
   const discarded: DiscardedStep[] = [];
-  let totalHours = sumHours(kept, catalog);
+  let totalHours = sumHours(kept, hoursBySlug);
 
   for (const origin of TRIM_ORDER) {
     for (let index = kept.length - 1; index >= 0 && totalHours > budgetHours; index--) {
@@ -301,7 +310,7 @@ export function trimToBudget(
         continue;
       }
       const [removed] = kept.splice(index, 1);
-      totalHours -= courseHours(removed.courseSlug, catalog);
+      totalHours -= hoursBySlug.get(removed.courseSlug) ?? 0;
       discarded.push({ ...removed, discardReason: "no cabía en tu tiempo" });
     }
   }
@@ -409,6 +418,7 @@ export function buildPath(
   programs: ProgramInput[],
 ): BuiltPath {
   const goal = requireGoal(profile.goal);
+  const hoursBySlug = indexHoursBySlug(catalog);
 
   const availableWeeks = Math.round(profile.deadlineMonths * WEEKS_PER_MONTH);
   const budgetHours = availableWeeks * profile.hoursPerWeek;
@@ -422,7 +432,7 @@ export function buildPath(
   steps = droppedMastered.steps;
   discarded.push(...droppedMastered.discarded);
 
-  const officialHours = sumHours(steps, catalog);
+  const officialHours = sumHours(steps, hoursBySlug);
 
   const withInterests = applyInterests(steps, profile, budgetHours, officialHours, catalog);
   steps = withInterests.steps;
@@ -434,7 +444,7 @@ export function buildPath(
 
   const finalSteps = renumberStages(steps, resolvedPrograms);
 
-  const totalHours = sumHours(finalSteps, catalog);
+  const totalHours = sumHours(finalSteps, hoursBySlug);
   const fitsInBudget = totalHours <= budgetHours;
   const overflowHours = fitsInBudget ? 0 : totalHours - budgetHours;
 

@@ -76,7 +76,7 @@ lista ya fijada de 15 `programs.slug`, no sus migraciones ni su RLS.
   personalización de IA. `programHints` (ADR 0001) tampoco entra: cuando el spec 11 lo necesite,
   extiende `LearnerProfile` con un campo opcional nuevo — una interfaz de TypeScript se extiende sin
   romper nada, a diferencia de una columna de Supabase (ver Decisiones).
-- El botón "Ajustar mi ruta" (spec 15): reusa `buildPath()` tal cual, sin cambios de este spec.
+- El botón "Ajustar mi ruta" (spec 16): reusa `buildPath()` tal cual, sin cambios de este spec.
 - Cualquier UI, incluido el mapa visual (spec 12): este spec no importa React ni `components/*`.
 - Un panel para editar `GOALS`/`INTERESTS`/`TECH_TO_SLUGS` desde el admin (spec 10): son tablas a
   mano en código, como ya decidió el ADR 0003; el spec 10 gestiona `courses`/`program_courses`, no
@@ -555,7 +555,7 @@ false` + `overflowHours`, sin tocar ningún `requerido`. **No:** recortar requer
 - La vista de la ruta, el acordeón de descartes y el cambio de estado de un paso (spec 08).
 - Las razones y el título escritos por IA, y `programHints` (spec 11) — reusa `buildPath()` sin
   cambios de este spec, extendiendo `LearnerProfile` cuando lo necesite.
-- El botón "Ajustar mi ruta" (spec 15) — reusa `buildPath()` sin cambios de este spec.
+- El botón "Ajustar mi ruta" (spec 16) — reusa `buildPath()` sin cambios de este spec.
 - Leer `data/*.json` o Supabase en tiempo de ejecución — el motor solo recibe datos por parámetro.
 - Un panel para editar las tres tablas a mano de `lib/paths/` — son código, no datos de Supabase.
 

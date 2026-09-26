@@ -43,7 +43,7 @@ pantalla que improvisa sus propios botones pierde en las dos.
   patrón oficial de Supabase (host local vs. `x-forwarded-host` detrás del proxy de Vercel),
   redirige siempre a `/dashboard` si el exchange funciona, o a `/login?error=oauth_denied` /
   `/login?error=oauth_callback_failed` si falla (ver Plan, paso 5).
-- `lib/supabase/actions.ts` (`'use server'`): `signInWithProvider(provider, formData)` y
+- `lib/supabase/actions.ts` (`'use server'`): `signInWithProvider(provider)` y
   `signOut()`. El archivo solo exporta estas dos funciones async — un archivo `'use server'` no
   puede exportar nada más (verificado en Context7, `/vercel/next.js`); el tipo `OAuthProvider` sí
   puede vivir ahí porque se borra en compilación.
@@ -130,10 +130,7 @@ async function requireAdmin(): Promise<SessionUser & { role: "admin" }>;
 // lib/supabase/actions.ts
 type OAuthProvider = "discord" | "google" | "github"; // type-only: se borra en compilación
 
-async function signInWithProvider(
-  provider: OAuthProvider,
-  formData: FormData,
-): Promise<void>;
+async function signInWithProvider(provider: OAuthProvider): Promise<void>;
 async function signOut(): Promise<void>;
 ```
 
@@ -276,7 +273,7 @@ provider)}>` con `provider-button.tsx`, lee `searchParams` (es una `Promise` en 
   el agente lo corra con el CLI de Vercel durante `/spec-impl`. Crear el proyecto y cargar env vars
   son acciones sobre una cuenta externa del usuario, y hoy no hay `.vercel/` en el repo que indique
   que ya existe un proyecto vinculado.
-- **Sí:** una sola server action `signInWithProvider(provider, formData)` para los tres botones,
+- **Sí:** una sola server action `signInWithProvider(provider)` para los tres botones,
   atada con `.bind()`. **No:** tres server actions casi idénticas
   (`signInWithDiscord`/`signInWithGoogle`/`signInWithGithub`). Pasar argumentos con `bind` a una
   Server Function es el patrón que documenta Next.js 16 para este caso, y evita triplicar la lógica

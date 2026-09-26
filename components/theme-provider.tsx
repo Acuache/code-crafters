@@ -1,15 +1,11 @@
-"use client"
+"use client";
 
-import { ThemeProvider as NextThemesProvider } from "next-themes"
-import type { ComponentProps } from "react"
+import { ThemeProvider as NextThemesProvider } from "next-themes";
+import type { ComponentProps } from "react";
 
-/**
- * Envuelve el ThemeProvider de next-themes en un Client Component propio:
- * app/layout.tsx es un Server Component y no puede importar directo una
- * librería que usa contexto de React.
- */
+// app/layout.tsx es un Server Component y no puede usar directo un provider con contexto.
 function ThemeProvider({ children, ...props }: ComponentProps<typeof NextThemesProvider>) {
-  return <NextThemesProvider {...props}>{children}</NextThemesProvider>
+  return <NextThemesProvider {...props}>{children}</NextThemesProvider>;
 }
 
-export { ThemeProvider }
+export { ThemeProvider };

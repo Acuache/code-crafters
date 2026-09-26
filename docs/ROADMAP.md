@@ -49,19 +49,31 @@
 
 > ⚠️ Conviene confirmar con la organización que Supabase y React Flow cuentan como "tecnología de DevTalles". Supabase es Postgres, que sí tiene curso.
 
+### Incremento implementado: quizzes y racha (2026-09-23)
+
+La ruta guardada ya cuenta con progreso persistente, prácticas de capítulo, evaluaciones de curso y
+racha diaria. Los quizzes usan Vercel AI SDK con OpenAI (el mismo modelo que la personalización), se
+generan una vez por objetivo y se comparten entre usuarios; sus intentos permanecen privados. El umbral
+de aprobación es 60 %, la fecha de actividad se deriva en Postgres desde la zona IANA y la entrega se
+ejecuta mediante una función transaccional e idempotente. Se integró en el mapa del spec 12 y la racha
+es una sola (`streak_activities`): ver `docs/decisiones/0005-quizzes-y-racha-unificados.md`. Los
+quizzes pasan a escribirlos el admin (spec 13), y el spec 14 suma XP, niveles e insignias derivados
+al leer.
+
 ---
 
 ## Arquitectura
 
 ### Modelo de datos (Supabase, todas las tablas con RLS)
 - `courses`: slug, title, description, url, image_url, hours, lessons, category, difficulty (principiante/intermedio/avanzado), outcome, tags text[], prerequisites text[] (slugs). Solo cursos activos: los Legacy no se cargan.
-- `profiles`: id (= auth.users.id), username, avatar_url, role (`user`/`admin`, `user` por defecto), xp, level, streak, last_activity_at. Se crea con un trigger al registrarse, leyendo los metadatos del proveedor OAuth (Discord, Google o GitHub).
+- `profiles`: id (= auth.users.id), username, avatar_url, role (`user`/`admin`, `user` por defecto), timezone (la última zona usada, define "hoy" para la racha). Sin columnas de XP, nivel ni racha: se derivan al leer (spec 14). Se crea con un trigger al registrarse, leyendo los metadatos del proveedor OAuth (Discord, Google o GitHub).
 - `programs`: slug, source_slug (agrupación oficial de DevTalles: `react` agrupa las rutas `react` y `react-native`), name, position. 15 filas — una por ruta oficial, no una por programa agrupado (ver spec 02).
 - `program_courses`: program_id, course_id, stage, level (requerido/recomendado/opcional), position, note. El vínculo curso↔programa que arma el motor.
 - `assessments`: user_id, answers jsonb, created_at.
 - `learning_paths`: user_id, assessment_id, title, goal, summary, is_public, share_slug, created_at.
 - `path_steps`: path_id, course_id, source_program_id, stage, position, origin (por qué entró: requerido, interés, etc.), reason (redactada por el motor; la IA la reescribe si hay key), depends_on, status (pending/in_progress/done/discarded), discard_reason (motivo si se descarta), completed_at.
-- `achievements` y `user_achievements`: insignias.
+- `streak_activities`: user_id, activity_date, timezone, source_attempt_id (un día por fecha local; ADR 0005). Borrar una ruta no borra sus días (spec 14).
+- Insignias: sin tablas. Son 6, con catálogo en `lib/gamification/achievements.ts`, y se derivan al leer (spec 14).
 - (Stretch) `checkpoints`: step_id, questions jsonb, score.
 
 ### Cómo se genera la ruta (ver ADR 0001 para el porqué de este diseño)
@@ -106,7 +118,8 @@ app/
   (marketing)/page.tsx          landing
   login/page.tsx                botón "Entrar con Discord"
   auth/callback/route.ts        exchangeCodeForSession
-  (app)/dashboard/page.tsx      mis rutas + XP + insignias
+  (app)/dashboard/page.tsx      mis rutas + nivel, XP y racha
+  (app)/profile/page.tsx        nivel, XP, racha, estadísticas e insignias
   (app)/quiz/page.tsx           cuestionario multi-step
   (app)/paths/[id]/page.tsx     mapa React Flow / vista lista + progreso
   r/[slug]/page.tsx             ruta pública (solo lectura)
@@ -115,7 +128,7 @@ components/{ui,quiz,path-map,gamification}/
 lib/supabase/{client,server}.ts
 lib/ai/{schemas,prompts,generate-path}.ts
 lib/paths/build-path.ts
-lib/gamification/{xp,achievements}.ts
+lib/gamification/{xp,achievements,summary,streak,load-gamification}.ts
 proxy.ts                        refresco de sesión Supabase (Next 16)
 scripts/scrape-courses.ts
 data/courses.json               catálogo versionado en el repo
@@ -140,7 +153,7 @@ CLAUDE.md                       convenciones para que la IA de los 3 escriba igu
 - **COULD (solo si todo lo anterior está sólido):**
   - Re-evaluación adaptativa: al terminar un curso, un mini-quiz de 5 preguntas generado por IA a partir del temario.
     - Puntaje bajo: se sugiere un curso de refuerzo.
-    - Puntaje alto: XP extra.
+    - Puntaje alto: XP extra (descartado en el spec 14: solo los cursos dan XP).
   - Versión mínima alternativa: botón "Recalcular mi ruta" que manda el progreso a la IA.
 - **WON'T (fuera del MVP):** panel de administración, chat mentor, notificaciones, i18n.
 

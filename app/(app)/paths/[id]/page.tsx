@@ -1,26 +1,167 @@
+import Image from "next/image";
+import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ListChecksIcon } from "@phosphor-icons/react/ssr";
+import { ArrowLeftIcon, PathIcon } from "@phosphor-icons/react/ssr";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { AutoPersonalizer } from "@/components/ai/auto-personalizer";
+import { ProfileAdjustmentsNote } from "@/components/ai/profile-adjustments-note";
+import { AiBadge } from "@/components/brand/ai-badge";
+import { Eyebrow } from "@/components/brand/eyebrow";
+import { StreakCard } from "@/components/gamification/streak-card";
+import type { PathStepView, PathView } from "@/components/paths/path-step";
+import { PathStepsView } from "@/components/paths/path-steps-view";
+import { SharePathDialog } from "@/components/sharing/share-path-dialog";
+import { Button } from "@/components/ui/button";
+import { assessmentAnswersSchema } from "@/components/quiz/quiz-schema";
+import { remainingPersonalizations } from "@/lib/ai/daily-limit";
+import {
+  countPersonalizationAttemptsForPath,
+  countPersonalizationsInLast24h,
+  isAiConfigured,
+} from "@/lib/ai/personalize-path";
+import { computeStreak, todayInTimeZone } from "@/lib/gamification/streak";
+import { isStepOrigin } from "@/lib/paths/levels";
+import type { StepOrigin } from "@/lib/paths/types";
+import { storedQuestionsSchema, type CourseQuiz } from "@/lib/quizzes/schema";
+import { authorHandle } from "@/lib/sharing/shared-path";
 import { requireUser } from "@/lib/supabase/guards";
 import { createClient } from "@/lib/supabase/server";
 
 type PathPageProps = {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ vista?: string | string[] }>;
 };
 
-// Placeholder mínimo y de sólo lectura: el spec 08 lo reescribe entero con la vista real (chips de
-// procedencia, acordeón de descartes, cambio de estado). Este spec sólo prueba que el redirect de
-// generatePath() llega a datos reales.
-export default async function PathPage({ params }: PathPageProps) {
-  const { id } = await params;
+// Solo el motor escribe `origin`: otro valor es un dato roto, y es mejor fallar que mostrar un
+// badge inventado.
+function toStepOrigin(value: string): StepOrigin {
+  if (!isStepOrigin(value)) {
+    throw new Error(`path_steps.origin desconocido: ${value}`);
+  }
 
-  await requireUser();
+  return value;
+}
+
+type AutoPersonalizeContext = {
+  pathId: string;
+  isPersonalized: boolean;
+  answers: unknown;
+};
+
+// La IA redacta el texto de la ruta una sola vez, y solo si el usuario escribió texto libre: sin
+// él no tiene nada propio que contar. Las consultas van de la más barata a la más cara.
+async function shouldAutoPersonalize(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  { pathId, isPersonalized, answers }: AutoPersonalizeContext,
+): Promise<boolean> {
+  if (!isAiConfigured() || isPersonalized) {
+    return false;
+  }
+
+  const parsedAnswers = assessmentAnswersSchema.safeParse(answers);
+  const wroteFreeText = parsedAnswers.success && parsedAnswers.data.freeText.trim() !== "";
+  if (!wroteFreeText) {
+    return false;
+  }
+
+  const usedInLast24h = await countPersonalizationsInLast24h(supabase);
+  if (usedInLast24h === null || remainingPersonalizations(usedInLast24h) === 0) {
+    return false;
+  }
+
+  // Un intento previo, aunque haya fallado, evita reintentar solo en cada visita.
+  const attemptsForPath = await countPersonalizationAttemptsForPath(supabase, pathId);
+  return attemptsForPath === 0;
+}
+
+// "Hoy" sale de la última zona guardada: el servidor no conoce la del navegador.
+async function loadStreak(supabase: Awaited<ReturnType<typeof createClient>>, userId: string) {
+  const [{ data: activities }, { data: profile }] = await Promise.all([
+    supabase.from("streak_activities").select("activity_date"),
+    supabase.from("profiles").select("timezone").eq("id", userId).maybeSingle(),
+  ]);
+
+  const activityDates = (activities ?? []).map((activity) => activity.activity_date);
+  const today = todayInTimeZone(profile?.timezone ?? "UTC");
+
+  return { streak: computeStreak(activityDates, today), activityDates, today };
+}
+
+// Username del autor de la ruta de la que salió esta copia (spec 15). El tipo generado dice
+// `string`, pero la función devuelve null si no es una copia o si el original ya no existe.
+async function loadPathOrigin(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  pathId: string,
+): Promise<string | null> {
+  const { data: originUsername, error } = await supabase.rpc("get_path_origin", {
+    p_path_id: pathId,
+  });
+
+  // Sin la línea de atribución la ruta funciona igual.
+  if (error) {
+    console.error(`[sharing] loadPathOrigin: ${error.message}`);
+    return null;
+  }
+
+  return originUsername ?? null;
+}
+
+// El quiz de cada curso de la ruta viaja con la página, así abrirlo no espera a nadie (spec 13).
+// El filtro por is_active no sobra: la RLS le deja ver los desactivados al admin.
+async function loadActiveQuizzes(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  courseIds: number[],
+): Promise<Map<number, CourseQuiz>> {
+  const quizzesByCourse = new Map<number, CourseQuiz>();
+  if (courseIds.length === 0) {
+    return quizzesByCourse;
+  }
+
+  const { data: rows, error } = await supabase
+    .from("quizzes")
+    .select("id, course_id, pass_percentage, questions")
+    .in("course_id", courseIds)
+    .eq("is_active", true);
+
+  // Sin quizzes la ruta funciona igual: el paso se sigue marcando con el toggle.
+  if (error) {
+    console.error(`[quiz] loadActiveQuizzes: ${error.message}`);
+    return quizzesByCourse;
+  }
+
+  for (const row of rows) {
+    const questions = storedQuestionsSchema.safeParse(row.questions);
+    if (!questions.success) {
+      console.error(`[quiz] loadActiveQuizzes: preguntas inválidas en el quiz ${row.id}`);
+      continue;
+    }
+
+    quizzesByCourse.set(row.course_id, {
+      id: row.id,
+      courseId: row.course_id,
+      passPercentage: row.pass_percentage,
+      questions: questions.data,
+    });
+  }
+
+  return quizzesByCourse;
+}
+
+export default async function PathPage({ params, searchParams }: PathPageProps) {
+  const { id } = await params;
+  // El mapa es la vista por defecto.
+  const { vista } = await searchParams;
+  const initialView: PathView = vista === "lista" ? "lista" : "mapa";
+
+  const user = await requireUser();
   const supabase = await createClient();
 
+  // RLS filtra al dueño: una ruta ajena o inexistente no vuelve y da 404.
   const { data: path } = await supabase
     .from("learning_paths")
-    .select("id, title, summary, budget_hours")
+    .select(
+      "id, title, summary, budget_hours, ai_title, ai_summary, personalized_at, ai_adjustments, share_slug, is_public, assessments(answers)",
+    )
     .eq("id", id)
     .single();
 
@@ -28,45 +169,115 @@ export default async function PathPage({ params }: PathPageProps) {
     notFound();
   }
 
-  // status <> 'discarded': sin este filtro, un curso que el motor sacó por "ya lo dominás" o por
-  // recorte de presupuesto se muestra igual como si fuera parte de la ruta, y sus horas se suman
-  // al total (perfil 4 de lib/paths/build-path.test.ts: react-de-cero queda discarded pese a ser
-  // requerido).
+  // Vigentes y descartados juntos: así el estado optimista mueve un paso entre la lista y el
+  // acordeón sin recargar.
   const { data: rawSteps } = await supabase
     .from("path_steps")
-    .select("stage, position, courses(title, hours)")
+    .select(
+      "id, stage, position, origin, reason, ai_reason, status, discard_reason, courses(id, title, hours, url, image_url), programs(slug, name)",
+    )
     .eq("path_id", path.id)
-    .neq("status", "discarded")
     .order("stage", { ascending: true })
     .order("position", { ascending: true });
 
-  const activeSteps = rawSteps ?? [];
-  // `courses.hours` es numeric(5,1) en Postgres y PostgREST puede devolverlo como string: sin
-  // Number() la suma concatenaría en vez de sumar.
-  const totalHours = activeSteps.reduce((sum, step) => sum + Number(step.courses.hours), 0);
-  const budgetHours = path.budget_hours ?? 0;
+  const stepRows = rawSteps ?? [];
+  const courseIds = stepRows.map((row) => row.courses.id);
+
+  // El texto de la IA reemplaza al de plantilla solo en pantalla; el original sigue en la base.
+  const title = path.ai_title ?? path.title;
+  const summary = path.ai_summary ?? path.summary;
+  const isPersonalized = path.personalized_at !== null;
+  const [autoPersonalize, streakView, quizzesByCourse, originUsername] = await Promise.all([
+    shouldAutoPersonalize(supabase, {
+      pathId: path.id,
+      isPersonalized,
+      answers: path.assessments?.answers,
+    }),
+    loadStreak(supabase, user.userId),
+    loadActiveQuizzes(supabase, courseIds),
+    loadPathOrigin(supabase, path.id),
+  ]);
+  const originAuthor = authorHandle(originUsername);
+
+  const steps: PathStepView[] = stepRows.map((row) => ({
+    id: row.id,
+    stage: row.stage,
+    position: row.position,
+    origin: toStepOrigin(row.origin),
+    // La razón de la IA si existe; si no, la del motor.
+    reason: row.ai_reason ?? row.reason,
+    status: row.status,
+    discardReason: row.discard_reason,
+    courseTitle: row.courses.title,
+    courseHours: Number(row.courses.hours),
+    courseUrl: row.courses.url,
+    courseImageUrl: row.courses.image_url,
+    quiz: quizzesByCourse.get(row.courses.id) ?? null,
+    // null para un curso que entró por interés sin pertenecer a un programa de la ruta.
+    programSlug: row.programs?.slug ?? null,
+    programName: row.programs?.name ?? null,
+  }));
+
+  const budgetHours = path.budget_hours === null ? null : Number(path.budget_hours);
 
   return (
-    <div className="flex flex-1 flex-col items-center px-6 py-16">
-      <Card className="w-full max-w-xl">
-        <CardHeader>
-          <CardTitle>{path.title}</CardTitle>
-          {path.summary ? <CardDescription>{path.summary}</CardDescription> : null}
-        </CardHeader>
-        <CardContent>
-          <p className="flex items-center gap-2 text-sm text-muted-foreground">
-            <ListChecksIcon />
-            {activeSteps.length} pasos · {totalHours} h de {budgetHours} h
-          </p>
-          <ol className="list-decimal space-y-2 pl-5">
-            {activeSteps.map((step) => (
-              <li key={`${step.stage}-${step.position}-${step.courses.title}`}>
-                {step.courses.title}
-              </li>
-            ))}
-          </ol>
-        </CardContent>
-      </Card>
+    <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-6 px-4 py-10 sm:px-6">
+      <div>
+        <Button variant="ghost" size="sm" render={<Link href="/dashboard" />} nativeButton={false}>
+          <ArrowLeftIcon data-icon="inline-start" />
+          Volver al dashboard
+        </Button>
+      </div>
+
+      <header className="relative flex items-center gap-6 overflow-hidden rounded-3xl border brand-gradient-soft p-6 shadow-brand sm:p-8">
+        <div className="flex min-w-0 flex-1 flex-col gap-3">
+          <div className="flex flex-wrap items-center gap-2">
+            <Eyebrow className="flex items-center gap-2">
+              <PathIcon />
+              Tu ruta de aprendizaje
+            </Eyebrow>
+            {isPersonalized ? <AiBadge /> : null}
+          </div>
+          <h1 className="text-title text-balance">{title}</h1>
+          {originAuthor ? (
+            <p className="text-sm text-muted-foreground">Basada en la ruta de {originAuthor}</p>
+          ) : null}
+          {summary ? (
+            <p className="max-w-prose text-pretty text-muted-foreground">{summary}</p>
+          ) : null}
+          {autoPersonalize ? <AutoPersonalizer pathId={path.id} /> : null}
+          <div>
+            <SharePathDialog
+              pathId={path.id}
+              shareSlug={path.share_slug}
+              isPublic={path.is_public}
+            />
+          </div>
+        </div>
+        {/* Decorativa: el título de la ruta ya está al lado. */}
+        <Image
+          src="/astronauta.webp"
+          alt=""
+          width={144}
+          height={144}
+          className="hidden shrink-0 drop-shadow-xl sm:block"
+        />
+      </header>
+
+      {path.ai_adjustments ? <ProfileAdjustmentsNote adjustments={path.ai_adjustments} /> : null}
+
+      <StreakCard
+        streak={streakView.streak}
+        activityDates={streakView.activityDates}
+        today={streakView.today}
+      />
+
+      <PathStepsView
+        pathId={path.id}
+        steps={steps}
+        budgetHours={budgetHours}
+        initialView={initialView}
+      />
     </div>
   );
 }
