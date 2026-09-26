@@ -1,102 +1,307 @@
 "use server";
 
-import { createHash } from "node:crypto";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
-import { normalizeTimezone, validateAttemptInput } from "@/lib/quizzes/action-validation";
-import { generateQuiz } from "@/lib/quizzes/generate";
-import { createSupabaseQuizStore, getOrCreateQuiz, toSafeQuiz } from "@/lib/quizzes/repository";
-import type { QuizKind, SafeQuiz } from "@/lib/quizzes/schema";
-import { createAdminClient } from "@/lib/supabase/admin";
-import type { Json } from "@/lib/supabase/database.types";
+import type { ActionFailure, ActionResult, ActionResultWithData } from "@/lib/action-result";
+import { loadGamificationInput } from "@/lib/gamification/load-gamification";
+import { todayInTimeZone } from "@/lib/gamification/streak";
+import {
+  celebrateStepChange,
+  type CelebrationEvents,
+  type GamificationInput,
+} from "@/lib/gamification/summary";
+import { USER_DISCARD_REASON } from "@/lib/progress/path-progress";
+import { validateAttemptInput } from "@/lib/quizzes/action-validation";
 import { requireUser } from "@/lib/supabase/guards";
 import { createClient } from "@/lib/supabase/server";
 
-export type ActionResult<T> = { ok: true; data: T } | { ok: false; message: string };
-export type AttemptResult = {
-  attemptId: string; correctCount: number; scorePercentage: number; passed: boolean;
-  streakCurrent: number; streakBest: number; streakIncreased: boolean;
-  stepCompleted: boolean; nextStepId: string | null;
+// `discarded` no es un estado válido acá: se entra a él sólo por discardStep, que exige `pending`.
+const stepIdSchema = z.uuid();
+const selectableStatusSchema = z.enum(["pending", "in_progress", "done"]);
+// Postgres valida la zona y cae a UTC si no existe.
+const timeZoneSchema = z.string().min(1).max(64);
+
+const INVALID_INPUT: ActionFailure = { ok: false, message: "El paso no es válido." };
+const SAVE_FAILED: ActionFailure = {
+  ok: false,
+  message: "No se pudo guardar el cambio. Prueba de nuevo.",
 };
 
-const uuid = z.string().uuid();
-function isStoredQuestion(value: Json): value is { [key: string]: Json | undefined } & {
-  id: string; correctOption: number; explanation: string;
-} {
-  return typeof value === "object" && value !== null && !Array.isArray(value)
-    && typeof value.id === "string"
-    && typeof value.correctOption === "number"
-    && typeof value.explanation === "string";
+// Las tres actions son endpoints públicos: las reglas de transición viven en los filtros del
+// `update`, no en qué botones muestra la UI. RLS (`path_steps_owner_all`) ya descarta los pasos de
+// otro usuario, así que cero filas actualizadas cubre a la vez "ajeno", "inexistente" y
+// "transición no permitida".
+async function finishStepUpdate(
+  updatedRows: { path_id: string }[] | null,
+  hasError: boolean,
+  rejectionMessage: string,
+): Promise<ActionResult> {
+  if (hasError) {
+    return SAVE_FAILED;
+  }
+
+  const updatedRow = updatedRows?.[0];
+  if (!updatedRow) {
+    return { ok: false, message: rejectionMessage };
+  }
+
+  revalidatePath(`/paths/${updatedRow.path_id}`);
+  return { ok: true };
 }
 
-type TargetInput = { pathId: string; pathStepId: string; kind: QuizKind; chapterTitle: string | null };
+export type StepStatusResult = { ok: true; gamification?: CelebrationEvents } | ActionFailure;
 
-async function loadOwnedTarget(input: TargetInput, userId: string) {
+export async function setStepStatus(
+  stepId: unknown,
+  status: unknown,
+  timeZone: unknown,
+): Promise<StepStatusResult> {
+  const parsedId = stepIdSchema.safeParse(stepId);
+  const parsedStatus = selectableStatusSchema.safeParse(status);
+  const parsedTimeZone = timeZoneSchema.safeParse(timeZone);
+
+  if (!parsedId.success || !parsedStatus.success || !parsedTimeZone.success) {
+    return INVALID_INPUT;
+  }
+
+  await requireUser();
   const supabase = await createClient();
-  const { data: step } = await supabase.from("path_steps")
-    .select("id, path_id, course_id, origin, status, stage, position, courses(id, title, summary, topics, prerequisites, outcomes, chapters)")
-    .eq("id", input.pathStepId).eq("path_id", input.pathId).single();
-  const { data: path } = await supabase.from("learning_paths").select("id").eq("id", input.pathId).eq("user_id", userId).maybeSingle();
-  if (!step || !path || step.status === "discarded") throw new Error("NOT_FOUND");
-  return { supabase, step };
+
+  // ADR 0007: un curso con quiz activo se completa aprobándolo.
+  if (parsedStatus.data === "done") {
+    const hasActiveQuiz = await courseOfStepHasActiveQuiz(supabase, parsedId.data);
+    if (hasActiveQuiz === null) {
+      return SAVE_FAILED;
+    }
+
+    if (hasActiveQuiz) {
+      return { ok: false, message: "Este curso se completa aprobando su quiz." };
+    }
+  }
+
+  // Volver a "Pendiente" no suma racha ni se celebra.
+  const progressStatus = parsedStatus.data === "pending" ? null : parsedStatus.data;
+
+  // El "después" se arma en memoria a partir de este "antes".
+  const gamificationBefore = progressStatus
+    ? await loadGamificationBefore(supabase, todayInTimeZone(parsedTimeZone.data))
+    : null;
+
+  // completed_at sólo tiene valor mientras el paso está `done`, así que volver atrás lo limpia.
+  const completedAt = parsedStatus.data === "done" ? new Date().toISOString() : null;
+
+  const { data, error } = await supabase
+    .from("path_steps")
+    .update({ status: parsedStatus.data, completed_at: completedAt })
+    .eq("id", parsedId.data)
+    .neq("status", "discarded")
+    .select("path_id");
+
+  const result = await finishStepUpdate(data, Boolean(error), "Este paso no se puede cambiar.");
+  const updatedPathId = data?.[0]?.path_id;
+
+  if (!result.ok || !progressStatus || !updatedPathId) {
+    return result;
+  }
+
+  const recordedActivityDay = await recordStreakDay(supabase, parsedId.data, parsedTimeZone.data);
+
+  if (!gamificationBefore) {
+    return result;
+  }
+
+  const gamification = celebrateStepChange(gamificationBefore, {
+    pathId: updatedPathId,
+    stepId: parsedId.data,
+    status: progressStatus,
+    recordedActivityDay,
+  });
+
+  return { ok: true, gamification };
 }
 
-export async function requestQuiz(input: TargetInput): Promise<ActionResult<SafeQuiz>> {
+// null si no se pudo leer. is_active porque la RLS le muestra los desactivados al admin.
+async function courseOfStepHasActiveQuiz(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  stepId: string,
+): Promise<boolean | null> {
+  const { data: step, error: stepError } = await supabase
+    .from("path_steps")
+    .select("course_id")
+    .eq("id", stepId)
+    .maybeSingle();
+
+  if (stepError) {
+    console.error(`[quiz] courseOfStepHasActiveQuiz: ${stepError.message}`);
+    return null;
+  }
+
+  if (!step) {
+    return false;
+  }
+
+  const { count, error: quizError } = await supabase
+    .from("quizzes")
+    .select("id", { count: "exact", head: true })
+    .eq("course_id", step.course_id)
+    .eq("is_active", true);
+
+  if (quizError) {
+    console.error(`[quiz] courseOfStepHasActiveQuiz: ${quizError.message}`);
+    return null;
+  }
+
+  return (count ?? 0) > 0;
+}
+
+// Si la racha falla, el paso igual queda guardado. Devuelve si hoy quedó registrado.
+async function recordStreakDay(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  stepId: string,
+  timeZone: string,
+): Promise<boolean> {
+  const { error } = await supabase.rpc("record_step_activity", {
+    p_step_id: stepId,
+    p_time_zone: timeZone,
+  });
+
+  if (error) {
+    console.error(`[streak] record_step_activity: ${error.message}`);
+    return false;
+  }
+
+  return true;
+}
+
+// La gamificación nunca rompe el cambio: sin el "antes", solo no hay celebración.
+async function loadGamificationBefore(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  today: string,
+): Promise<GamificationInput | null> {
   try {
-    const user = await requireUser();
-    const { supabase, step } = await loadOwnedTarget(input, user.userId);
-    const course = step.courses;
-    if (input.kind === "course" && step.origin !== "opcional" && step.status === "pending") {
-      const { data: prior } = await supabase.from("path_steps").select("id").eq("path_id", input.pathId)
-        .not("status", "in", '("done","discarded")').or(`stage.lt.${step.stage},and(stage.eq.${step.stage},position.lt.${step.position})`).limit(1);
-      if (prior?.length) return { ok: false, message: "Completá el paso anterior para continuar." };
-      await supabase.from("path_steps").update({ status: "in_progress" }).eq("id", step.id);
-    }
-    const targetKey = input.kind === "course" ? `course:${course.id}` :
-      `chapter:${course.id}:${createHash("sha256").update(input.chapterTitle ?? "").digest("hex")}`;
-    const admin = createAdminClient();
-    const model = process.env.OPENROUTER_MODEL ?? "google/gemma-4-26b-a4b-it:free";
-    const record = await getOrCreateQuiz({ targetKey, title: input.chapterTitle ?? course.title, kind: input.kind }, {
-      store: createSupabaseQuizStore(admin, { courseId: course.id, chapterTitle: input.chapterTitle, model }),
-      generate: () => generateQuiz({ kind: input.kind, chapterTitle: input.chapterTitle, course }),
-    });
-    return { ok: true, data: toSafeQuiz(record) };
+    return await loadGamificationInput(supabase, today);
   } catch (error) {
-    console.error("No se pudo preparar el quiz:", error instanceof Error ? error.message : "Error desconocido");
-    return { ok: false, message: "No pudimos preparar el quiz. Intentá de nuevo." };
+    const message = error instanceof Error ? error.message : String(error);
+    console.error(`[gamification] loadGamificationInput: ${message}`);
+    return null;
   }
 }
 
-export async function checkQuizAnswer(input: { quizId: string; questionId: string; selectedOption: number }): Promise<ActionResult<{ correct: boolean; explanation: string }>> {
-  const user = await requireUser();
-  if (!uuid.safeParse(input.quizId).success || !Number.isInteger(input.selectedOption) || input.selectedOption < 0 || input.selectedOption > 3) return { ok: false, message: "La respuesta no es válida." };
-  const admin = createAdminClient();
-  const { data: quiz } = await admin.from("quizzes").select("course_id, questions").eq("id", input.quizId).eq("status", "ready").single();
-  const supabase = await createClient();
-  const { data: owned } = quiz ? await supabase.from("path_steps").select("id, learning_paths!inner(user_id)").eq("course_id", quiz.course_id).eq("learning_paths.user_id", user.userId).limit(1) : { data: null };
-  if (!quiz || !owned?.length || !Array.isArray(quiz.questions)) return { ok: false, message: "Quiz no disponible." };
-  const question = (quiz.questions as Json[]).find((item) => isStoredQuestion(item) && item.id === input.questionId);
-  if (!question || !isStoredQuestion(question)) return { ok: false, message: "Pregunta no disponible." };
-  return { ok: true, data: { correct: question.correctOption === input.selectedOption, explanation: question.explanation } };
-}
+export async function discardStep(stepId: unknown): Promise<ActionResult> {
+  const parsedId = stepIdSchema.safeParse(stepId);
 
-export async function submitQuizAttempt(input: unknown): Promise<ActionResult<AttemptResult>> {
+  if (!parsedId.success) {
+    return INVALID_INPUT;
+  }
+
   await requireUser();
-  const parsed = validateAttemptInput(input);
-  if (!parsed.success) return { ok: false, message: "Las respuestas no son válidas." };
   const supabase = await createClient();
-  const { data, error } = await supabase.rpc("submit_quiz_attempt", {
-    p_quiz_id: parsed.data.quizId, p_path_id: parsed.data.pathId, p_path_step_id: parsed.data.pathStepId,
-    p_answers: parsed.data.answers, p_timezone: normalizeTimezone(parsed.data.timezone), p_idempotency_key: parsed.data.idempotencyKey,
-  });
-  if (error || !data) return { ok: false, message: "No pudimos guardar el intento." };
-  revalidatePath(`/paths/${parsed.data.pathId}`);
-  return { ok: true, data: data as unknown as AttemptResult };
+
+  const { data, error } = await supabase
+    .from("path_steps")
+    .update({ status: "discarded", discard_reason: USER_DISCARD_REASON, completed_at: null })
+    .eq("id", parsedId.data)
+    .eq("status", "pending")
+    .select("path_id");
+
+  return finishStepUpdate(data, Boolean(error), "Solo puedes quitar pasos pendientes.");
 }
 
-export async function updateTimezone(timezone: string): Promise<ActionResult<null>> {
-  const user = await requireUser();
-  const { error } = await createAdminClient().from("profiles").update({ timezone: normalizeTimezone(timezone) }).eq("id", user.userId);
-  return error ? { ok: false, message: "No pudimos guardar tu zona horaria." } : { ok: true, data: null };
+export async function restoreStep(stepId: unknown): Promise<ActionResult> {
+  const parsedId = stepIdSchema.safeParse(stepId);
+
+  if (!parsedId.success) {
+    return INVALID_INPUT;
+  }
+
+  await requireUser();
+  const supabase = await createClient();
+
+  // Filtrar por USER_DISCARD_REASON es lo que impide restaurar un descarte del motor ("ya lo
+  // dominas", "no cabía en tu tiempo"...): devolverlos rompería el presupuesto de horas.
+  const { data, error } = await supabase
+    .from("path_steps")
+    .update({ status: "pending", discard_reason: null })
+    .eq("id", parsedId.data)
+    .eq("status", "discarded")
+    .eq("discard_reason", USER_DISCARD_REASON)
+    .select("path_id");
+
+  return finishStepUpdate(data, Boolean(error), "Solo puedes restaurar los pasos que quitaste tú.");
+}
+
+const questionResultSchema = z.object({
+  questionId: z.string(),
+  selectedOption: z.number(),
+  correctOption: z.number(),
+  correct: z.boolean(),
+  explanation: z.string(),
+});
+
+// El RPC devuelve `Json` sin tipo: se valida en vez de castear.
+const attemptResultSchema = z.object({
+  attemptId: z.uuid(),
+  correctCount: z.number(),
+  scorePercentage: z.number(),
+  passed: z.boolean(),
+  streakIncreased: z.boolean(),
+  stepCompleted: z.boolean(),
+  results: z.array(questionResultSchema),
+});
+
+export type QuizQuestionResult = z.infer<typeof questionResultSchema>;
+// Opcional para no tocar los fixtures de quiz-dialog.test.tsx.
+export type AttemptResult = z.infer<typeof attemptResultSchema> & {
+  gamification?: CelebrationEvents;
+};
+
+// Vuelve a corregir en Postgres (el diálogo ya mostró el feedback con las respuestas del quiz),
+// guarda el intento y, si aprobó, suma la racha y marca el paso como hecho.
+export async function submitQuizAttempt(
+  input: unknown,
+): Promise<ActionResultWithData<AttemptResult>> {
+  const parsed = validateAttemptInput(input);
+  if (!parsed.success) {
+    return { ok: false, message: "Las respuestas no son válidas." };
+  }
+
+  await requireUser();
+  const supabase = await createClient();
+
+  const gamificationBefore = await loadGamificationBefore(
+    supabase,
+    todayInTimeZone(parsed.data.timezone),
+  );
+
+  const { data, error } = await supabase.rpc("submit_quiz_attempt", {
+    p_quiz_id: parsed.data.quizId,
+    p_path_id: parsed.data.pathId,
+    p_path_step_id: parsed.data.pathStepId,
+    p_answers: parsed.data.answers,
+    p_timezone: parsed.data.timezone,
+    p_idempotency_key: parsed.data.idempotencyKey,
+  });
+
+  const attempt = attemptResultSchema.safeParse(data);
+  if (error || !attempt.success) {
+    console.error(`[quiz] submit_quiz_attempt: ${error?.message ?? "respuesta inválida"}`);
+    return { ok: false, message: "No pudimos guardar tu intento. Prueba de nuevo." };
+  }
+
+  revalidatePath(`/paths/${parsed.data.pathId}`);
+
+  if (!attempt.data.passed || !gamificationBefore) {
+    return { ok: true, data: attempt.data };
+  }
+
+  // El RPC ya marcó el paso y registró el día.
+  const gamification = celebrateStepChange(gamificationBefore, {
+    pathId: parsed.data.pathId,
+    stepId: parsed.data.pathStepId,
+    status: "done",
+    recordedActivityDay: true,
+  });
+
+  return { ok: true, data: { ...attempt.data, gamification } };
 }

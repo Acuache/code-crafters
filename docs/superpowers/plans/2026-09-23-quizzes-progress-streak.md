@@ -1,5 +1,7 @@
 # Quizzes, Progress, and Streak Implementation Plan
 
+> **Nota (2026-09-24):** este diseño se integró con cambios en la pantalla (quizzes dentro del mapa del spec 12), el proveedor de IA (OpenAI en vez de OpenRouter) y la racha (derivada al leer, también suma al avanzar pasos). Ver `docs/decisiones/0005-quizzes-y-racha-unificados.md`.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Construir la vista persistente de una ruta, quizzes compartidos por curso/capítulo e intentos privados que actualicen progreso y racha de forma atómica.

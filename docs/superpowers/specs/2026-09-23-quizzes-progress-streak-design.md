@@ -1,5 +1,7 @@
 # Quizzes, progreso y racha persistentes
 
+> **Nota (2026-09-24):** este diseño se integró con cambios en la pantalla (quizzes dentro del mapa del spec 12), el proveedor de IA (OpenAI en vez de OpenRouter) y la racha (derivada al leer, también suma al avanzar pasos). Ver `docs/decisiones/0005-quizzes-y-racha-unificados.md`.
+
 **Fecha:** 2026-09-23
 
 **Estado:** Implementado

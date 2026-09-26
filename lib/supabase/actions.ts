@@ -3,6 +3,7 @@
 import { headers } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { parseNextPath } from "@/lib/supabase/next-path";
 import { createClient } from "@/lib/supabase/server";
 
 export type OAuthProvider = "discord" | "google" | "github";
@@ -30,24 +31,27 @@ async function getOrigin(): Promise<string> {
   return "http://localhost:3000";
 }
 
-// `formData` no se usa, pero el parámetro es obligatorio: el proveedor viene
-// pre-atado con .bind() y <form action> siempre pasa el FormData como último argumento.
+// `next` viaja en el redirectTo para que /auth/callback sepa a dónde volver (spec 15). Se valida
+// otra vez acá: el argumento llega desde el formulario.
 export async function signInWithProvider(
   provider: OAuthProvider,
-  formData: FormData
+  nextPath: string | null,
 ): Promise<void> {
   const supabase = await createClient();
   const origin = await getOrigin();
+  const safeNextPath = parseNextPath(nextPath);
+  const nextQuery = safeNextPath ? `?next=${encodeURIComponent(safeNextPath)}` : "";
 
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider,
     options: {
-      redirectTo: `${origin}/auth/callback`,
+      redirectTo: `${origin}/auth/callback${nextQuery}`,
     },
   });
 
   if (error || !data.url) {
-    redirect("/login?error=oauth_init_failed");
+    const retryNextQuery = safeNextPath ? `&next=${encodeURIComponent(safeNextPath)}` : "";
+    redirect(`/login?error=oauth_init_failed${retryNextQuery}`);
   }
 
   redirect(data.url);

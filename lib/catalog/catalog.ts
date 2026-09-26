@@ -1,45 +1,41 @@
-// Acceso a datos del catálogo (SPEC 07): dos queries a Supabase (cursos activos; program_courses
-// con el slug del programa y del curso embebidos) más las funciones puras que traducen esas filas
-// al contrato del motor de reglas (CatalogCourse[] / ProgramInput[], spec 04) y a los mapas
-// slug → id que generatePath() necesita para insertar path_steps. Vive en lib/, no en
-// app/(app)/paths/: es acceso a datos reutilizable, del mismo tipo que lib/supabase/* — no
-// propiedad del motor puro (lib/paths/*, spec 04), que no hace ningún I/O.
+// Carga el catálogo desde Supabase y lo traduce al contrato del motor de reglas (lib/paths), que es
+// puro y no hace I/O. También arma los mapas slug → id que generatePath() necesita para insertar.
 
 import type { SupabaseClient } from "@supabase/supabase-js";
+
+import { PROGRAM_LEVEL_ORDER } from "@/lib/paths/levels";
+import type {
+  CatalogCourse,
+  ProgramInput,
+  ProgramLevel,
+  ProgramStepInput,
+} from "@/lib/paths/types";
 import type { Database } from "@/lib/supabase/database.types";
-import type { CatalogCourse, ProgramInput, ProgramStepInput } from "@/lib/paths/types";
 
 type Supabase = SupabaseClient<Database>;
 
-type ProgramCourseLevel = "requerido" | "recomendado" | "opcional";
-
-// Una fila por curso activo — de acá salen CatalogCourse[] y el mapa slug → id de cursos.
 type CourseRow = {
   id: number;
   slug: string;
-  hours: number; // numeric(5,1) en Postgres; PostgREST puede devolverlo como string, se normaliza con Number()
+  hours: number;
   difficulty: "principiante" | "intermedio" | "avanzado";
   outcome: string;
 };
 
-// Una fila por cada program_courses, ya aplanada — la forma que produce flattenProgramCourseRows a
-// partir de la respuesta cruda de Supabase (RawProgramCourseRow, abajo).
 export type ProgramCourseRow = {
   programSlug: string;
   stage: number;
-  level: ProgramCourseLevel;
+  level: ProgramLevel;
   position: number;
   note: string | null;
   courseSlug: string;
 };
 
-// Forma cruda que devuelve PostgREST: `programs`/`courses` llegan anidados (así es como Supabase
-// embebe relaciones). `programs` trae también `id` — ProgramCourseRow no lo declara porque
-// groupProgramCourseRows no lo necesita, pero buildProgramIdMap sí, y lo lee de esta forma cruda
-// (antes de aplanar) en vez de ensanchar el tipo público sólo para ese mapa aparte.
+// Como llega de PostgREST, con las relaciones anidadas. buildProgramIdMap lee `programs.id` de acá
+// para no ensanchar ProgramCourseRow solo por ese mapa.
 type RawProgramCourseRow = {
   stage: number;
-  level: ProgramCourseLevel;
+  level: ProgramLevel;
   position: number;
   note: string | null;
   programs: { id: number; slug: string };
@@ -85,6 +81,7 @@ function flattenProgramCourseRows(rows: RawProgramCourseRow[]): ProgramCourseRow
 function mapCourseRowsToCatalog(rows: CourseRow[]): CatalogCourse[] {
   return rows.map((row) => ({
     slug: row.slug,
+    // numeric(5,1): Number() asegura que las horas se sumen y no se concatenen.
     hours: Number(row.hours),
     difficulty: row.difficulty,
     outcome: row.outcome,
@@ -107,23 +104,10 @@ function buildProgramIdMap(rows: RawProgramCourseRow[]): Record<string, number> 
   return programIds;
 }
 
-const LEVEL_RANK: Record<ProgramCourseLevel, number> = {
-  requerido: 0,
-  recomendado: 1,
-  opcional: 2,
-};
-
-// Agrupa por programSlug y, dentro de cada programa, por (stage, level) — la clave que garantiza
-// unique (program_id, stage, level, position) del spec 02. Verificado contra la base real (select
-// program_id, stage, level, count(*) from program_courses group by 1,2,3 having count(*) > 1): da
-// exactamente 7 grupos, con posiciones consecutivas 1..N en cada uno — los mismos 7 pasos con
-// alternativas que documentó el spec 04, ninguno es un choque entre dos pasos distintos. Las filas
-// de un mismo grupo se ordenan por `position` para convertirse en `courseSlugs`. Los pasos
-// resultantes se ordenan por `stage` asc y, dentro del mismo `stage`, por LEVEL_RANK — necesario
-// porque `stage` se repite dentro de una misma ruta en 10 de las 15 rutas, y sin un segundo
-// criterio el orden dependería del orden de llegada de la query. Los programas del resultado se
-// ordenan por `slug` para que el resultado no dependa tampoco del orden en que aparecieron las
-// filas de programas distintos.
+// Un paso del programa es un grupo (stage, level): sus filas son alternativas, ordenadas por
+// `position`. Los pasos se ordenan por stage y después por nivel, porque un mismo stage puede tener
+// cursos de varios niveles; y los programas por slug, para que el resultado no dependa del orden en
+// que llegan las filas.
 export function groupProgramCourseRows(rows: ProgramCourseRow[]): ProgramInput[] {
   const rowsByProgram = new Map<string, Map<string, ProgramCourseRow[]>>();
 
@@ -162,7 +146,7 @@ export function groupProgramCourseRows(rows: ProgramCourseRow[]): ProgramInput[]
       if (a.stage !== b.stage) {
         return a.stage - b.stage;
       }
-      return LEVEL_RANK[a.level] - LEVEL_RANK[b.level];
+      return PROGRAM_LEVEL_ORDER[a.level] - PROGRAM_LEVEL_ORDER[b.level];
     });
 
     programs.push({ slug: programSlug, steps });
@@ -180,9 +164,6 @@ export type LoadedCatalog = {
   programIds: Record<string, number>;
 };
 
-// Punto de entrada que usa generatePath() (spec 07): las dos queries en paralelo, traducidas al
-// contrato del motor de reglas más los dos mapas slug → id que hacen falta para insertar
-// path_steps.
 export async function loadCatalog(supabase: Supabase): Promise<LoadedCatalog> {
   const [courseRows, rawProgramCourseRows] = await Promise.all([
     fetchActiveCourses(supabase),

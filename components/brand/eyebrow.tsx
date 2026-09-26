@@ -1,12 +1,8 @@
-import * as React from "react"
+import * as React from "react";
 
-import { cn } from "@/lib/utils"
+import { cn } from "@/lib/utils";
 
-/**
- * La etiqueta pequeña en mayúsculas que DevTalles usa arriba de cada
- * título de sección. Encapsula la combinación text-eyebrow + tracking +
- * uppercase para no repetirla en cada pantalla.
- */
+// La etiqueta pequeña en mayúsculas que DevTalles pone arriba de cada título de sección.
 function Eyebrow({ className, ...props }: React.ComponentProps<"p">) {
   return (
     <p
@@ -14,7 +10,7 @@ function Eyebrow({ className, ...props }: React.ComponentProps<"p">) {
       className={cn("text-eyebrow text-primary-bright uppercase", className)}
       {...props}
     />
-  )
+  );
 }
 
-export { Eyebrow }
+export { Eyebrow };

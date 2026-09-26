@@ -1,133 +1,224 @@
-"use client";
+// Sin "use client" a propósito, mismo criterio que step-status-toggle.tsx: recibe callbacks y solo
+// se importa desde path-steps-view.tsx, que ya es cliente.
+import { useState } from "react";
 
-import { useEffect, useRef, useState } from "react";
-import type { ActionResult, AttemptResult } from "@/app/(app)/paths/[id]/actions";
+import type { AttemptResult } from "@/app/(app)/paths/[id]/actions";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Progress } from "@/components/ui/progress";
 import { Spinner } from "@/components/ui/spinner";
-import type { QuizKind, SafeQuiz } from "@/lib/quizzes/schema";
+import type { ActionResultWithData } from "@/lib/action-result";
+import { browserTimeZone } from "@/lib/gamification/streak";
+import type { CourseQuiz } from "@/lib/quizzes/schema";
+
 import { QuizQuestion } from "./quiz-question";
 import { QuizResult } from "./quiz-result";
 
-export type QuizTarget = { pathId: string; pathStepId: string; kind: QuizKind; chapterTitle: string | null };
-type CheckResult = { correct: boolean; explanation: string };
-type RequestQuiz = (target: QuizTarget) => Promise<ActionResult<SafeQuiz>>;
-type CheckAnswer = (input: { quizId: string; questionId: string; selectedOption: number }) => Promise<ActionResult<CheckResult>>;
-type SubmitAttempt = (input: unknown) => Promise<ActionResult<AttemptResult>>;
+// El quiz llega ya cargado con la página: abrirlo no espera a nadie.
+export type QuizSession = {
+  quiz: CourseQuiz;
+  courseTitle: string;
+  pathId: string;
+  pathStepId: string;
+};
 
-export function QuizDialog({ open, target, onClose, onCompleted, requestQuizAction, checkAnswerAction, submitAttemptAction }: {
-  open: boolean;
-  target: QuizTarget | null;
-  onClose(): void;
-  onCompleted(): void;
-  requestQuizAction: RequestQuiz;
-  checkAnswerAction: CheckAnswer;
-  submitAttemptAction: SubmitAttempt;
-}) {
-  const [state, setState] = useState<"loading" | "answering" | "submitting" | "result" | "error">("loading");
-  const [quiz, setQuiz] = useState<SafeQuiz | null>(null);
-  const [index, setIndex] = useState(0);
-  const [answers, setAnswers] = useState<Array<number | undefined>>([]);
-  const [feedback, setFeedback] = useState<Array<CheckResult | undefined>>([]);
+type SubmitAttemptAction = (input: unknown) => Promise<ActionResultWithData<AttemptResult>>;
+
+type QuizDialogProps = {
+  // null = cerrado. El padre le pone una `key` nueva en cada apertura, así cada intento arranca
+  // limpio sin reiniciar el estado desde un efecto.
+  session: QuizSession | null;
+  onClose: () => void;
+  // Se llama después de guardar un intento, para que la ruta refleje el paso hecho y la racha.
+  onAttemptSaved: (result: AttemptResult) => void;
+  // La action se inyecta para poder probar el diálogo sin servidor.
+  submitAttemptAction: SubmitAttemptAction;
+};
+
+type Phase = "answering" | "submitting" | "result" | "error";
+
+// Una action rechaza (en vez de devolver ok: false) cuando se corta la conexión.
+const CONNECTION_ERROR = "Se perdió la conexión. Revisa tu internet e intenta de nuevo.";
+
+function describeQuiz(quiz: CourseQuiz): string {
+  const questionCount = quiz.questions.length;
+  const questionsLabel = questionCount === 1 ? "pregunta" : "preguntas";
+  return `${questionCount} ${questionsLabel} · apruebas con ${quiz.passPercentage} %`;
+}
+
+function emptyAnswers(session: QuizSession | null): (number | undefined)[] {
+  const questionCount = session?.quiz.questions.length ?? 0;
+  return Array.from({ length: questionCount }, () => undefined);
+}
+
+export function QuizDialog({
+  session,
+  onClose,
+  onAttemptSaved,
+  submitAttemptAction,
+}: QuizDialogProps) {
+  // La sesión con la que se abrió: sigue visible mientras el diálogo se anima al cerrarse, cuando
+  // el padre ya pasó `null`.
+  const [openedSession] = useState(session);
+  const [phase, setPhase] = useState<Phase>("answering");
+  const [questionIndex, setQuestionIndex] = useState(0);
+  const [answers, setAnswers] = useState(() => emptyAnswers(session));
   const [result, setResult] = useState<AttemptResult | null>(null);
-  const [message, setMessage] = useState("");
-  const idempotencyKey = useRef(crypto.randomUUID());
+  const [errorMessage, setErrorMessage] = useState("");
+  // Una clave por intento: si el envío se repite (doble click, reintento tras un corte), Postgres
+  // devuelve el mismo resultado en vez de guardar dos intentos.
+  const [idempotencyKey, setIdempotencyKey] = useState(() => crypto.randomUUID());
 
-  const applyQuizResponse = (response: Awaited<ReturnType<RequestQuiz>>) => {
-    if (!response.ok) {
-      setMessage(response.message);
-      setState("error");
+  function handleOpenChange(nextOpen: boolean) {
+    if (!nextOpen) {
+      onClose();
+    }
+  }
+
+  function selectOption(optionIndex: number) {
+    // Una vez elegida, la respuesta queda fija.
+    if (answers[questionIndex] !== undefined) {
       return;
     }
-    setQuiz(response.data);
-    setAnswers(Array(response.data.questions.length).fill(undefined));
-    setFeedback(Array(response.data.questions.length).fill(undefined));
-    setIndex(0);
-    idempotencyKey.current = crypto.randomUUID();
-    setState("answering");
-  };
 
-  const load = async () => {
-    if (!target) return;
-    setState("loading");
-    setMessage("");
-    applyQuizResponse(await requestQuizAction(target));
-  };
+    setAnswers((current) =>
+      current.map((answer, index) => (index === questionIndex ? optionIndex : answer)),
+    );
+  }
 
-  useEffect(() => {
-    if (!open || !target) return;
-    let active = true;
-    void requestQuizAction(target).then((response) => {
-      if (active) applyQuizResponse(response);
-    });
-    return () => { active = false; };
-  }, [open, requestQuizAction, target]);
+  function showError(message: string) {
+    setErrorMessage(message);
+    setPhase("error");
+  }
 
-  const check = async () => {
-    if (!quiz || answers[index] === undefined) return;
-    const response = await checkAnswerAction({ quizId: quiz.id, questionId: quiz.questions[index].id, selectedOption: answers[index] });
-    if (!response.ok) {
-      setMessage(response.message);
-      setState("error");
+  async function submitAttempt() {
+    if (!openedSession) {
       return;
     }
-    setFeedback((current) => current.map((item, itemIndex) => itemIndex === index ? response.data : item));
-  };
 
-  const submit = async () => {
-    if (!quiz || !target || answers.some((answer) => answer === undefined)) return;
-    setState("submitting");
-    const response = await submitAttemptAction({
-      quizId: quiz.id,
-      pathId: target.pathId,
-      pathStepId: target.pathStepId,
-      answers: answers as number[],
-      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC",
-      idempotencyKey: idempotencyKey.current,
-    });
-    if (!response.ok) {
-      setMessage(response.message);
-      setState("error");
+    const completeAnswers = answers.filter((answer) => answer !== undefined);
+    if (completeAnswers.length !== openedSession.quiz.questions.length) {
       return;
     }
+
+    setPhase("submitting");
+    let response: ActionResultWithData<AttemptResult>;
+    try {
+      // Reintentar tras un corte reusa la misma clave: si el intento sí se guardó, vuelve ese.
+      response = await submitAttemptAction({
+        quizId: openedSession.quiz.id,
+        pathId: openedSession.pathId,
+        pathStepId: openedSession.pathStepId,
+        answers: completeAnswers,
+        timezone: browserTimeZone(),
+        idempotencyKey,
+      });
+    } catch {
+      showError(CONNECTION_ERROR);
+      return;
+    }
+
+    if (!response.ok) {
+      showError(response.message);
+      return;
+    }
+
     setResult(response.data);
-    setState("result");
-    onCompleted();
-  };
+    setPhase("result");
+    onAttemptSaved(response.data);
+  }
 
-  const retryQuiz = () => {
-    idempotencyKey.current = crypto.randomUUID();
-    setAnswers(Array(quiz?.questions.length ?? 0).fill(undefined));
-    setFeedback(Array(quiz?.questions.length ?? 0).fill(undefined));
-    setIndex(0);
+  function startNewAttempt() {
+    setIdempotencyKey(crypto.randomUUID());
+    setAnswers(emptyAnswers(openedSession));
+    setQuestionIndex(0);
     setResult(null);
-    setState("answering");
-  };
+    setPhase("answering");
+  }
 
-  const currentQuestion = quiz?.questions[index];
-  const currentFeedback = feedback[index];
-  const atLast = Boolean(quiz && index === quiz.questions.length - 1);
+  if (!openedSession) {
+    return null;
+  }
+
+  const { quiz, courseTitle } = openedSession;
+  const questionCount = quiz.questions.length;
+  const currentQuestion = quiz.questions[questionIndex];
+  const isLastQuestion = questionIndex === questionCount - 1;
+  const hasCurrentAnswer = answers[questionIndex] !== undefined;
+  const progressPercent = Math.round(((questionIndex + 1) / questionCount) * 100);
 
   return (
-    <Dialog open={open} onOpenChange={(nextOpen) => { if (!nextOpen) onClose(); }}>
-      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-2xl">
+    <Dialog open={session !== null} onOpenChange={handleOpenChange}>
+      <DialogContent className="max-h-[90dvh] overflow-y-auto sm:max-w-xl">
         <DialogHeader>
-          <DialogTitle>{quiz?.title ?? "Quiz"}</DialogTitle>
-          <DialogDescription>{quiz ? `${quiz.questions.length} preguntas ${quiz.kind === "chapter" ? "de práctica" : "del curso"}` : "Poné a prueba lo aprendido"}</DialogDescription>
+          <DialogTitle className="text-xl font-semibold text-pretty">
+            Quiz: {courseTitle}
+          </DialogTitle>
+          <DialogDescription>{describeQuiz(quiz)}</DialogDescription>
         </DialogHeader>
-        {state === "loading" ? <p className="flex items-center gap-2"><Spinner /> Preparando tu quiz…</p> : null}
-        {state === "error" ? <div className="space-y-3"><p role="alert">{message}</p><Button onClick={() => { if (quiz) setState("answering"); else void load(); }}>Intentar de nuevo</Button></div> : null}
-        {state === "answering" && quiz && currentQuestion ? (
+
+        {phase === "answering" && currentQuestion ? (
           <>
-            <p className="text-sm text-muted-foreground">Pregunta {index + 1} de {quiz.questions.length}</p>
-            <QuizQuestion question={currentQuestion} selected={answers[index]} feedback={currentFeedback} onSelect={(answer) => setAnswers((current) => current.map((item, itemIndex) => itemIndex === index ? answer : item))} />
+            <Progress
+              value={progressPercent}
+              aria-label={`Pregunta ${questionIndex + 1} de ${questionCount}`}
+            />
+            <QuizQuestion
+              // Cada pregunta monta su propio grupo de opciones: el foco no arrastra a la siguiente.
+              key={currentQuestion.id}
+              question={currentQuestion}
+              selectedOption={answers[questionIndex]}
+              onSelect={selectOption}
+            />
             <DialogFooter>
-              {!currentFeedback ? <Button disabled={answers[index] === undefined} onClick={() => void check()}>Comprobar</Button> : atLast ? <Button onClick={() => void submit()}>Ver resultado</Button> : <Button onClick={() => setIndex((current) => current + 1)}>Siguiente</Button>}
+              {isLastQuestion ? (
+                <Button variant="brand" disabled={!hasCurrentAnswer} onClick={submitAttempt}>
+                  Entregar
+                </Button>
+              ) : (
+                <Button
+                  disabled={!hasCurrentAnswer}
+                  onClick={() => setQuestionIndex(questionIndex + 1)}
+                >
+                  Siguiente
+                </Button>
+              )}
             </DialogFooter>
           </>
         ) : null}
-        {state === "submitting" ? <p className="flex items-center gap-2"><Spinner /> Guardando tu resultado…</p> : null}
-        {state === "result" && result && quiz ? <QuizResult kind={quiz.kind} onClose={onClose} onRetry={retryQuiz} result={result} /> : null}
+
+        {phase === "submitting" ? (
+          <p className="flex items-center gap-2 text-muted-foreground">
+            <Spinner /> Guardando tu intento…
+          </p>
+        ) : null}
+
+        {phase === "error" ? (
+          <div className="flex flex-col items-start gap-3">
+            <p role="alert">{errorMessage}</p>
+            {/* Vuelve a la última pregunta con sus respuestas: "Entregar" reusa la misma clave. */}
+            <Button variant="outline" onClick={() => setPhase("answering")}>
+              Intentar de nuevo
+            </Button>
+          </div>
+        ) : null}
+
+        {phase === "result" && result ? (
+          <QuizResult
+            questions={quiz.questions}
+            passPercentage={quiz.passPercentage}
+            result={result}
+            onRetry={startNewAttempt}
+            onClose={onClose}
+          />
+        ) : null}
       </DialogContent>
     </Dialog>
   );

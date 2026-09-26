@@ -54,7 +54,7 @@ abajo — ver Decisiones y los criterios de aceptación correspondientes.
   `program_courses` y el `slug` del curso embebido) más las funciones puras que las traducen a
   `CatalogCourse[]` / `ProgramInput[]` (el contrato del spec 04) y a los mapas `slug → id` de cursos y
   programas que hacen falta para insertar `path_steps`. Vive en `lib/catalog/`, no en
-  `app/(app)/paths/`: es acceso a datos reutilizable (el spec 11 y el 15 van a volver a invocar
+  `app/(app)/paths/`: es acceso a datos reutilizable (el spec 11 y el 16 van a volver a invocar
   `buildPath()` con las mismas fuentes), del mismo tipo que `lib/supabase/*` — no una pieza privada de
   una sola ruta. No es propiedad de `lib/paths/*` (spec 04): esa carpeta es el motor puro, sin I/O.
 - `lib/catalog/catalog.test.ts`: un caso sobre `groupProgramCourseRows` — que el resultado no depende
@@ -91,8 +91,8 @@ abajo — ver Decisiones y los criterios de aceptación correspondientes.
   02/11/13/14; este spec sólo lee y escribe en tablas que el 02 ya dejó listas.
 - Tocar `lib/paths/*`: es propiedad del spec 04. Este spec lo invoca con los parámetros que arma, no
   le cambia ninguna regla.
-- El mapa visual (spec 12), gamificación (13), compartir (14), las razones/título escritos por IA
-  (spec 11) y "Ajustar mi ruta" (15): todos reusan lo que este spec deja, ninguno lo modifica.
+- El mapa visual (spec 12), gamificación (14), compartir (15), las razones/título escritos por IA
+  (spec 11) y "Ajustar mi ruta" (16): todos reusan lo que este spec deja, ninguno lo modifica.
 - Volver a validar los seis pasos del cuestionario: la action sólo revalida el jsonb ya guardado
   (`answers`), no vuelve a pedirle nada al usuario ni reabre el formulario.
 - Un historial de generaciones, un límite de reintentos, o deduplicar assessments ya usados: cada
@@ -345,7 +345,7 @@ para el "X h de Y h", y el spec 08 lo reusa para mostrar `fitsInBudget`.
   de todos modos necesita `course_id`/`program_id` de Supabase para el insert de `path_steps`.
 - **Sí:** `lib/catalog/catalog.ts`, no `app/(app)/paths/catalog.ts`. **No:** meter las queries dentro
   del route group para esquivar que `lib/paths/*` es del spec 04. Es acceso a datos reutilizable —
-  mismo tipo de módulo que `lib/supabase/*` — y los specs 11 y 15 (que también invocan `buildPath()`
+  mismo tipo de módulo que `lib/supabase/*` — y los specs 11 y 16 (que también invocan `buildPath()`
   sobre una ruta ya guardada o para generar una nueva) lo van a necesitar sin tener que importar desde
   dentro de una ruta ajena.
 - **Sí:** agrupar `program_courses` por `(stage, level)`, no por `stage` solo. **No:** asumir `stage`
@@ -445,8 +445,8 @@ para el "X h de Y h", y el spec 08 lo reusa para mostrar `fitsInBudget`.
   paso (spec 08) — el placeholder de `/paths/[id]` es mínimo y de sólo lectura.
 - Cualquier migración o columna nueva en `learning_paths`/`path_steps`.
 - Cambios a `lib/paths/*` (spec 04): este spec sólo lo invoca con los parámetros que arma.
-- El mapa visual (12), gamificación (13), compartir (14), personalización con IA (11) y "Ajustar mi
-  ruta" (15).
+- El mapa visual (12), gamificación (14), compartir (15), personalización con IA (11) y "Ajustar mi
+  ruta" (16).
 - Un historial de generaciones, un límite de reintentos, o una UI para recuperar un assessment
   huérfano.
 - Mostrar `fitsInBudget`/`overflowHours` al usuario (spec 08, a partir de datos derivados).

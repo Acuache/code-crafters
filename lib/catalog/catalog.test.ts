@@ -27,7 +27,7 @@ const rows: ProgramCourseRow[] = [
     stage: 2,
     level: "requerido",
     position: 2,
-    note: "elegí una de las dos",
+    note: "elige una de las dos",
     courseSlug: "react-pro",
   },
   {

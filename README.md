@@ -9,7 +9,7 @@ Generador de rutas de aprendizaje sobre el catálogo real de cursos de [DevTalle
 | Next.js 16, Supabase, autenticación y catálogo persistente | Módulos posteriores descritos en el roadmap |
 | Cuestionario inicial y generación de rutas por reglas | Deploy y validación de producción |
 | Ruta interactiva con progreso persistente | — |
-| Quizzes compartidos, intentos privados y racha diaria | — |
+| Quizzes por curso escritos desde el panel, intentos privados y racha diaria | — |
 
 El detalle del plan está en [`docs/ROADMAP.md`](docs/ROADMAP.md).
 
@@ -21,15 +21,13 @@ El detalle del plan está en [`docs/ROADMAP.md`](docs/ROADMAP.md).
 
 ## Variables de entorno
 
-Copiá `.env.example` a `.env.local` y completá las variables de Supabase. Para generar quizzes también necesitás:
+Copia `.env.example` a `.env.local` y completa las variables de Supabase. La clave de OpenAI es opcional: sin ella la ruta se genera y se recorre igual, con quizzes incluidos.
 
 ```dotenv
-OPENROUTER_API_KEY=tu_clave_de_servidor
-OPENROUTER_MODEL=google/gemma-4-26b-a4b-it:free
-SUPABASE_SECRET_KEY=tu_clave_secreta_de_supabase
+OPENAI_API_KEY=tu_clave_de_openai          # personalización de la ruta con IA
 ```
 
-`OPENROUTER_MODEL` es opcional y usa `google/gemma-4-26b-a4b-it:free` por defecto porque admite salida estructurada. Si ese endpoint está limitado, OpenRouter intenta otro modelo gratuito compatible y aplica reparación de JSON antes de la validación Zod. La disponibilidad y los límites de los modelos gratuitos dependen de OpenRouter. `OPENROUTER_API_KEY` y `SUPABASE_SECRET_KEY` son secretos exclusivos del servidor: nunca uses el prefijo `NEXT_PUBLIC_` para ellos ni los expongas al navegador.
+Es un secreto exclusivo del servidor: nunca uses el prefijo `NEXT_PUBLIC_` para ella ni la expongas al navegador.
 
 ## Cómo levantarlo
 
@@ -54,11 +52,13 @@ npx supabase test db # pruebas pgTAP
 
 ## Quizzes, progreso y racha
 
-- Cada curso tiene una evaluación de 10 preguntas y cada capítulo una práctica de 3 preguntas.
-- Un quiz generado se reutiliza entre todos los usuarios para el mismo curso o capítulo; los intentos, resultados y progreso siguen siendo privados mediante RLS.
-- Se aprueba con 60%. Aprobar un capítulo registra actividad, pero solo aprobar el quiz de curso completa el paso y desbloquea el siguiente.
-- La racha suma como máximo una vez por fecha local, usando la zona IANA del navegador. El servidor deriva la fecha efectiva y no confía en una fecha enviada por el cliente.
-- Si falta `OPENROUTER_API_KEY` o el proveedor falla, la ruta permanece disponible y el diálogo permite reintentar sin alterar el progreso.
+Los quizzes y la racha los diseñó Ariel Tonato. Cómo se integraron con el mapa de la ruta está en [`docs/decisiones/0005-quizzes-y-racha-unificados.md`](docs/decisiones/0005-quizzes-y-racha-unificados.md), y por qué los quizzes pasaron a escribirse desde el panel, sin IA, en [`docs/decisiones/0006-quizzes-de-curso-escritos-por-el-admin.md`](docs/decisiones/0006-quizzes-de-curso-escritos-por-el-admin.md).
+
+- Cada curso tiene un quiz que el admin escribe y edita en `/admin/courses/[slug]/quiz`. Las migraciones traen 3 preguntas básicas para cada uno de los 74 cursos.
+- El quiz se abre al instante desde el detalle de cada paso del mapa o desde la lista. Al elegir una opción queda fija y se ve si es correcta, cuál era la correcta y por qué.
+- Se aprueba con el porcentaje de cada quiz (60 % por defecto). Aprobar marca el curso como hecho; también se puede marcar a mano con el selector de estado.
+- Al entregar, Postgres vuelve a corregir y guarda el intento. Los intentos y el progreso son privados mediante RLS; los quizzes los lee cualquier usuario con sesión y solo los escribe el admin.
+- La racha suma como máximo un día por fecha local (zona del navegador) al aprobar un quiz o al pasar un paso a "En curso" o "Hecho".
 
 ## Estructura del repo
 

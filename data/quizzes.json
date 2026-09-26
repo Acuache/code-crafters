@@ -1,0 +1,3036 @@
+[
+  {
+    "courseSlug": "git-github-control-versiones-desde-cero",
+    "questions": [
+      {
+        "id": "1",
+        "prompt": "¿Qué comando guarda los cambios preparados en el historial de Git?",
+        "options": [
+          "git push",
+          "git status",
+          "git add",
+          "git commit"
+        ],
+        "correctOption": 3,
+        "explanation": "git commit crea una instantánea con lo que está en el área de preparación (staging)."
+      },
+      {
+        "id": "2",
+        "prompt": "¿Para qué sirve una rama (branch) en Git?",
+        "options": [
+          "Para subir el repositorio a GitHub",
+          "Para comprimir los archivos del proyecto",
+          "Para desarrollar en una línea separada sin afectar la rama principal",
+          "Para borrar commits antiguos del historial"
+        ],
+        "correctOption": 2,
+        "explanation": "Una rama permite trabajar una funcionalidad o corrección de forma aislada y después integrarla con un merge."
+      },
+      {
+        "id": "3",
+        "prompt": "En GitHub, ¿qué es un Pull Request?",
+        "options": [
+          "Una copia de seguridad automática del repositorio",
+          "Una solicitud para integrar los cambios de una rama en otra, con revisión del equipo",
+          "Un comando para descargar el repositorio",
+          "Un token de acceso personal"
+        ],
+        "correctOption": 1,
+        "explanation": "Un Pull Request propone integrar cambios y permite revisarlos y discutirlos antes de hacer el merge."
+      }
+    ]
+  },
+  {
+    "courseSlug": "golang-backend-profesional",
+    "questions": [
+      {
+        "id": "1",
+        "prompt": "¿Qué formato de datos intercambia la API REST del curso con sus clientes?",
+        "options": [
+          "JSON",
+          "CSV",
+          "YAML",
+          "XML"
+        ],
+        "correctOption": 0,
+        "explanation": "El curso trabaja con HTTP, rutas, middlewares y JSON, el formato estándar de las APIs REST."
+      },
+      {
+        "id": "2",
+        "prompt": "¿Qué se usa en el curso para autenticar a los usuarios de la API?",
+        "options": [
+          "Cookies de terceros",
+          "JWT (JSON Web Tokens)",
+          "Contraseñas guardadas en texto plano",
+          "Direcciones IP fijas"
+        ],
+        "correctOption": 1,
+        "explanation": "La seguridad del curso se basa en JWT, con las contraseñas protegidas con Argon2id."
+      },
+      {
+        "id": "3",
+        "prompt": "En Clean Architecture, ¿dónde vive la lógica de negocio?",
+        "options": [
+          "En las migraciones de la base de datos",
+          "En los middlewares",
+          "En el dominio y los casos de uso, independientes de la infraestructura",
+          "En los controladores HTTP"
+        ],
+        "correctOption": 2,
+        "explanation": "La arquitectura limpia separa el dominio y los casos de uso de detalles como HTTP o la base de datos, que se conectan con adaptadores."
+      }
+    ]
+  },
+  {
+    "courseSlug": "laravel-ai",
+    "questions": [
+      {
+        "id": "1",
+        "prompt": "¿En qué lenguaje está escrito Laravel?",
+        "options": [
+          "Python",
+          "Ruby",
+          "PHP",
+          "Java"
+        ],
+        "correctOption": 2,
+        "explanation": "Laravel es un framework de PHP; el curso usa PHP 8.4."
+      },
+      {
+        "id": "2",
+        "prompt": "¿Qué busca el Repository Pattern?",
+        "options": [
+          "Generar la documentación de la API",
+          "Cifrar las respuestas JSON",
+          "Desplegar la API en la nube",
+          "Separar el acceso a datos de la lógica de la aplicación"
+        ],
+        "correctOption": 3,
+        "explanation": "El repositorio encapsula cómo se leen y guardan los datos, así el resto del código no depende de la base de datos."
+      },
+      {
+        "id": "3",
+        "prompt": "¿Con qué modelo de IA se integra la API del curso para generar sinopsis y recomendaciones?",
+        "options": [
+          "Claude de Anthropic",
+          "Llama de Meta",
+          "Mistral",
+          "Gemini de Google"
+        ],
+        "correctOption": 0,
+        "explanation": "El curso integra Claude de Anthropic para generar sinopsis y recomendaciones de películas."
+      }
+    ]
+  },
+  {
+    "courseSlug": "spring-AI",
+    "questions": [
+      {
+        "id": "1",
+        "prompt": "¿Qué significa RAG?",
+        "options": [
+          "Retrieval-Augmented Generation: generar respuestas apoyadas en información recuperada",
+          "Random Access Generation",
+          "Rapid API Gateway",
+          "Reactive Agent Graph"
+        ],
+        "correctOption": 0,
+        "explanation": "RAG recupera fragmentos relevantes, por ejemplo desde un vector store, y se los pasa al modelo para que responda con esa información."
+      },
+      {
+        "id": "2",
+        "prompt": "¿Qué es Tool Calling en una aplicación con LLMs?",
+        "options": [
+          "Instalar herramientas en el servidor",
+          "Que el modelo pida ejecutar funciones o APIs de tu aplicación para responder",
+          "Llamar al soporte técnico de AWS",
+          "Compilar el proyecto con Maven"
+        ],
+        "correctOption": 1,
+        "explanation": "Con Tool Calling el modelo decide usar funciones, APIs o bases de datos que tu aplicación le expone."
+      },
+      {
+        "id": "3",
+        "prompt": "¿En qué lenguaje se programa con Spring AI en el curso?",
+        "options": [
+          "Python",
+          "TypeScript",
+          "Java",
+          "Kotlin"
+        ],
+        "correctOption": 2,
+        "explanation": "El stack del curso es Java 21 con Spring Boot 4 y Spring AI 2.x."
+      }
+    ]
+  },
+  {
+    "courseSlug": "open-code-guia-completa",
+    "questions": [
+      {
+        "id": "1",
+        "prompt": "¿Qué es OpenCode?",
+        "options": [
+          "Un lenguaje de programación",
+          "Un servicio de hosting",
+          "Un editor de texto gráfico",
+          "Un agente de IA open source para programar desde la terminal"
+        ],
+        "correctOption": 3,
+        "explanation": "OpenCode es un agente de IA open source que se usa desde la terminal para programar."
+      },
+      {
+        "id": "2",
+        "prompt": "¿Qué significa SDD en el curso?",
+        "options": [
+          "Software Deployment Daemon",
+          "Structured Data Design",
+          "Spec Driven Development: definir especificaciones con criterios de aceptación antes de implementar",
+          "Server Driven Display"
+        ],
+        "correctOption": 2,
+        "explanation": "En Spec Driven Development primero se escribe la especificación, después se implementa y se verifica contra sus criterios de aceptación."
+      },
+      {
+        "id": "3",
+        "prompt": "¿Para qué sirve conectar un MCP a un agente de IA?",
+        "options": [
+          "Para acelerar la conexión a internet",
+          "Para ampliar sus capacidades conectándolo con herramientas externas",
+          "Para comprimir el código",
+          "Para reemplazar Git"
+        ],
+        "correctOption": 1,
+        "explanation": "Con MCPs como Playwright, Context7 o Supabase, el agente puede usar herramientas y servicios externos."
+      }
+    ]
+  },
+  {
+    "courseSlug": "claude-code-guia-completa",
+    "questions": [
+      {
+        "id": "1",
+        "prompt": "¿Para qué sirve el archivo CLAUDE.md?",
+        "options": [
+          "Para configurar el servidor web",
+          "Para dar a Claude Code contexto e instrucciones persistentes sobre el proyecto",
+          "Para guardar contraseñas",
+          "Para listar las dependencias de npm"
+        ],
+        "correctOption": 1,
+        "explanation": "CLAUDE.md personaliza cómo trabaja Claude Code en tu proyecto: convenciones, comandos y contexto."
+      },
+      {
+        "id": "2",
+        "prompt": "¿Qué son los hooks en Claude Code?",
+        "options": [
+          "Comandos que se ejecutan automáticamente en momentos concretos del flujo de trabajo",
+          "Componentes de React",
+          "Ramas de Git",
+          "Modelos de IA locales"
+        ],
+        "correctOption": 0,
+        "explanation": "Los hooks automatizan acciones, por ejemplo antes o después de que Claude use una herramienta."
+      },
+      {
+        "id": "3",
+        "prompt": "¿Qué permite conectar un MCP server a Claude Code?",
+        "options": [
+          "Cambiar el lenguaje de programación del proyecto",
+          "Desinstalar Git",
+          "Aumentar la memoria RAM",
+          "Acceder a servicios externos, como controlar un navegador con Playwright"
+        ],
+        "correctOption": 3,
+        "explanation": "Los MCP servers conectan Claude Code con servicios externos; el curso incluye control de navegador con Playwright."
+      }
+    ]
+  },
+  {
+    "courseSlug": "ia-para-developers",
+    "questions": [
+      {
+        "id": "1",
+        "prompt": "¿Qué es function calling (tool use) con la API de Claude?",
+        "options": [
+          "El nombre del SDK de Anthropic",
+          "El modelo pide ejecutar una herramienta y tu código le devuelve el resultado",
+          "Un tipo de base de datos",
+          "Una forma de pagar la API"
+        ],
+        "correctOption": 1,
+        "explanation": "El flujo es: envías el mensaje, el modelo responde con tool_use, tu código ejecuta la herramienta y devuelve un tool_result."
+      },
+      {
+        "id": "2",
+        "prompt": "¿Para qué se usan los embeddings en un sistema RAG?",
+        "options": [
+          "Para representar textos como vectores y buscar los más parecidos",
+          "Para dibujar interfaces",
+          "Para comprimir imágenes",
+          "Para cifrar la API key"
+        ],
+        "correctOption": 0,
+        "explanation": "Los embeddings convierten texto en vectores; buscar los vectores más cercanos encuentra los fragmentos más relevantes."
+      },
+      {
+        "id": "3",
+        "prompt": "¿Qué usa el curso como vector store local?",
+        "options": [
+          "MongoDB",
+          "Redis",
+          "Oracle",
+          "SQLite con sqlite-vec"
+        ],
+        "correctOption": 3,
+        "explanation": "El curso guarda los vectores en SQLite con la extensión sqlite-vec y hace búsqueda KNN."
+      }
+    ]
+  },
+  {
+    "courseSlug": "python-ia-aplicada",
+    "questions": [
+      {
+        "id": "1",
+        "prompt": "¿Qué es un prompt few-shot?",
+        "options": [
+          "Un prompt sin instrucciones",
+          "Un modelo con pocos parámetros",
+          "Un error de la API",
+          "Un prompt que incluye algunos ejemplos para guiar al modelo"
+        ],
+        "correctOption": 3,
+        "explanation": "Few-shot significa dar unos pocos ejemplos de entrada y salida para que el modelo imite el patrón."
+      },
+      {
+        "id": "2",
+        "prompt": "¿Con qué framework se despliegan en el curso los proyectos de IA como API?",
+        "options": [
+          "Django",
+          "Flask",
+          "FastAPI",
+          "Express"
+        ],
+        "correctOption": 2,
+        "explanation": "El curso orquesta con LangChain y despliega con FastAPI."
+      },
+      {
+        "id": "3",
+        "prompt": "¿Qué es LangChain?",
+        "options": [
+          "Una base de datos relacional",
+          "Un framework para orquestar aplicaciones con LLMs",
+          "Un lenguaje de programación",
+          "Un servicio de hosting"
+        ],
+        "correctOption": 1,
+        "explanation": "LangChain ayuda a encadenar prompts, modelos, memoria y herramientas; el curso usa su lenguaje LCEL."
+      }
+    ]
+  },
+  {
+    "courseSlug": "spring-boot-patrones-arquitectura",
+    "questions": [
+      {
+        "id": "1",
+        "prompt": "¿Qué busca la arquitectura hexagonal?",
+        "options": [
+          "Usar seis bases de datos",
+          "Dividir la interfaz en seis pantallas",
+          "Desacoplar el dominio de la infraestructura mediante puertos y adaptadores",
+          "Eliminar las pruebas"
+        ],
+        "correctOption": 2,
+        "explanation": "El dominio queda en el centro y se comunica con el exterior a través de puertos que implementan los adaptadores."
+      },
+      {
+        "id": "2",
+        "prompt": "¿Para qué se usa ArchUnit en el curso?",
+        "options": [
+          "Para generar interfaces gráficas",
+          "Para desplegar en la nube",
+          "Para gestionar usuarios",
+          "Para escribir pruebas que verifican las reglas de la arquitectura"
+        ],
+        "correctOption": 3,
+        "explanation": "ArchUnit permite escribir tests que fallan si el código rompe las reglas de dependencias entre capas."
+      },
+      {
+        "id": "3",
+        "prompt": "¿Qué herramienta de seguridad empresarial usa el curso?",
+        "options": [
+          "Keycloak",
+          "Firebase Auth",
+          "Passport.js",
+          "Auth0"
+        ],
+        "correctOption": 0,
+        "explanation": "El curso trabaja la seguridad con Keycloak."
+      }
+    ]
+  },
+  {
+    "courseSlug": "Ingeniería-de-prompts",
+    "questions": [
+      {
+        "id": "1",
+        "prompt": "¿Qué es un prompt?",
+        "options": [
+          "Un virus informático",
+          "La instrucción o pregunta que le das a una herramienta de IA",
+          "Un formato de imagen",
+          "El nombre de la empresa que creó ChatGPT"
+        ],
+        "correctOption": 1,
+        "explanation": "El prompt es el texto con el que le pides algo a una IA como ChatGPT, Claude o Gemini."
+      },
+      {
+        "id": "2",
+        "prompt": "¿Qué suele mejorar la respuesta de una IA?",
+        "options": [
+          "Dar contexto, un objetivo claro y el formato que esperas",
+          "Escribir todo en mayúsculas",
+          "Hacer la pregunta lo más corta posible, sin contexto",
+          "Repetir la misma palabra muchas veces"
+        ],
+        "correctOption": 0,
+        "explanation": "Cuanto más claro es lo que pides, para qué y en qué formato, mejor es el resultado."
+      },
+      {
+        "id": "3",
+        "prompt": "Según el curso, ¿para qué te sirve la ingeniería de prompts?",
+        "options": [
+          "Para reparar hardware",
+          "Solo para programar",
+          "Solo para generar imágenes",
+          "Para redactar correos, resumir textos y organizar ideas, entre otras tareas"
+        ],
+        "correctOption": 3,
+        "explanation": "El curso aplica los prompts a tareas cotidianas: correos, resúmenes, textos creativos, estudio y trabajo."
+      }
+    ]
+  },
+  {
+    "courseSlug": "vibe-coding",
+    "questions": [
+      {
+        "id": "1",
+        "prompt": "¿Qué implica hacer vibe coding de forma responsable?",
+        "options": [
+          "No usar control de versiones",
+          "Evitar las bases de datos",
+          "Aceptar todo el código que genera la IA sin revisarlo",
+          "Validar y entender el código generado por la IA antes de usarlo"
+        ],
+        "correctOption": 3,
+        "explanation": "El curso enseña a formular mejores prompts y a validar con precisión el código que genera la IA."
+      },
+      {
+        "id": "2",
+        "prompt": "¿Qué servicio se integra en el curso para la base de datos?",
+        "options": [
+          "MongoDB Atlas",
+          "DynamoDB",
+          "Supabase con PostgreSQL",
+          "Firebase"
+        ],
+        "correctOption": 2,
+        "explanation": "La aplicación del curso gestiona sus datos con Supabase y PostgreSQL."
+      },
+      {
+        "id": "3",
+        "prompt": "¿Dónde se despliega la aplicación del curso?",
+        "options": [
+          "Netlify",
+          "Vercel",
+          "GitHub Pages",
+          "Heroku"
+        ],
+        "correctOption": 1,
+        "explanation": "El curso lleva la aplicación a producción con Vercel."
+      }
+    ]
+  },
+  {
+    "courseSlug": "golang-fundamentos-lenguaje",
+    "questions": [
+      {
+        "id": "1",
+        "prompt": "¿Qué es una goroutine en Go?",
+        "options": [
+          "Un tipo de error",
+          "Un comando para compilar",
+          "Un paquete para bases de datos",
+          "Una función que se ejecuta de forma concurrente, gestionada por el runtime de Go"
+        ],
+        "correctOption": 3,
+        "explanation": "Las goroutines son la base de la concurrencia nativa de Go; se lanzan con la palabra clave go."
+      },
+      {
+        "id": "2",
+        "prompt": "¿Cómo maneja Go normalmente los errores?",
+        "options": [
+          "Con excepciones checked, como Java",
+          "Ignorándolos hasta que el programa termina",
+          "Devolviendo un valor de tipo error que se revisa explícitamente",
+          "Con bloques try/catch"
+        ],
+        "correctOption": 2,
+        "explanation": "En Go las funciones devuelven un error como un valor más, y quien llama lo revisa con un if."
+      },
+      {
+        "id": "3",
+        "prompt": "¿Para qué sirven los canales (channels) en Go?",
+        "options": [
+          "Para dar estilo a una web",
+          "Para comunicar y sincronizar goroutines",
+          "Para declarar variables globales",
+          "Para importar paquetes"
+        ],
+        "correctOption": 1,
+        "explanation": "Los canales permiten que las goroutines se envíen datos entre sí de forma segura."
+      }
+    ]
+  },
+  {
+    "courseSlug": "PHP-moderno",
+    "questions": [
+      {
+        "id": "1",
+        "prompt": "¿Qué es Composer en PHP?",
+        "options": [
+          "Un editor de código",
+          "Un framework de frontend",
+          "Una base de datos",
+          "El gestor de dependencias de PHP"
+        ],
+        "correctOption": 3,
+        "explanation": "Composer instala y gestiona las librerías del proyecto y genera el autoloading."
+      },
+      {
+        "id": "2",
+        "prompt": "¿Cuál de estas operaciones NO forma parte de un CRUD?",
+        "options": [
+          "Eliminar",
+          "Crear",
+          "Compilar",
+          "Actualizar"
+        ],
+        "correctOption": 2,
+        "explanation": "CRUD es Create, Read, Update y Delete: crear, leer, actualizar y eliminar."
+      },
+      {
+        "id": "3",
+        "prompt": "¿Qué framework de PHP presenta el curso al final?",
+        "options": [
+          "Django",
+          "Laravel",
+          "Symfony",
+          "CodeIgniter"
+        ],
+        "correctOption": 1,
+        "explanation": "El curso cierra con una introducción al ecosistema Laravel y su despliegue."
+      }
+    ]
+  },
+  {
+    "courseSlug": "spring-boot-microservicios",
+    "questions": [
+      {
+        "id": "1",
+        "prompt": "¿Qué hace un API Gateway en una arquitectura de microservicios?",
+        "options": [
+          "Reemplaza a la base de datos",
+          "Guarda los datos de todos los servicios",
+          "Es el punto de entrada que enruta las peticiones a cada servicio",
+          "Compila el código Java"
+        ],
+        "correctOption": 2,
+        "explanation": "El gateway recibe las peticiones de los clientes y las dirige al microservicio que corresponde."
+      },
+      {
+        "id": "2",
+        "prompt": "¿Para qué sirve la mensajería asíncrona entre servicios?",
+        "options": [
+          "Para enviar correos a los usuarios",
+          "Para hacer consultas SQL",
+          "Para dibujar gráficos",
+          "Para desacoplar componentes: quien envía no espera una respuesta inmediata"
+        ],
+        "correctOption": 3,
+        "explanation": "Con mensajería asíncrona un servicio publica un mensaje y otro lo procesa cuando puede, sin acoplarse."
+      },
+      {
+        "id": "3",
+        "prompt": "¿Qué herramienta orquesta los contenedores en el despliegue del curso?",
+        "options": [
+          "Kubernetes",
+          "Jenkins",
+          "Maven",
+          "Gradle"
+        ],
+        "correctOption": 0,
+        "explanation": "El curso contenedoriza con Docker y despliega con Kubernetes."
+      }
+    ]
+  },
+  {
+    "courseSlug": "Angular_socket_bun",
+    "questions": [
+      {
+        "id": "1",
+        "prompt": "¿Qué permiten los WebSockets?",
+        "options": [
+          "Comunicación bidireccional en tiempo real entre cliente y servidor",
+          "Crear estilos CSS",
+          "Guardar archivos en el disco",
+          "Compilar TypeScript"
+        ],
+        "correctOption": 0,
+        "explanation": "Un WebSocket mantiene la conexión abierta para que cliente y servidor se envíen mensajes en cualquier momento."
+      },
+      {
+        "id": "2",
+        "prompt": "¿Qué es Bun en este curso?",
+        "options": [
+          "Una librería de gráficos",
+          "El runtime de JavaScript que se usa en el backend",
+          "Un framework de CSS",
+          "Un gestor de base de datos"
+        ],
+        "correctOption": 1,
+        "explanation": "Bun es un runtime de JavaScript; el curso lo usa para el backend con websockets nativos."
+      },
+      {
+        "id": "3",
+        "prompt": "En Angular, ¿qué usa el curso para lograr una experiencia reactiva y eficiente?",
+        "options": [
+          "Web Workers",
+          "jQuery",
+          "Signals y Signal Outputs",
+          "Redux"
+        ],
+        "correctOption": 2,
+        "explanation": "El curso aplica Signals y Signal Outputs para manejar el estado de forma reactiva."
+      }
+    ]
+  },
+  {
+    "courseSlug": "react-sockets",
+    "questions": [
+      {
+        "id": "1",
+        "prompt": "¿Qué tecnología mantiene los datos actualizados en vivo en las apps del curso?",
+        "options": [
+          "Service Workers",
+          "Cookies",
+          "WebSockets",
+          "LocalStorage"
+        ],
+        "correctOption": 2,
+        "explanation": "Los dashboards, mapas, colas y chats del curso se actualizan en tiempo real con WebSockets."
+      },
+      {
+        "id": "2",
+        "prompt": "¿Qué librería se usa en el curso para validar los datos?",
+        "options": [
+          "Lodash",
+          "Moment",
+          "Axios",
+          "Zod"
+        ],
+        "correctOption": 3,
+        "explanation": "El curso valida estrictamente los datos con Zod."
+      },
+      {
+        "id": "3",
+        "prompt": "¿Cómo se gestiona el estado de React en el curso?",
+        "options": [
+          "Con Context API y hooks personalizados",
+          "Con jQuery",
+          "Con variables globales de window",
+          "Con servicios de Angular"
+        ],
+        "correctOption": 0,
+        "explanation": "El estado se maneja con Context API y hooks personalizados."
+      }
+    ]
+  },
+  {
+    "courseSlug": "tailwindcss-para-desarrolladores",
+    "questions": [
+      {
+        "id": "1",
+        "prompt": "¿Qué enfoque usa Tailwind CSS?",
+        "options": [
+          "Hojas de estilo generadas con JavaScript",
+          "Clases utilitarias que se aplican directamente en el HTML",
+          "Componentes visuales listos con un diseño fijo",
+          "Estilos definidos solo en archivos .scss"
+        ],
+        "correctOption": 1,
+        "explanation": "Tailwind ofrece un catálogo de clases utilitarias (flex, p-4, text-center…) para maquetar sin escribir CSS a mano."
+      },
+      {
+        "id": "2",
+        "prompt": "¿Qué sistemas de layout se trabajan en el curso para crear diseños responsivos?",
+        "options": [
+          "Flexbox y Grid",
+          "Solo posicionamiento absoluto",
+          "Tablas HTML",
+          "Frames"
+        ],
+        "correctOption": 0,
+        "explanation": "El curso arma layouts complejos y responsivos con Flexbox y Grid usando clases de Tailwind."
+      },
+      {
+        "id": "3",
+        "prompt": "¿Qué permiten las pseudo-clases de Tailwind, como hover: o focus:?",
+        "options": [
+          "Crear bases de datos",
+          "Conectarse a una API",
+          "Minificar imágenes",
+          "Aplicar estilos según el estado del elemento sin escribir JavaScript"
+        ],
+        "correctOption": 3,
+        "explanation": "Con prefijos como hover: o focus: creas componentes interactivos sin depender de scripts."
+      }
+    ]
+  },
+  {
+    "courseSlug": "python-n8n-automatiza-rutinas",
+    "questions": [
+      {
+        "id": "1",
+        "prompt": "¿Qué es n8n?",
+        "options": [
+          "Una base de datos",
+          "Un sistema operativo",
+          "Una herramienta para crear flujos de automatización",
+          "Un lenguaje de programación"
+        ],
+        "correctOption": 2,
+        "explanation": "n8n permite conectar servicios y automatizar tareas con flujos de trabajo visuales."
+      },
+      {
+        "id": "2",
+        "prompt": "¿Qué framework de Python se usa en el curso para crear servicios simples?",
+        "options": [
+          "Flask",
+          "Tornado",
+          "Django",
+          "FastAPI"
+        ],
+        "correctOption": 3,
+        "explanation": "El curso crea servicios simples con FastAPI."
+      },
+      {
+        "id": "3",
+        "prompt": "¿Cuál es un ejemplo de automatización de archivos que ve el curso?",
+        "options": [
+          "Detectar archivos duplicados y organizar directorios",
+          "Diseñar logotipos",
+          "Editar videos",
+          "Instalar sistemas operativos"
+        ],
+        "correctOption": 0,
+        "explanation": "El curso automatiza la organización de directorios, la detección de duplicados y la lectura de archivos pesados por partes."
+      }
+    ]
+  },
+  {
+    "courseSlug": "springboot-mvc-hexagonal",
+    "questions": [
+      {
+        "id": "1",
+        "prompt": "¿Qué se busca al aislar el dominio en la arquitectura hexagonal?",
+        "options": [
+          "Que la lógica de negocio no dependa de frameworks ni de bases de datos",
+          "Usar un solo archivo para todo",
+          "Que el dominio acceda directo a la base de datos",
+          "Eliminar los DTOs"
+        ],
+        "correctOption": 0,
+        "explanation": "Un dominio aislado se mantiene estable aunque cambie la tecnología que lo rodea."
+      },
+      {
+        "id": "2",
+        "prompt": "¿Qué migración de datos usa el curso para mostrar el acoplamiento?",
+        "options": [
+          "De archivos CSV a XML",
+          "De SQL (JPA) a MongoDB",
+          "De MongoDB a Excel",
+          "De MySQL a Oracle"
+        ],
+        "correctOption": 1,
+        "explanation": "Migrar de JPA a MongoDB deja ver cuánto dependía el código de la base de datos y justifica la inversión de dependencias."
+      },
+      {
+        "id": "3",
+        "prompt": "¿Para qué sirven los DTOs?",
+        "options": [
+          "Para desplegar la aplicación",
+          "Para crear tablas en la base de datos",
+          "Para transferir datos entre capas sin exponer las entidades internas",
+          "Para compilar Java"
+        ],
+        "correctOption": 2,
+        "explanation": "Un DTO (Data Transfer Object) define qué datos entran y salen de la API, separado del modelo interno."
+      }
+    ]
+  },
+  {
+    "courseSlug": "net-pruebascompletas",
+    "questions": [
+      {
+        "id": "1",
+        "prompt": "¿Qué diferencia a una prueba unitaria de una de integración?",
+        "options": [
+          "La unitaria prueba una pieza aislada; la de integración, varias piezas trabajando juntas",
+          "La unitaria solo se ejecuta en producción",
+          "La de integración no ejecuta código",
+          "Son exactamente lo mismo"
+        ],
+        "correctOption": 0,
+        "explanation": "Las unitarias aíslan un componente; las de integración prueban, por ejemplo, un endpoint HTTP real con sus dependencias."
+      },
+      {
+        "id": "2",
+        "prompt": "¿Qué significa el patrón AAA al escribir tests?",
+        "options": [
+          "Async, Await, Apply",
+          "Arrange, Act, Assert",
+          "Add, Alter, Archive",
+          "Always Assert Anything"
+        ],
+        "correctOption": 1,
+        "explanation": "Arrange prepara los datos, Act ejecuta lo que se prueba y Assert verifica el resultado."
+      },
+      {
+        "id": "3",
+        "prompt": "¿Para qué se usa Moq en el curso?",
+        "options": [
+          "Para escribir aserciones más legibles",
+          "Para desplegar la API",
+          "Para simular dependencias y aislar componentes",
+          "Para crear la base de datos"
+        ],
+        "correctOption": 2,
+        "explanation": "Moq crea dobles de prueba de las dependencias; las aserciones legibles son trabajo de FluentAssertions."
+      }
+    ]
+  },
+  {
+    "courseSlug": "nuxt",
+    "questions": [
+      {
+        "id": "1",
+        "prompt": "¿Sobre qué framework está construido Nuxt?",
+        "options": [
+          "React",
+          "Vue.js",
+          "Angular",
+          "Svelte"
+        ],
+        "correctOption": 1,
+        "explanation": "Nuxt es un framework basado en Vue.js; el curso empieza reforzando Vue 3."
+      },
+      {
+        "id": "2",
+        "prompt": "¿Qué significa SSR?",
+        "options": [
+          "Server-Side Rendering: el HTML se genera en el servidor",
+          "Static Style Rules",
+          "Single Source Repository",
+          "Secure Session Routing"
+        ],
+        "correctOption": 0,
+        "explanation": "Con SSR el servidor entrega el HTML ya armado, lo que mejora la carga inicial y el SEO."
+      },
+      {
+        "id": "3",
+        "prompt": "¿Cómo se definen las páginas en Nuxt?",
+        "options": [
+          "Registrándolas a mano en un archivo XML",
+          "Guardándolas en una base de datos",
+          "Con comandos de Git",
+          "Con enrutamiento basado en archivos dentro del directorio de páginas"
+        ],
+        "correctOption": 3,
+        "explanation": "Cada archivo dentro de pages se convierte en una ruta de la aplicación."
+      }
+    ]
+  },
+  {
+    "courseSlug": "netfullstack",
+    "questions": [
+      {
+        "id": "1",
+        "prompt": "¿Qué lenguaje se usa para programar con Blazor?",
+        "options": [
+          "Java",
+          "Python",
+          "C#",
+          "PHP"
+        ],
+        "correctOption": 2,
+        "explanation": "Blazor permite crear interfaces web con C# y .NET, sin necesidad de escribir JavaScript."
+      },
+      {
+        "id": "2",
+        "prompt": "¿Qué propone el patrón CQRS?",
+        "options": [
+          "Usar solo consultas SQL",
+          "Eliminar la capa de dominio",
+          "Guardar todo en un solo archivo",
+          "Separar las operaciones de lectura (queries) de las de escritura (commands)"
+        ],
+        "correctOption": 3,
+        "explanation": "CQRS separa los comandos que cambian datos de las consultas que los leen; el curso lo implementa con MediatR."
+      },
+      {
+        "id": "3",
+        "prompt": "¿Qué herramienta de .NET se usa para la persistencia y las migraciones?",
+        "options": [
+          "Entity Framework Core",
+          "Hibernate",
+          "Prisma",
+          "Sequelize"
+        ],
+        "correctOption": 0,
+        "explanation": "Entity Framework Core es el ORM de .NET que usa el curso para conectarse a SQL Server."
+      }
+    ]
+  },
+  {
+    "courseSlug": "fastapi",
+    "questions": [
+      {
+        "id": "1",
+        "prompt": "¿Qué librería usa FastAPI para validar los datos con tipos?",
+        "options": [
+          "Pydantic",
+          "Pandas",
+          "Requests",
+          "NumPy"
+        ],
+        "correctOption": 0,
+        "explanation": "FastAPI se apoya en Pydantic para validar y tipar los datos de entrada y salida."
+      },
+      {
+        "id": "2",
+        "prompt": "¿Para qué se usa Alembic en el curso?",
+        "options": [
+          "Para enviar correos",
+          "Para gestionar las migraciones de la base de datos",
+          "Para crear la interfaz de usuario",
+          "Para autenticar usuarios"
+        ],
+        "correctOption": 1,
+        "explanation": "Alembic versiona los cambios del esquema de la base de datos (PostgreSQL en el curso)."
+      },
+      {
+        "id": "3",
+        "prompt": "¿Qué palabras clave de Python permiten escribir funciones asíncronas?",
+        "options": [
+          "import y from",
+          "class y def",
+          "async y await",
+          "try y except"
+        ],
+        "correctOption": 2,
+        "explanation": "Con async def se declara una función asíncrona y con await se espera un resultado sin bloquear."
+      }
+    ]
+  },
+  {
+    "courseSlug": "spring-boot",
+    "questions": [
+      {
+        "id": "1",
+        "prompt": "¿Con qué se protegen los endpoints de la API en el curso?",
+        "options": [
+          "Con contraseñas en la URL",
+          "Con un firewall de Windows",
+          "Con Spring Security y JWT",
+          "Con cookies sin firmar"
+        ],
+        "correctOption": 2,
+        "explanation": "El curso combina Spring Security con la generación y validación de JSON Web Tokens."
+      },
+      {
+        "id": "2",
+        "prompt": "¿Para qué sirve MapStruct?",
+        "options": [
+          "Para crear tablas",
+          "Para desplegar la aplicación",
+          "Para dibujar mapas",
+          "Para convertir automáticamente entidades en DTOs"
+        ],
+        "correctOption": 3,
+        "explanation": "MapStruct genera el código que mapea entidades a DTOs y así desacopla la capa de presentación."
+      },
+      {
+        "id": "3",
+        "prompt": "¿Qué genera la documentación interactiva de la API en el curso?",
+        "options": [
+          "OpenAPI (Swagger)",
+          "Javadoc",
+          "Storybook",
+          "Postman"
+        ],
+        "correctOption": 0,
+        "explanation": "OpenAPI (Swagger) documenta los endpoints de forma automática e interactiva."
+      }
+    ]
+  },
+  {
+    "courseSlug": "n8n-mcp",
+    "questions": [
+      {
+        "id": "1",
+        "prompt": "¿Qué es un nodo en n8n?",
+        "options": [
+          "Un lenguaje de programación",
+          "Una base de datos",
+          "Un servidor físico",
+          "Un paso del flujo que hace una acción, como leer Google Sheets o enviar un correo"
+        ],
+        "correctOption": 3,
+        "explanation": "Un flujo de n8n se arma encadenando nodos como Google Sheets, Gmail o HTTP Request."
+      },
+      {
+        "id": "2",
+        "prompt": "¿Qué significa MCP?",
+        "options": [
+          "Multi Cloud Platform",
+          "Main Control Panel",
+          "Model Context Protocol",
+          "Machine Code Processor"
+        ],
+        "correctOption": 2,
+        "explanation": "Model Context Protocol es el estándar para que los agentes de IA se conecten con servidores y herramientas externas."
+      },
+      {
+        "id": "3",
+        "prompt": "¿Para qué canales de mensajería se crean bots en el curso?",
+        "options": [
+          "Llamadas telefónicas",
+          "Telegram y WhatsApp",
+          "Fax y correo postal",
+          "Solo SMS"
+        ],
+        "correctOption": 1,
+        "explanation": "El curso crea agentes de voz y bots interactivos para Telegram y WhatsApp."
+      }
+    ]
+  },
+  {
+    "courseSlug": "react-de-cero",
+    "questions": [
+      {
+        "id": "1",
+        "prompt": "¿Qué librería ligera de gestión de estado se usa en el curso?",
+        "options": [
+          "Vuex",
+          "Zustand",
+          "Redux Saga",
+          "MobX"
+        ],
+        "correctOption": 1,
+        "explanation": "El curso gestiona el estado de forma moderna y ligera con Zustand, además de Context API."
+      },
+      {
+        "id": "2",
+        "prompt": "¿Qué significan las siglas MERN?",
+        "options": [
+          "MongoDB, Express, React y Node.js",
+          "Mongo, Elixir, Rust y Next",
+          "MariaDB, Electron, React y NestJS",
+          "MySQL, Ember, Redis y Nginx"
+        ],
+        "correctOption": 0,
+        "explanation": "MERN es el stack MongoDB, Express, React y Node.js que el curso usa para aplicaciones completas."
+      },
+      {
+        "id": "3",
+        "prompt": "¿En qué lenguaje está basado todo el contenido del curso?",
+        "options": [
+          "JavaScript sin tipos",
+          "Dart",
+          "Python",
+          "TypeScript"
+        ],
+        "correctOption": 3,
+        "explanation": "Todo el curso de React está escrito con TypeScript."
+      }
+    ]
+  },
+  {
+    "courseSlug": "expo-gemini",
+    "questions": [
+      {
+        "id": "1",
+        "prompt": "¿Qué aporta recibir la respuesta de la IA en modo streaming?",
+        "options": [
+          "Guardar la respuesta en la base de datos",
+          "Traducir la respuesta",
+          "Mostrar la respuesta a medida que se genera, sin esperar a que termine",
+          "Comprimir la respuesta"
+        ],
+        "correctOption": 2,
+        "explanation": "Con streaming el texto aparece de a poco, lo que mejora mucho la experiencia del usuario."
+      },
+      {
+        "id": "2",
+        "prompt": "¿Cómo se conecta la app de Expo con Gemini en el curso?",
+        "options": [
+          "Por Bluetooth",
+          "Mediante SMS",
+          "Directamente desde la base de datos",
+          "A través de un backend personalizado"
+        ],
+        "correctOption": 3,
+        "explanation": "La app habla con un backend propio que usa la librería oficial de Gemini; así la clave de la API no viaja en la app."
+      },
+      {
+        "id": "3",
+        "prompt": "¿Qué es el procesamiento multimodal en el curso?",
+        "options": [
+          "Enviar imágenes, además de texto, al modelo de IA",
+          "Usar varios lenguajes de programación",
+          "Tener varios modos de color",
+          "Instalar la app en varios teléfonos"
+        ],
+        "correctOption": 0,
+        "explanation": "El curso envía imágenes de la cámara o la galería para que el modelo las procese junto con el texto."
+      }
+    ]
+  },
+  {
+    "courseSlug": "java-avanzado",
+    "questions": [
+      {
+        "id": "1",
+        "prompt": "¿Para qué sirve Optional<T> en Java?",
+        "options": [
+          "Para crear hilos",
+          "Para representar un valor que puede no existir y evitar NullPointerException",
+          "Para conectarse a la base de datos",
+          "Para compilar más rápido"
+        ],
+        "correctOption": 1,
+        "explanation": "Optional obliga a contemplar el caso sin valor en vez de devolver null."
+      },
+      {
+        "id": "2",
+        "prompt": "¿Qué permite la API de Streams?",
+        "options": [
+          "Procesar colecciones de forma declarativa con operaciones como map, filter y reduce",
+          "Transmitir video",
+          "Crear interfaces gráficas",
+          "Leer el teclado"
+        ],
+        "correctOption": 0,
+        "explanation": "Streams, junto con las expresiones lambda, permite escribir el procesamiento de colecciones de forma funcional."
+      },
+      {
+        "id": "3",
+        "prompt": "¿Qué hace Lombok?",
+        "options": [
+          "Ejecuta las pruebas",
+          "Despliega en la nube",
+          "Crea bases de datos",
+          "Reduce el código repetitivo generando getters, setters y constructores con anotaciones"
+        ],
+        "correctOption": 3,
+        "explanation": "Lombok genera ese código repetitivo a partir de anotaciones como @Getter o @Builder."
+      }
+    ]
+  },
+  {
+    "courseSlug": "NET-Backend",
+    "questions": [
+      {
+        "id": "1",
+        "prompt": "¿Qué es un JWT?",
+        "options": [
+          "Un token firmado que identifica al usuario en cada petición",
+          "Un lenguaje de programación",
+          "Un framework de frontend",
+          "Una base de datos"
+        ],
+        "correctOption": 0,
+        "explanation": "El curso autentica a los usuarios con JSON Web Tokens que el cliente envía en cada petición."
+      },
+      {
+        "id": "2",
+        "prompt": "¿Qué significa RBAC?",
+        "options": [
+          "Registro de errores en la nube",
+          "Control de acceso basado en roles",
+          "Respaldo automático de la base de datos",
+          "Rutas basadas en componentes"
+        ],
+        "correctOption": 1,
+        "explanation": "Role-Based Access Control: lo que puede hacer cada usuario depende de su rol."
+      },
+      {
+        "id": "3",
+        "prompt": "¿Qué ORM se usa en el curso para trabajar con SQL Server?",
+        "options": [
+          "Doctrine",
+          "Hibernate",
+          "Entity Framework",
+          "Mongoose"
+        ],
+        "correctOption": 2,
+        "explanation": "El curso modela y persiste las entidades con Entity Framework."
+      }
+    ]
+  },
+  {
+    "courseSlug": "django",
+    "questions": [
+      {
+        "id": "1",
+        "prompt": "¿En qué lenguaje está escrito Django?",
+        "options": [
+          "JavaScript",
+          "Ruby",
+          "Go",
+          "Python"
+        ],
+        "correctOption": 3,
+        "explanation": "Django es un framework web de Python."
+      },
+      {
+        "id": "2",
+        "prompt": "¿Qué ventaja da el ORM de Django?",
+        "options": [
+          "Evitar usar una base de datos",
+          "Compilar a código máquina",
+          "Definir modelos, relaciones y migraciones sin escribir SQL a mano",
+          "Diseñar logotipos"
+        ],
+        "correctOption": 2,
+        "explanation": "El ORM traduce los modelos de Python a tablas y consultas SQL."
+      },
+      {
+        "id": "3",
+        "prompt": "¿Qué es el Django Admin?",
+        "options": [
+          "Un servicio de hosting",
+          "El panel de administración que trae el propio framework",
+          "Un editor de código",
+          "Un usuario con permisos de root"
+        ],
+        "correctOption": 1,
+        "explanation": "Django incluye un panel de administración que se configura y personaliza, una de sus herramientas más potentes."
+      }
+    ]
+  },
+  {
+    "courseSlug": "Flutter-Gemini",
+    "questions": [
+      {
+        "id": "1",
+        "prompt": "¿Qué gestor de estado se usa en la app de Flutter del curso?",
+        "options": [
+          "NgRx",
+          "Redux",
+          "Riverpod con anotaciones",
+          "Vuex"
+        ],
+        "correctOption": 2,
+        "explanation": "El chat del curso gestiona su estado con Riverpod usando anotaciones."
+      },
+      {
+        "id": "2",
+        "prompt": "¿Con qué framework se construye la API intermedia hacia Gemini?",
+        "options": [
+          "Django",
+          "Laravel",
+          "Spring Boot",
+          "NestJS"
+        ],
+        "correctOption": 3,
+        "explanation": "La app de Flutter se conecta a Gemini a través de una API construida con NestJS."
+      },
+      {
+        "id": "3",
+        "prompt": "¿Qué aporta mantener el historial de la conversación?",
+        "options": [
+          "Que la IA recuerde el contexto a lo largo de varios turnos",
+          "Que la app pese menos",
+          "Que no haga falta internet",
+          "Que las imágenes se vean mejor"
+        ],
+        "correctOption": 0,
+        "explanation": "Enviar el historial permite que el modelo responda teniendo en cuenta lo que ya se habló."
+      }
+    ]
+  },
+  {
+    "courseSlug": "react-router",
+    "questions": [
+      {
+        "id": "1",
+        "prompt": "¿En qué dos modos se puede usar React Router, según el curso?",
+        "options": [
+          "Solo en aplicaciones móviles",
+          "Solo en servidores Java",
+          "Como base de datos o como API",
+          "Como librería para SPAs o como framework"
+        ],
+        "correctOption": 3,
+        "explanation": "El curso lo trabaja como librería para SPAs tradicionales y como framework con server actions y pre-rendering."
+      },
+      {
+        "id": "2",
+        "prompt": "¿Para qué sirven los loaders?",
+        "options": [
+          "Para instalar dependencias",
+          "Para mostrar una animación de carga",
+          "Para cargar los datos de una ruta antes de mostrarla",
+          "Para comprimir imágenes"
+        ],
+        "correctOption": 2,
+        "explanation": "Un loader obtiene los datos que necesita la ruta, incluso del lado del servidor."
+      },
+      {
+        "id": "3",
+        "prompt": "¿Qué ventaja da el pre-rendering?",
+        "options": [
+          "Menos componentes",
+          "Mejor SEO y más velocidad de carga",
+          "Menos seguridad",
+          "Menos rutas"
+        ],
+        "correctOption": 1,
+        "explanation": "Las páginas pre-renderizadas llegan listas al navegador, lo que mejora el SEO y la carga."
+      }
+    ]
+  },
+  {
+    "courseSlug": "python",
+    "questions": [
+      {
+        "id": "1",
+        "prompt": "¿Cuál de estos tipos de datos de Python es inmutable?",
+        "options": [
+          "Lista",
+          "Diccionario",
+          "Tupla",
+          "Set"
+        ],
+        "correctOption": 2,
+        "explanation": "Una tupla no se puede modificar después de crearla; listas, diccionarios y sets sí."
+      },
+      {
+        "id": "2",
+        "prompt": "¿Qué palabra clave define una función en Python?",
+        "options": [
+          "func",
+          "fn",
+          "function",
+          "def"
+        ],
+        "correctOption": 3,
+        "explanation": "En Python una función se declara con def nombre():"
+      },
+      {
+        "id": "3",
+        "prompt": "¿Para qué sirve un entorno virtual?",
+        "options": [
+          "Para aislar las dependencias de cada proyecto",
+          "Para ejecutar Python en el navegador",
+          "Para crear máquinas virtuales de Windows",
+          "Para acelerar el procesador"
+        ],
+        "correctOption": 0,
+        "explanation": "Cada entorno virtual tiene sus propios paquetes, así un proyecto no rompe las versiones de otro."
+      }
+    ]
+  },
+  {
+    "courseSlug": "csharp",
+    "questions": [
+      {
+        "id": "1",
+        "prompt": "¿Para qué sirve LINQ en C#?",
+        "options": [
+          "Para crear interfaces gráficas",
+          "Para enlazar archivos CSS",
+          "Para gestionar paquetes",
+          "Para consultar colecciones y datos con una sintaxis integrada en el lenguaje"
+        ],
+        "correctOption": 3,
+        "explanation": "LINQ permite filtrar, ordenar y transformar datos con consultas escritas en C#."
+      },
+      {
+        "id": "2",
+        "prompt": "¿Qué bloque se usa para manejar excepciones en C#?",
+        "options": [
+          "for / foreach",
+          "if / else",
+          "try / catch",
+          "switch / case"
+        ],
+        "correctOption": 2,
+        "explanation": "El código que puede fallar va en try y el error se maneja en catch."
+      },
+      {
+        "id": "3",
+        "prompt": "¿Con qué se desarrollan las APIs web en el curso?",
+        "options": [
+          "Ruby on Rails",
+          "ASP.NET Core",
+          "Express",
+          "Flask"
+        ],
+        "correctOption": 1,
+        "explanation": "El curso introduce el desarrollo de APIs web con ASP.NET Core."
+      }
+    ]
+  },
+  {
+    "courseSlug": "Java",
+    "questions": [
+      {
+        "id": "1",
+        "prompt": "¿Qué es una clase en programación orientada a objetos?",
+        "options": [
+          "Un molde que define los atributos y métodos de los objetos",
+          "Una base de datos",
+          "Un tipo de bucle",
+          "Un archivo de configuración"
+        ],
+        "correctOption": 0,
+        "explanation": "A partir de una clase se crean objetos (instancias) con sus propios datos."
+      },
+      {
+        "id": "2",
+        "prompt": "¿Qué permite la herencia?",
+        "options": [
+          "Borrar objetos",
+          "Que una clase reutilice y extienda el comportamiento de otra",
+          "Ejecutar código en paralelo",
+          "Conectarse a internet"
+        ],
+        "correctOption": 1,
+        "explanation": "Con extends una clase hija hereda los atributos y métodos de la clase padre y puede sobrescribirlos."
+      },
+      {
+        "id": "3",
+        "prompt": "¿Qué necesitas instalar para compilar y ejecutar Java?",
+        "options": [
+          "Python",
+          "Solo el SDK de Android",
+          "El JDK",
+          "Node.js"
+        ],
+        "correctOption": 2,
+        "explanation": "El JDK (Java Development Kit) incluye el compilador y la máquina virtual de Java."
+      }
+    ]
+  },
+  {
+    "courseSlug": "NestJS-Testing",
+    "questions": [
+      {
+        "id": "1",
+        "prompt": "¿Qué framework de pruebas usa el curso?",
+        "options": [
+          "Jest",
+          "Mocha",
+          "PHPUnit",
+          "JUnit"
+        ],
+        "correctOption": 0,
+        "explanation": "El curso configura y escribe todas las pruebas de NestJS con Jest."
+      },
+      {
+        "id": "2",
+        "prompt": "¿Qué verifica una prueba end to end (e2e)?",
+        "options": [
+          "Una sola función aislada",
+          "Que la aplicación completa funcione, por ejemplo llamando a la API como lo haría un cliente",
+          "El estilo del código",
+          "La velocidad del disco"
+        ],
+        "correctOption": 1,
+        "explanation": "Las pruebas e2e recorren el flujo entero, de la petición HTTP a la respuesta."
+      },
+      {
+        "id": "3",
+        "prompt": "¿Qué mide un informe de cobertura de código?",
+        "options": [
+          "El tamaño de la base de datos",
+          "La cantidad de commits",
+          "Qué porcentaje del código ejecutan las pruebas",
+          "Cuántos usuarios tiene la aplicación"
+        ],
+        "correctOption": 2,
+        "explanation": "La cobertura muestra qué partes del código recorren las pruebas y cuáles quedan sin probar."
+      }
+    ]
+  },
+  {
+    "courseSlug": "angular-moderno",
+    "questions": [
+      {
+        "id": "1",
+        "prompt": "¿En qué paradigma de Angular se basa el curso?",
+        "options": [
+          "Clases de Java",
+          "Zoneless, basado en señales (signals)",
+          "Redux",
+          "jQuery"
+        ],
+        "correctOption": 1,
+        "explanation": "El curso enseña Angular con el nuevo paradigma Zoneless basado en señales."
+      },
+      {
+        "id": "2",
+        "prompt": "¿Para qué sirven los Guards en Angular?",
+        "options": [
+          "Para proteger rutas y decidir si se puede navegar a ellas",
+          "Para dar estilos a los componentes",
+          "Para hacer peticiones HTTP",
+          "Para crear pipes"
+        ],
+        "correctOption": 0,
+        "explanation": "Un guard decide si el usuario puede entrar a una ruta, por ejemplo si inició sesión."
+      },
+      {
+        "id": "3",
+        "prompt": "¿Qué es la carga perezosa (lazy load)?",
+        "options": [
+          "Deshabilitar el caché",
+          "Esperar a que el usuario recargue la página",
+          "Cargar toda la aplicación al inicio",
+          "Cargar partes de la aplicación solo cuando se necesitan"
+        ],
+        "correctOption": 3,
+        "explanation": "Con lazy load los componentes o rutas se descargan recién cuando se usan, y la carga inicial es más liviana."
+      }
+    ]
+  },
+  {
+    "courseSlug": "patrones-diseno",
+    "questions": [
+      {
+        "id": "1",
+        "prompt": "¿Qué es un patrón de diseño?",
+        "options": [
+          "Una librería de CSS",
+          "Una solución reutilizable a un problema común de diseño de software",
+          "Un lenguaje de programación",
+          "Un tipo de base de datos"
+        ],
+        "correctOption": 1,
+        "explanation": "Los patrones de diseño describen soluciones probadas a problemas que se repiten al diseñar software."
+      },
+      {
+        "id": "2",
+        "prompt": "¿Qué garantiza el patrón Singleton?",
+        "options": [
+          "Que una clase tenga una sola instancia",
+          "Que no haya herencia",
+          "Que un objeto se pueda copiar",
+          "Que existan muchas subclases"
+        ],
+        "correctOption": 0,
+        "explanation": "Singleton asegura una única instancia de la clase y un punto de acceso global a ella."
+      },
+      {
+        "id": "3",
+        "prompt": "¿Qué hace el patrón Observer?",
+        "options": [
+          "Construye objetos complejos paso a paso",
+          "Adapta una interfaz incompatible",
+          "Restringe el acceso a un objeto",
+          "Notifica a varios objetos cuando otro cambia de estado"
+        ],
+        "correctOption": 3,
+        "explanation": "Los observadores se suscriben a un sujeto y reciben un aviso cada vez que este cambia."
+      }
+    ]
+  },
+  {
+    "courseSlug": "react-native-expo",
+    "questions": [
+      {
+        "id": "1",
+        "prompt": "¿Para qué plataformas se crean apps con React Native y Expo en el curso?",
+        "options": [
+          "Solo para smart TVs",
+          "Solo para la web",
+          "iOS y Android",
+          "Solo para Windows"
+        ],
+        "correctOption": 2,
+        "explanation": "El curso crea apps nativas y las publica en la Google Play Store y la Apple App Store."
+      },
+      {
+        "id": "2",
+        "prompt": "¿Qué permite EAS Build?",
+        "options": [
+          "Crear un backend en Java",
+          "Diseñar la base de datos",
+          "Escribir estilos CSS",
+          "Compilar y empaquetar la app para publicarla en las tiendas"
+        ],
+        "correctOption": 3,
+        "explanation": "EAS Build genera los binarios de iOS y Android en la nube, incluso sin tener una Mac."
+      },
+      {
+        "id": "3",
+        "prompt": "¿Qué usa el curso para la navegación entre pantallas?",
+        "options": [
+          "Expo Router",
+          "Angular Router",
+          "Vue Router",
+          "React Router DOM"
+        ],
+        "correctOption": 0,
+        "explanation": "La navegación de la app se resuelve con Expo Router."
+      }
+    ]
+  },
+  {
+    "courseSlug": "angular-pro",
+    "questions": [
+      {
+        "id": "1",
+        "prompt": "¿De qué se libera una aplicación Angular en modo Zoneless?",
+        "options": [
+          "De las rutas",
+          "De los componentes",
+          "De la dependencia de zone.js para detectar cambios",
+          "De TypeScript"
+        ],
+        "correctOption": 2,
+        "explanation": "Zoneless elimina zone.js y usa señales para saber qué cambió."
+      },
+      {
+        "id": "2",
+        "prompt": "¿Qué diferencia a SSG de SSR?",
+        "options": [
+          "Son exactamente lo mismo",
+          "SSG solo funciona en móviles",
+          "SSR no usa un servidor",
+          "SSG genera las páginas al construir la app; SSR las genera en cada petición"
+        ],
+        "correctOption": 3,
+        "explanation": "Con SSG el HTML se genera una vez en el build; con SSR el servidor lo arma en cada petición."
+      },
+      {
+        "id": "3",
+        "prompt": "¿Qué significa i18n?",
+        "options": [
+          "Internacionalización: adaptar la app a varios idiomas",
+          "Un tipo de interceptor",
+          "Una versión de Angular",
+          "Una base de datos"
+        ],
+        "correctOption": 0,
+        "explanation": "i18n abrevia internationalization: hay 18 letras entre la i y la n."
+      }
+    ]
+  },
+  {
+    "courseSlug": "Astro",
+    "questions": [
+      {
+        "id": "1",
+        "prompt": "¿Para qué tipo de sitios está pensado Astro?",
+        "options": [
+          "Solo para apps de escritorio",
+          "Para sitios web orientados al contenido, rápidos y eficientes",
+          "Solo para bases de datos",
+          "Solo para videojuegos 3D"
+        ],
+        "correctOption": 1,
+        "explanation": "Astro está diseñado para construir sitios de contenido rápidos con las tecnologías que ya conoces."
+      },
+      {
+        "id": "2",
+        "prompt": "¿Qué es una isla en Astro?",
+        "options": [
+          "Un componente interactivo dentro de una página mayormente estática",
+          "Un tipo de base de datos",
+          "Una ruta protegida",
+          "Un servidor aislado"
+        ],
+        "correctOption": 0,
+        "explanation": "Astro envía HTML estático y solo hidrata las islas que necesitan JavaScript."
+      },
+      {
+        "id": "3",
+        "prompt": "¿Con qué formatos de contenido trabaja el curso?",
+        "options": [
+          "Solo PDF",
+          "Solo Excel",
+          "Documentos de Word",
+          "Markdown y MDX"
+        ],
+        "correctOption": 3,
+        "explanation": "El curso escribe contenido con Markdown y MDX."
+      }
+    ]
+  },
+  {
+    "courseSlug": "nestjs-reportes",
+    "questions": [
+      {
+        "id": "1",
+        "prompt": "¿Qué librería se usa para generar los PDFs en el curso?",
+        "options": [
+          "Pdfmake",
+          "Puppeteer",
+          "jsPDF",
+          "LaTeX"
+        ],
+        "correctOption": 0,
+        "explanation": "El curso arma los reportes con Pdfmake desde NestJS."
+      },
+      {
+        "id": "2",
+        "prompt": "¿Qué se usa para agregar gráficos a los reportes?",
+        "options": [
+          "Solo D3",
+          "Chart.js",
+          "Excel",
+          "Photoshop"
+        ],
+        "correctOption": 1,
+        "explanation": "Los gráficos de los reportes se generan con Chart.js."
+      },
+      {
+        "id": "3",
+        "prompt": "¿Qué ORM conecta los reportes con PostgreSQL?",
+        "options": [
+          "Entity Framework",
+          "Eloquent",
+          "Prisma",
+          "Hibernate"
+        ],
+        "correctOption": 2,
+        "explanation": "El curso extrae los datos de PostgreSQL con Prisma."
+      }
+    ]
+  },
+  {
+    "courseSlug": "shadcn-ui",
+    "questions": [
+      {
+        "id": "1",
+        "prompt": "¿Qué diferencia a shadcn/ui de una librería de componentes tradicional?",
+        "options": [
+          "Solo funciona con Angular",
+          "No permite personalizar los estilos",
+          "Copias el código de cada componente a tu proyecto y tienes control total sobre él",
+          "Se instala como un único paquete cerrado"
+        ],
+        "correctOption": 2,
+        "explanation": "Con shadcn/ui cada componente que importas vive en tu proyecto y lo puedes modificar libremente."
+      },
+      {
+        "id": "2",
+        "prompt": "¿Sobre qué herramienta de estilos se apoya shadcn/ui?",
+        "options": [
+          "Sass puro",
+          "Material Design Lite",
+          "Bootstrap",
+          "Tailwind CSS"
+        ],
+        "correctOption": 3,
+        "explanation": "Los componentes de shadcn/ui se estilan con Tailwind CSS."
+      },
+      {
+        "id": "3",
+        "prompt": "¿Qué proyecto completo se construye en el curso?",
+        "options": [
+          "Un dashboard",
+          "Un videojuego",
+          "Un sistema operativo",
+          "Un compilador"
+        ],
+        "correctOption": 0,
+        "explanation": "El curso construye un dashboard completo con formularios, tablas con filtros y temas."
+      }
+    ]
+  },
+  {
+    "courseSlug": "vue-cero-a-experto",
+    "questions": [
+      {
+        "id": "1",
+        "prompt": "¿Qué API de Vue es el foco del curso?",
+        "options": [
+          "jQuery API",
+          "Context API",
+          "Composition API",
+          "Solo Options API"
+        ],
+        "correctOption": 2,
+        "explanation": "Esta versión del curso se enfoca por completo en la Composition API con TypeScript."
+      },
+      {
+        "id": "2",
+        "prompt": "¿Qué herramienta de pruebas se usa en el curso?",
+        "options": [
+          "PHPUnit",
+          "Karma",
+          "JUnit",
+          "Vitest"
+        ],
+        "correctOption": 3,
+        "explanation": "El curso implementa pruebas automáticas con Vitest."
+      },
+      {
+        "id": "3",
+        "prompt": "¿Para qué sirven directivas como v-if y v-for?",
+        "options": [
+          "Para mostrar elementos según una condición o repetirlos por cada elemento de una lista",
+          "Para conectarse a la base de datos",
+          "Para definir rutas del servidor",
+          "Para compilar TypeScript"
+        ],
+        "correctOption": 0,
+        "explanation": "v-if renderiza un elemento solo si se cumple una condición; v-for lo repite por cada elemento."
+      }
+    ]
+  },
+  {
+    "courseSlug": "nestjs-microservicios",
+    "questions": [
+      {
+        "id": "1",
+        "prompt": "¿Qué transportador de mensajes usa el curso además de TCP y HTTP?",
+        "options": [
+          "Bluetooth",
+          "FTP",
+          "SMTP",
+          "NATS"
+        ],
+        "correctOption": 3,
+        "explanation": "Los microservicios del curso se comunican con TCP, HTTP y NATS."
+      },
+      {
+        "id": "2",
+        "prompt": "¿Qué es un monolito?",
+        "options": [
+          "Un contenedor de Docker",
+          "Un microservicio muy pequeño",
+          "Una aplicación que se despliega como una sola unidad",
+          "Una base de datos distribuida"
+        ],
+        "correctOption": 2,
+        "explanation": "El curso compara monolitos y microservicios para decidir cuándo conviene cada arquitectura."
+      },
+      {
+        "id": "3",
+        "prompt": "¿Dónde se despliegan los microservicios del curso?",
+        "options": [
+          "En Heroku",
+          "En Google Cloud con Kubernetes (GKE)",
+          "En AWS Lambda",
+          "En Azure Functions"
+        ],
+        "correctOption": 1,
+        "explanation": "El curso dockeriza los servicios y los despliega en Google Kubernetes Engine."
+      }
+    ]
+  },
+  {
+    "courseSlug": "openai-angular-nestjs",
+    "questions": [
+      {
+        "id": "1",
+        "prompt": "¿En qué frontend se consume la API de OpenAI en este curso?",
+        "options": [
+          "React",
+          "Vue",
+          "Svelte",
+          "Angular"
+        ],
+        "correctOption": 3,
+        "explanation": "El curso usa la librería de OpenAI en un backend de NestJS y la consume desde Angular."
+      },
+      {
+        "id": "2",
+        "prompt": "¿Qué permite la conversión de audio a texto?",
+        "options": [
+          "Comprimir archivos",
+          "Generar imágenes",
+          "Transcribir lo que se dice en un audio",
+          "Editar videos"
+        ],
+        "correctOption": 2,
+        "explanation": "El curso transcribe audios y genera subtítulos, incluso traducidos a otros idiomas."
+      },
+      {
+        "id": "3",
+        "prompt": "¿Qué es un thread en la Assistant API?",
+        "options": [
+          "Un formato de imagen",
+          "Una conversación que agrupa los mensajes con el asistente",
+          "Un hilo del procesador",
+          "Un archivo de configuración"
+        ],
+        "correctOption": 1,
+        "explanation": "Con la Assistant API se crean threads, se les agregan mensajes y se ejecutan runs."
+      }
+    ]
+  },
+  {
+    "courseSlug": "openai",
+    "questions": [
+      {
+        "id": "1",
+        "prompt": "¿En qué frontend se consume la API de OpenAI en este curso?",
+        "options": [
+          "Angular",
+          "Vue",
+          "React",
+          "Svelte"
+        ],
+        "correctOption": 2,
+        "explanation": "El curso usa la librería de OpenAI en un backend de NestJS y la consume desde React."
+      },
+      {
+        "id": "2",
+        "prompt": "¿Cómo se editan imágenes con IA en el curso?",
+        "options": [
+          "Con filtros de Instagram",
+          "Con Photoshop",
+          "Cambiando el nombre del archivo",
+          "Con máscaras que indican qué zona de la imagen modificar"
+        ],
+        "correctOption": 3,
+        "explanation": "La edición con máscaras le indica al modelo qué parte de la imagen cambiar."
+      },
+      {
+        "id": "3",
+        "prompt": "¿Qué permite un asistente personalizado?",
+        "options": [
+          "Responder usando información y material de tu propio proyecto",
+          "Reemplazar la base de datos",
+          "Aumentar la velocidad de internet",
+          "Cambiar el lenguaje del backend"
+        ],
+        "correctOption": 0,
+        "explanation": "El curso entrena asistentes con material propio y personaliza sus instrucciones."
+      }
+    ]
+  },
+  {
+    "courseSlug": "zustand-gestor-de-estado-para-react",
+    "questions": [
+      {
+        "id": "1",
+        "prompt": "¿Qué busca reemplazar Zustand?",
+        "options": [
+          "A React",
+          "A TypeScript",
+          "A Redux, Redux Toolkit y Context API, con menos código",
+          "Al DOM"
+        ],
+        "correctOption": 2,
+        "explanation": "Zustand ofrece funciones similares a Redux sin tanto código base."
+      },
+      {
+        "id": "2",
+        "prompt": "¿Qué hace el middleware persist?",
+        "options": [
+          "Borra el estado",
+          "Envía correos",
+          "Crea componentes",
+          "Guarda el estado, por ejemplo en LocalStorage, para que sobreviva a una recarga"
+        ],
+        "correctOption": 3,
+        "explanation": "persist guarda el store en un almacenamiento como LocalStorage o SessionStorage."
+      },
+      {
+        "id": "3",
+        "prompt": "¿Se puede usar Zustand fuera de los componentes de React?",
+        "options": [
+          "Sí, el store se puede leer y actualizar fuera del ciclo de vida de los componentes",
+          "Solo en Angular",
+          "Solo en el servidor",
+          "No, solo dentro de un componente"
+        ],
+        "correctOption": 0,
+        "explanation": "El curso muestra cómo usar Zustand más allá de los componentes, por ejemplo en interceptores de Axios."
+      }
+    ]
+  },
+  {
+    "courseSlug": "node-clean-architecture",
+    "questions": [
+      {
+        "id": "1",
+        "prompt": "¿Qué base de datos NoSQL usa el curso?",
+        "options": [
+          "SQL Server",
+          "SQLite",
+          "MongoDB con Mongoose",
+          "PostgreSQL"
+        ],
+        "correctOption": 2,
+        "explanation": "El curso modela y persiste la información en MongoDB con Mongoose."
+      },
+      {
+        "id": "2",
+        "prompt": "¿Qué es la inyección de dependencias?",
+        "options": [
+          "Inyectar SQL en la base de datos",
+          "Copiar código entre archivos",
+          "Instalar paquetes con npm",
+          "Pasarle a una clase lo que necesita desde afuera, en vez de crearlo adentro"
+        ],
+        "correctOption": 3,
+        "explanation": "Recibir las dependencias desde afuera hace al código más desacoplado, reutilizable y fácil de probar."
+      },
+      {
+        "id": "3",
+        "prompt": "¿Qué hace un DTO en la API del curso?",
+        "options": [
+          "Valida y transporta los datos entre las capas",
+          "Guarda las contraseñas",
+          "Genera el frontend",
+          "Despliega en Docker"
+        ],
+        "correctOption": 0,
+        "explanation": "Los DTOs validan lo que entra y definen qué datos viajan entre capas."
+      }
+    ]
+  },
+  {
+    "courseSlug": "flutter-bloc",
+    "questions": [
+      {
+        "id": "1",
+        "prompt": "¿Qué es BLoC en Flutter?",
+        "options": [
+          "Un servicio de hosting",
+          "Un patrón y una librería para gestionar el estado",
+          "Un lenguaje de programación",
+          "Un widget de texto"
+        ],
+        "correctOption": 1,
+        "explanation": "flutter_bloc organiza el manejo de estado con cubits y blocs."
+      },
+      {
+        "id": "2",
+        "prompt": "¿Qué diferencia a un Cubit de un Bloc?",
+        "options": [
+          "El Cubit cambia el estado llamando a métodos; el Bloc lo hace a partir de eventos",
+          "El Cubit solo funciona en iOS",
+          "El Bloc no maneja estado",
+          "No hay ninguna diferencia"
+        ],
+        "correctOption": 0,
+        "explanation": "El Cubit es la versión más simple: expone métodos que emiten estados; el Bloc recibe eventos."
+      },
+      {
+        "id": "3",
+        "prompt": "¿Qué se usa en el curso para la navegación?",
+        "options": [
+          "Solo Navigator 1.0",
+          "React Router",
+          "Vue Router",
+          "GoRouter"
+        ],
+        "correctOption": 3,
+        "explanation": "El curso integra GoRouter para la navegación."
+      }
+    ]
+  },
+  {
+    "courseSlug": "nodejs-de-cero-a-experto",
+    "questions": [
+      {
+        "id": "1",
+        "prompt": "¿Qué es Node.js?",
+        "options": [
+          "Un framework de CSS",
+          "Un entorno de ejecución de JavaScript fuera del navegador",
+          "Una base de datos",
+          "Un navegador web"
+        ],
+        "correctOption": 1,
+        "explanation": "Node.js permite ejecutar JavaScript en el servidor para crear backends, scripts y herramientas."
+      },
+      {
+        "id": "2",
+        "prompt": "¿Qué es un middleware en una API?",
+        "options": [
+          "Una función que se ejecuta entre la llegada de la petición y la respuesta",
+          "Un tipo de token",
+          "Una tabla de la base de datos",
+          "Un componente visual"
+        ],
+        "correctOption": 0,
+        "explanation": "Los middlewares sirven, por ejemplo, para validar el JWT antes de llegar al controlador."
+      },
+      {
+        "id": "3",
+        "prompt": "¿Qué es un spy en testing?",
+        "options": [
+          "Un virus",
+          "Un tipo de base de datos",
+          "Una ruta protegida",
+          "Una función que registra cómo fue llamada para verificarlo en la prueba"
+        ],
+        "correctOption": 3,
+        "explanation": "Un spy observa una función para comprobar si se llamó, cuántas veces y con qué argumentos."
+      }
+    ]
+  },
+  {
+    "courseSlug": "riverpod-con-anotaciones",
+    "questions": [
+      {
+        "id": "1",
+        "prompt": "¿Qué aporta usar Riverpod con anotaciones?",
+        "options": [
+          "Reemplaza a Flutter",
+          "Elimina la necesidad de Dart",
+          "Convierte la app en una web",
+          "La generación de código crea los providers a partir de anotaciones"
+        ],
+        "correctOption": 3,
+        "explanation": "Con anotaciones escribes menos código: el generador crea los providers por ti."
+      },
+      {
+        "id": "2",
+        "prompt": "¿Qué provider se usa para un valor asíncrono que se obtiene una vez, como una petición HTTP?",
+        "options": [
+          "ChangeNotifier",
+          "Provider",
+          "FutureProvider",
+          "StateProvider"
+        ],
+        "correctOption": 2,
+        "explanation": "FutureProvider expone el resultado de un Future con sus estados de carga, dato y error."
+      },
+      {
+        "id": "3",
+        "prompt": "¿Qué hace invalidar un provider?",
+        "options": [
+          "Desinstala el paquete",
+          "Descarta su estado para que se vuelva a calcular",
+          "Borra la aplicación",
+          "Cierra la sesión del usuario"
+        ],
+        "correctOption": 1,
+        "explanation": "Al invalidarlo, Riverpod vuelve a crear el provider la próxima vez que se lee."
+      }
+    ]
+  },
+  {
+    "courseSlug": "sql-con-postgres",
+    "questions": [
+      {
+        "id": "1",
+        "prompt": "¿Qué hace un JOIN?",
+        "options": [
+          "Borra una tabla",
+          "Crea un índice",
+          "Hace un respaldo",
+          "Combina filas de dos o más tablas según una relación"
+        ],
+        "correctOption": 3,
+        "explanation": "Un JOIN une tablas por una columna en común, por ejemplo una llave foránea."
+      },
+      {
+        "id": "2",
+        "prompt": "¿Para qué sirve un índice?",
+        "options": [
+          "Para borrar duplicados",
+          "Para cambiar el tipo de una columna",
+          "Para acelerar las búsquedas en una tabla",
+          "Para cifrar los datos"
+        ],
+        "correctOption": 2,
+        "explanation": "Un índice evita recorrer toda la tabla para encontrar las filas que buscas."
+      },
+      {
+        "id": "3",
+        "prompt": "¿Qué es un trigger?",
+        "options": [
+          "Un tipo de dato",
+          "Una función que se ejecuta automáticamente ante un evento, como un INSERT",
+          "Una tabla temporal",
+          "Un usuario administrador"
+        ],
+        "correctOption": 1,
+        "explanation": "Los triggers automatizan procesos dentro de la base de datos cuando se insertan, actualizan o borran filas."
+      }
+    ]
+  },
+  {
+    "courseSlug": "nextjs",
+    "questions": [
+      {
+        "id": "1",
+        "prompt": "¿Sobre qué librería está construido Next.js?",
+        "options": [
+          "Vue",
+          "Angular",
+          "React",
+          "Svelte"
+        ],
+        "correctOption": 2,
+        "explanation": "Next.js es el framework de React para producción."
+      },
+      {
+        "id": "2",
+        "prompt": "¿Qué significa SSG?",
+        "options": [
+          "Server Side Gateway",
+          "Secure Session Guard",
+          "Simple Style Guide",
+          "Static Site Generation: páginas generadas al construir la app"
+        ],
+        "correctOption": 3,
+        "explanation": "Con SSG las páginas se generan en el build y se sirven como archivos estáticos."
+      },
+      {
+        "id": "3",
+        "prompt": "¿Para qué se usan los middlewares en el curso?",
+        "options": [
+          "Para proteger rutas, autenticar y redirigir",
+          "Para crear la base de datos",
+          "Para procesar los pagos",
+          "Para diseñar la interfaz"
+        ],
+        "correctOption": 0,
+        "explanation": "El curso usa middlewares para proteger rutas, autenticar y redirigir."
+      }
+    ]
+  },
+  {
+    "courseSlug": "qwik-introduccion",
+    "questions": [
+      {
+        "id": "1",
+        "prompt": "¿Qué concepto diferencia a Qwik de otros frameworks?",
+        "options": [
+          "Que solo corre en el servidor",
+          "Que no usa JavaScript",
+          "La reanudabilidad (resumability)",
+          "El uso de jQuery"
+        ],
+        "correctOption": 2,
+        "explanation": "Qwik reanuda en el navegador lo que el servidor dejó listo, en vez de volver a ejecutar toda la app."
+      },
+      {
+        "id": "2",
+        "prompt": "¿Qué es Qwik City?",
+        "options": [
+          "Una base de datos",
+          "Un servicio de hosting",
+          "Un videojuego",
+          "El meta-framework de Qwik para rutas y layouts"
+        ],
+        "correctOption": 3,
+        "explanation": "Qwik City agrega el sistema de rutas, layouts y datos sobre Qwik."
+      },
+      {
+        "id": "3",
+        "prompt": "¿Con qué se validan los formularios en el curso?",
+        "options": [
+          "Zod",
+          "Validator.js",
+          "Joi",
+          "Yup"
+        ],
+        "correctOption": 0,
+        "explanation": "El curso valida los formularios con Zod."
+      }
+    ]
+  },
+  {
+    "courseSlug": "flutter-movil-intermedio",
+    "questions": [
+      {
+        "id": "1",
+        "prompt": "¿En qué se enfoca el curso?",
+        "options": [
+          "En crear bases de datos en la nube",
+          "En programar en Java",
+          "En diseñar logotipos",
+          "En usar recursos nativos del dispositivo, como sensores, cámara y biometría"
+        ],
+        "correctOption": 3,
+        "explanation": "El curso aprovecha el giroscopio, la cámara, la biometría, los mapas y otros recursos del teléfono."
+      },
+      {
+        "id": "2",
+        "prompt": "¿Qué es un deep link?",
+        "options": [
+          "Un cable de red",
+          "Un tipo de base de datos",
+          "Un enlace que abre una pantalla específica dentro de la app",
+          "Un enlace roto"
+        ],
+        "correctOption": 2,
+        "explanation": "Con deep linking un enlace lleva directo a una pantalla de la aplicación."
+      },
+      {
+        "id": "3",
+        "prompt": "¿Qué base de datos local se usa en el curso?",
+        "options": [
+          "Redis",
+          "Isar",
+          "MongoDB",
+          "Oracle"
+        ],
+        "correctOption": 1,
+        "explanation": "El curso persiste datos en el dispositivo con Isar."
+      }
+    ]
+  },
+  {
+    "courseSlug": "flutter-movil-cero-a-experto",
+    "questions": [
+      {
+        "id": "1",
+        "prompt": "¿En qué lenguaje se programa con Flutter?",
+        "options": [
+          "Kotlin",
+          "Swift",
+          "Dart",
+          "JavaScript"
+        ],
+        "correctOption": 2,
+        "explanation": "El curso empieza por Dart, desde el \"Hola Mundo\" hasta clases y mixins."
+      },
+      {
+        "id": "2",
+        "prompt": "En Flutter, ¿qué es un widget?",
+        "options": [
+          "Un servidor",
+          "Un plugin de pago",
+          "Una base de datos",
+          "La pieza básica con la que se construye la interfaz"
+        ],
+        "correctOption": 3,
+        "explanation": "En Flutter todo lo que ves es un widget, y los widgets se combinan para armar las pantallas."
+      },
+      {
+        "id": "3",
+        "prompt": "¿Para qué plataformas se crean y publican apps en el curso?",
+        "options": [
+          "iOS y Android",
+          "Solo Windows",
+          "Solo la web",
+          "Solo macOS"
+        ],
+        "correctOption": 0,
+        "explanation": "El curso llega hasta la publicación de las apps en las tiendas de iOS y Android."
+      }
+    ]
+  },
+  {
+    "courseSlug": "angular",
+    "questions": [
+      {
+        "id": "1",
+        "prompt": "¿Cómo se organiza la aplicación en este curso de Angular clásico?",
+        "options": [
+          "En módulos (NgModules) que agrupan componentes, servicios y rutas",
+          "Con scripts de jQuery",
+          "En un solo archivo HTML",
+          "Con clases de Java"
+        ],
+        "correctOption": 0,
+        "explanation": "Este curso trabaja el enfoque clásico de Angular, con módulos."
+      },
+      {
+        "id": "2",
+        "prompt": "¿Qué son los formularios reactivos en Angular?",
+        "options": [
+          "Formularios que cambian de color",
+          "Formularios que se definen y validan desde el código del componente",
+          "Formularios en PDF",
+          "Formularios que envían correos"
+        ],
+        "correctOption": 1,
+        "explanation": "En los formularios reactivos la estructura y las validaciones viven en TypeScript."
+      },
+      {
+        "id": "3",
+        "prompt": "¿Con qué backend se implementa la autenticación en el curso?",
+        "options": [
+          "Laravel",
+          "Ruby on Rails",
+          "NestJS",
+          "Django"
+        ],
+        "correctOption": 2,
+        "explanation": "El desarrollo full stack del curso autentica contra un backend en NestJS."
+      }
+    ]
+  },
+  {
+    "courseSlug": "docker-guia-practica",
+    "questions": [
+      {
+        "id": "1",
+        "prompt": "¿Qué es un Dockerfile?",
+        "options": [
+          "Un contenedor en ejecución",
+          "Un archivo con las instrucciones para construir una imagen",
+          "Una base de datos",
+          "Un registro de errores"
+        ],
+        "correctOption": 1,
+        "explanation": "El Dockerfile describe paso a paso cómo se construye una imagen."
+      },
+      {
+        "id": "2",
+        "prompt": "¿Para qué sirve Docker Compose?",
+        "options": [
+          "Para definir y levantar aplicaciones de varios contenedores",
+          "Para escribir código Java",
+          "Para diseñar interfaces",
+          "Para crear ramas de Git"
+        ],
+        "correctOption": 0,
+        "explanation": "Compose define en un archivo los servicios de la aplicación (por ejemplo, app y base de datos) y los levanta juntos."
+      },
+      {
+        "id": "3",
+        "prompt": "¿Qué diferencia hay entre una imagen y un contenedor?",
+        "options": [
+          "Son exactamente lo mismo",
+          "El contenedor es un archivo de texto",
+          "La imagen solo existe en Windows",
+          "La imagen es la plantilla; el contenedor es una instancia en ejecución de esa imagen"
+        ],
+        "correctOption": 3,
+        "explanation": "De una misma imagen se pueden crear muchos contenedores."
+      }
+    ]
+  },
+  {
+    "courseSlug": "nest-graphql",
+    "questions": [
+      {
+        "id": "1",
+        "prompt": "En GraphQL, ¿qué es una mutation?",
+        "options": [
+          "Una consulta de solo lectura",
+          "Un error del servidor",
+          "Una operación que modifica datos",
+          "Un tipo de base de datos"
+        ],
+        "correctOption": 2,
+        "explanation": "Las queries leen datos y las mutations los crean, actualizan o borran."
+      },
+      {
+        "id": "2",
+        "prompt": "¿Qué ventaja ofrece GraphQL frente a una API REST tradicional?",
+        "options": [
+          "No necesita un servidor",
+          "Nunca usa HTTP",
+          "No permite autenticación",
+          "El cliente pide exactamente los campos que necesita"
+        ],
+        "correctOption": 3,
+        "explanation": "Con GraphQL el frontend arma la consulta a su medida y no recibe datos de más ni de menos."
+      },
+      {
+        "id": "3",
+        "prompt": "¿Qué enfoque de NestJS con GraphQL usa el curso?",
+        "options": [
+          "Code First: el esquema se genera a partir de las clases de TypeScript",
+          "Sin esquema",
+          "Database First",
+          "Schema First con archivos XML"
+        ],
+        "correctOption": 0,
+        "explanation": "Con Code First defines tipos y resolvers en TypeScript y Nest genera el esquema de GraphQL."
+      }
+    ]
+  },
+  {
+    "courseSlug": "programacion-para-principiantes",
+    "questions": [
+      {
+        "id": "1",
+        "prompt": "¿Qué es una variable?",
+        "options": [
+          "Un tipo de computadora",
+          "Un lenguaje de programación",
+          "Un error del programa",
+          "Un espacio con nombre para guardar un valor que puede cambiar"
+        ],
+        "correctOption": 3,
+        "explanation": "Una variable guarda un dato con un nombre para usarlo después; su valor puede cambiar."
+      },
+      {
+        "id": "2",
+        "prompt": "¿Para qué sirve un ciclo (bucle)?",
+        "options": [
+          "Para instalar programas",
+          "Para apagar la computadora",
+          "Para repetir instrucciones varias veces",
+          "Para borrar variables"
+        ],
+        "correctOption": 2,
+        "explanation": "Un ciclo repite un bloque de código mientras se cumpla una condición o por cada elemento."
+      },
+      {
+        "id": "3",
+        "prompt": "¿Qué se crea como proyecto final del curso?",
+        "options": [
+          "Un compilador",
+          "Un juego web",
+          "Un sistema operativo",
+          "Una red social completa"
+        ],
+        "correctOption": 1,
+        "explanation": "El curso termina creando y desplegando un pequeño juego web."
+      }
+    ]
+  },
+  {
+    "courseSlug": "nest",
+    "questions": [
+      {
+        "id": "1",
+        "prompt": "¿Qué es NestJS?",
+        "options": [
+          "Una librería de CSS",
+          "Un gestor de bases de datos",
+          "Un framework de Node.js para aplicaciones del lado del servidor",
+          "Un framework de frontend"
+        ],
+        "correctOption": 2,
+        "explanation": "Nest es un framework de Node extensible y progresivo para construir backends."
+      },
+      {
+        "id": "2",
+        "prompt": "En NestJS, ¿qué hace un controller?",
+        "options": [
+          "Compila TypeScript",
+          "Crea la base de datos",
+          "Guarda los estilos",
+          "Recibe las peticiones y devuelve las respuestas"
+        ],
+        "correctOption": 3,
+        "explanation": "El controller define las rutas y delega la lógica en los services."
+      },
+      {
+        "id": "3",
+        "prompt": "¿Para qué sirven los Pipes junto con los DTOs?",
+        "options": [
+          "Para validar y transformar los datos de la petición",
+          "Para enviar correos",
+          "Para crear migraciones",
+          "Para dibujar gráficos"
+        ],
+        "correctOption": 0,
+        "explanation": "Los pipes validan los DTOs antes de que la petición llegue al controller."
+      }
+    ]
+  },
+  {
+    "courseSlug": "tanstack-query",
+    "questions": [
+      {
+        "id": "1",
+        "prompt": "¿Qué gestiona TanStack Query?",
+        "options": [
+          "El estado asíncrono: los datos que vienen del servidor",
+          "Los estilos CSS",
+          "Las rutas de la app",
+          "Las animaciones"
+        ],
+        "correctOption": 0,
+        "explanation": "TanStack Query se encarga de pedir, guardar en caché y actualizar datos remotos."
+      },
+      {
+        "id": "2",
+        "prompt": "¿Qué hook se usa para obtener datos con TanStack Query?",
+        "options": [
+          "useState",
+          "useQuery",
+          "useEffect",
+          "useRef"
+        ],
+        "correctOption": 1,
+        "explanation": "useQuery recibe una clave y una función que trae los datos, y devuelve los datos con su estado."
+      },
+      {
+        "id": "3",
+        "prompt": "¿Para qué sirve el caché de TanStack Query?",
+        "options": [
+          "Para cifrar contraseñas",
+          "Para compilar la app",
+          "Para reutilizar los datos ya pedidos y evitar peticiones repetidas",
+          "Para borrar datos"
+        ],
+        "correctOption": 2,
+        "explanation": "Los datos quedan en caché bajo su clave, y la app los muestra al instante mientras se actualizan."
+      }
+    ]
+  },
+  {
+    "courseSlug": "visual-studio-code",
+    "questions": [
+      {
+        "id": "1",
+        "prompt": "¿En qué se enfoca el curso de Visual Studio Code?",
+        "options": [
+          "En diseñar bases de datos",
+          "En aumentar tu velocidad al programar con atajos y funciones del editor",
+          "En crear videojuegos",
+          "En aprender Java"
+        ],
+        "correctOption": 1,
+        "explanation": "El curso busca que edites código más rápido y conozcas mejor VS Code."
+      },
+      {
+        "id": "2",
+        "prompt": "¿Qué ventaja dan los atajos de teclado?",
+        "options": [
+          "Editar código más rápido sin depender del mouse",
+          "Aumentar la memoria RAM",
+          "Instalar lenguajes",
+          "Mejorar la conexión a internet"
+        ],
+        "correctOption": 0,
+        "explanation": "Con los atajos adecuados las tareas de edición frecuentes se hacen en segundos."
+      },
+      {
+        "id": "3",
+        "prompt": "¿Las mejoras de productividad del curso dependen del lenguaje que uses?",
+        "options": [
+          "Sí, solo sirven para Java",
+          "Solo sirven para HTML",
+          "Sí, solo sirven para Python",
+          "No, sirven sin importar el lenguaje o framework"
+        ],
+        "correctOption": 3,
+        "explanation": "El curso optimiza tu flujo de trabajo en el editor, uses el lenguaje que uses."
+      }
+    ]
+  },
+  {
+    "courseSlug": "dart-cero-hasta-detalles",
+    "questions": [
+      {
+        "id": "1",
+        "prompt": "¿Qué framework popular usa Dart como lenguaje?",
+        "options": [
+          "Flutter",
+          "React",
+          "Django",
+          "Laravel"
+        ],
+        "correctOption": 0,
+        "explanation": "Dart es el lenguaje de Flutter; este curso da las bases para cualquier tecnología que lo use."
+      },
+      {
+        "id": "2",
+        "prompt": "En Dart, ¿qué indica el signo ? después de un tipo, como en String?",
+        "options": [
+          "Que es una lista",
+          "Que la variable puede ser null",
+          "Que es privada",
+          "Que es una constante"
+        ],
+        "correctOption": 1,
+        "explanation": "Con null safety, un tipo sin ? nunca es null; con ? puede serlo."
+      },
+      {
+        "id": "3",
+        "prompt": "¿Qué función es el punto de entrada de un programa en Dart?",
+        "options": [
+          "init()",
+          "run()",
+          "main()",
+          "start()"
+        ],
+        "correctOption": 2,
+        "explanation": "Todo programa de Dart empieza a ejecutarse en la función main."
+      }
+    ]
+  },
+  {
+    "courseSlug": "javascript-moderno",
+    "questions": [
+      {
+        "id": "1",
+        "prompt": "¿Qué representa una promesa (Promise) en JavaScript?",
+        "options": [
+          "Un comentario",
+          "Una variable constante",
+          "Un valor que estará disponible en el futuro, como el resultado de una petición",
+          "Un bucle"
+        ],
+        "correctOption": 2,
+        "explanation": "Una promesa se resuelve o se rechaza más adelante; se consume con then o con await."
+      },
+      {
+        "id": "2",
+        "prompt": "¿Qué es el DOM?",
+        "options": [
+          "Un framework",
+          "Una base de datos",
+          "Un servidor",
+          "La representación de la página HTML que JavaScript puede manipular"
+        ],
+        "correctOption": 3,
+        "explanation": "Con el DOM JavaScript lee y modifica los elementos de la página."
+      },
+      {
+        "id": "3",
+        "prompt": "¿Qué API del navegador se usa para hacer peticiones HTTP?",
+        "options": [
+          "Fetch API",
+          "Canvas API",
+          "Geolocation API",
+          "Vibration API"
+        ],
+        "correctOption": 0,
+        "explanation": "fetch hace peticiones HTTP y devuelve una promesa con la respuesta."
+      }
+    ]
+  },
+  {
+    "courseSlug": "typescript-guia-completa",
+    "questions": [
+      {
+        "id": "1",
+        "prompt": "¿Qué agrega TypeScript a JavaScript?",
+        "options": [
+          "Tipado estático",
+          "Estilos CSS",
+          "Un nuevo navegador",
+          "Una base de datos"
+        ],
+        "correctOption": 0,
+        "explanation": "TypeScript agrega tipos que detectan errores antes de ejecutar el código."
+      },
+      {
+        "id": "2",
+        "prompt": "¿Qué pasa con el código TypeScript antes de ejecutarse en el navegador?",
+        "options": [
+          "Se ejecuta tal cual, sin cambios",
+          "Se compila (transpila) a JavaScript",
+          "Se convierte en Python",
+          "Se guarda en una base de datos"
+        ],
+        "correctOption": 1,
+        "explanation": "El navegador ejecuta JavaScript, así que TypeScript se compila antes."
+      },
+      {
+        "id": "3",
+        "prompt": "¿Para qué sirve una interfaz (interface) en TypeScript?",
+        "options": [
+          "Para conectarse a internet",
+          "Para definir estilos",
+          "Para describir la forma que debe tener un objeto",
+          "Para crear una ventana gráfica"
+        ],
+        "correctOption": 2,
+        "explanation": "Una interfaz define qué propiedades y tipos debe tener un objeto."
+      }
+    ]
+  },
+  {
+    "courseSlug": "react-pro",
+    "questions": [
+      {
+        "id": "1",
+        "prompt": "¿A quién está dirigido React PRO?",
+        "options": [
+          "A quienes nunca programaron",
+          "Solo a diseñadores",
+          "Solo a desarrolladores de Java",
+          "A quienes ya conocen React con hooks"
+        ],
+        "correctOption": 3,
+        "explanation": "No es un curso para empezar con React: busca mejorar habilidades que ya tienes."
+      },
+      {
+        "id": "2",
+        "prompt": "¿Para qué se usa Storybook en el curso?",
+        "options": [
+          "Para desplegar el backend",
+          "Para escribir historias de usuario en Jira",
+          "Para documentar y probar componentes de forma aislada",
+          "Para crear la base de datos"
+        ],
+        "correctOption": 2,
+        "explanation": "El curso documenta y publica librerías de componentes reutilizables con Storybook."
+      },
+      {
+        "id": "3",
+        "prompt": "¿Qué permite una PWA con Service Workers?",
+        "options": [
+          "Que no haga falta un navegador",
+          "Que la app funcione sin conexión",
+          "Que la app no use JavaScript",
+          "Que la app solo funcione en iOS"
+        ],
+        "correctOption": 1,
+        "explanation": "Con Service Workers, Workbox e IndexedDB la app sigue funcionando offline."
+      }
+    ]
+  },
+  {
+    "courseSlug": "solid-clean-code",
+    "questions": [
+      {
+        "id": "1",
+        "prompt": "¿Qué dice el principio de responsabilidad única (SRP)?",
+        "options": [
+          "Cada función debe tener una sola línea",
+          "Una clase debe hacer todo el trabajo",
+          "Solo puede haber una clase por proyecto",
+          "Una clase debe tener una sola razón para cambiar"
+        ],
+        "correctOption": 3,
+        "explanation": "La S de SOLID: cada clase se ocupa de una sola responsabilidad."
+      },
+      {
+        "id": "2",
+        "prompt": "¿Qué propone el principio abierto/cerrado (OCP)?",
+        "options": [
+          "Los archivos deben cerrarse después de usarlos",
+          "Las clases no pueden usar herencia",
+          "El código debe estar abierto a la extensión y cerrado a la modificación",
+          "El código debe ser abierto y público"
+        ],
+        "correctOption": 2,
+        "explanation": "La O de SOLID: agregas comportamiento nuevo sin modificar el código que ya funciona."
+      },
+      {
+        "id": "3",
+        "prompt": "¿Qué dice el principio de inversión de dependencias (DIP)?",
+        "options": [
+          "Depender siempre de clases concretas",
+          "Depender de abstracciones, no de implementaciones concretas",
+          "Invertir el orden de los parámetros",
+          "Eliminar todas las dependencias del proyecto"
+        ],
+        "correctOption": 1,
+        "explanation": "La D de SOLID: los módulos dependen de interfaces, no de detalles de implementación."
+      }
+    ]
+  },
+  {
+    "courseSlug": "codex",
+    "questions": [
+      {
+        "id": "1",
+        "prompt": "¿Qué aplicación se construye en el curso de Codex?",
+        "options": [
+          "Un clon de Twitter",
+          "door-list, una app de eventos con check-in por QR",
+          "Un videojuego de plataformas",
+          "Un sistema contable"
+        ],
+        "correctOption": 1,
+        "explanation": "El curso construye door-list y después la vuelve a construir con Spec-Driven Development."
+      },
+      {
+        "id": "2",
+        "prompt": "¿Con qué herramienta se reconstruye la app aplicando Spec-Driven Development?",
+        "options": [
+          "Spec Kit",
+          "Jenkins",
+          "Storybook",
+          "Webpack"
+        ],
+        "correctOption": 0,
+        "explanation": "La segunda versión de door-list se hace con Spec-Driven Development y Spec Kit."
+      },
+      {
+        "id": "3",
+        "prompt": "¿Para qué sirven las aprobaciones en un agente como Codex?",
+        "options": [
+          "Para aprobar pagos",
+          "Para publicar en redes sociales",
+          "Para calificar el código",
+          "Para que confirmes las acciones del agente antes de que las ejecute"
+        ],
+        "correctOption": 3,
+        "explanation": "Junto con el sandbox, las aprobaciones controlan qué puede hacer el agente sin preguntarte."
+      }
+    ]
+  },
+  {
+    "courseSlug": "go-microservicios",
+    "questions": [
+      {
+        "id": "1",
+        "prompt": "¿Qué es gRPC?",
+        "options": [
+          "Un editor de texto",
+          "Un lenguaje de estilos",
+          "Un framework de llamadas a procedimientos remotos para comunicar servicios",
+          "Una base de datos"
+        ],
+        "correctOption": 2,
+        "explanation": "gRPC permite que un servicio llame a funciones de otro como si fueran locales."
+      },
+      {
+        "id": "2",
+        "prompt": "¿Qué propone una arquitectura event driven?",
+        "options": [
+          "Que no haya comunicación entre servicios",
+          "Que los servicios compartan una sola base de datos",
+          "Que todo se ejecute en un solo proceso",
+          "Que los servicios se comuniquen reaccionando a eventos"
+        ],
+        "correctOption": 3,
+        "explanation": "En una arquitectura orientada a eventos, un servicio publica lo que pasó y otros reaccionan."
+      },
+      {
+        "id": "3",
+        "prompt": "¿De qué tipo de proyecto parte el curso?",
+        "options": [
+          "De un proyecto monolítico existente que se transforma en microservicios",
+          "De cero, sin código",
+          "De una app móvil",
+          "De un sitio estático"
+        ],
+        "correctOption": 0,
+        "explanation": "El curso toma un monolito existente y lo lleva a microservicios."
+      }
+    ]
+  },
+  {
+    "courseSlug": "kafka-springboot-event-driven",
+    "questions": [
+      {
+        "id": "1",
+        "prompt": "¿Qué es Apache Kafka?",
+        "options": [
+          "Una plataforma de streaming de eventos para comunicar servicios mediante mensajes",
+          "Un editor de código",
+          "Un framework de frontend",
+          "Un lenguaje de programación"
+        ],
+        "correctOption": 0,
+        "explanation": "Kafka recibe, guarda y distribuye eventos entre los servicios que los producen y consumen."
+      },
+      {
+        "id": "2",
+        "prompt": "¿Con qué versiones de Java y Spring Boot trabaja el curso?",
+        "options": [
+          "Java 17 y Spring Boot 3",
+          "Java 21 y Spring Boot 4",
+          "Java 8 y Spring Boot 1",
+          "Java 11 y Spring Boot 2"
+        ],
+        "correctOption": 1,
+        "explanation": "El curso usa Apache Kafka con Spring Boot 4 y Java 21."
+      },
+      {
+        "id": "3",
+        "prompt": "¿Cómo evoluciona el backend del curso?",
+        "options": [
+          "De Java a Python",
+          "De backend a frontend",
+          "De monolito modular a microservicios",
+          "De microservicios a un solo archivo"
+        ],
+        "correctOption": 2,
+        "explanation": "El proyecto empieza como un monolito modular y evoluciona a microservicios."
+      }
+    ]
+  },
+  {
+    "courseSlug": "patrones-diseno-agentico",
+    "questions": [
+      {
+        "id": "1",
+        "prompt": "¿Qué es el patrón ReAct en agentes de IA?",
+        "options": [
+          "Alternar razonamiento y acciones (uso de herramientas) hasta resolver la tarea",
+          "Reiniciar el agente ante un error",
+          "Responder siempre con la misma frase",
+          "Usar la librería React"
+        ],
+        "correctOption": 0,
+        "explanation": "ReAct combina razonar (Reason) y actuar (Act): el agente piensa, usa una herramienta y vuelve a pensar con el resultado."
+      },
+      {
+        "id": "2",
+        "prompt": "¿Qué hace el patrón Reflection?",
+        "options": [
+          "Guarda la respuesta en la base de datos",
+          "El agente revisa y critica su propia respuesta para mejorarla",
+          "Copia la respuesta de otro agente",
+          "Refleja la interfaz como un espejo"
+        ],
+        "correctOption": 1,
+        "explanation": "Con Reflection el agente evalúa su salida y la corrige antes de entregarla."
+      },
+      {
+        "id": "3",
+        "prompt": "¿Qué costos mide el curso en cada paso?",
+        "options": [
+          "Solo líneas de código",
+          "Solo megabytes de memoria",
+          "Tokens, latencia y dólares",
+          "Solo horas de trabajo"
+        ],
+        "correctOption": 2,
+        "explanation": "El curso mide el coste real de cada patrón en tokens, latencia y dólares."
+      }
+    ]
+  },
+  {
+    "courseSlug": "Vue-intermedio",
+    "questions": [
+      {
+        "id": "1",
+        "prompt": "¿Qué librería de estado se usa en el curso?",
+        "options": [
+          "Redux",
+          "MobX",
+          "NgRx",
+          "Pinia"
+        ],
+        "correctOption": 3,
+        "explanation": "El curso trabaja con Pinia, con Options Store y Setup Store."
+      },
+      {
+        "id": "2",
+        "prompt": "¿Qué es <script setup> en Vue 3?",
+        "options": [
+          "Un comando de instalación",
+          "Un archivo de configuración del servidor",
+          "Una sintaxis más concisa para usar la Composition API en los componentes",
+          "Un plugin de CSS"
+        ],
+        "correctOption": 2,
+        "explanation": "Con script setup lo que declaras en el script queda disponible directamente en el template."
+      },
+      {
+        "id": "3",
+        "prompt": "¿Qué framework de componentes UI se usa en el curso?",
+        "options": [
+          "Element Plus",
+          "Quasar",
+          "Bootstrap Vue",
+          "Vuetify"
+        ],
+        "correctOption": 1,
+        "explanation": "El curso usa Quasar: su sistema de estilos, temas, Boot Files e íconos."
+      }
+    ]
+  }
+]

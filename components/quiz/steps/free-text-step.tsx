@@ -2,10 +2,7 @@
 
 import { type Control, useController } from "react-hook-form";
 
-import {
-  MAX_FREE_TEXT_LENGTH,
-  type AssessmentAnswers,
-} from "@/components/quiz/quiz-schema";
+import { MAX_FREE_TEXT_LENGTH, type AssessmentAnswers } from "@/components/quiz/quiz-schema";
 import {
   Field,
   FieldDescription,
@@ -21,7 +18,7 @@ export function FreeTextStep({ control }: { control: Control<AssessmentAnswers> 
 
   return (
     <FieldSet>
-      <FieldLegend>Contanos más sobre tu meta (opcional)</FieldLegend>
+      <FieldLegend>Cuéntanos más sobre tu meta (opcional)</FieldLegend>
       <FieldGroup>
         <Field data-invalid={!!fieldState.error}>
           <Textarea
@@ -31,8 +28,10 @@ export function FreeTextStep({ control }: { control: Control<AssessmentAnswers> 
             {...field}
           />
           <FieldDescription>
-            {field.value.length}/{MAX_FREE_TEXT_LENGTH} caracteres — la IA lo usa para
-            personalizar tu ruta, el motor de reglas no lo necesita.
+            {field.value.length}/{MAX_FREE_TEXT_LENGTH} caracteres. Si la personalización con IA
+            está disponible, ajustamos tu ruta según lo que cuentes (y te mostramos qué cambiamos) y
+            explicamos cada curso pensando en ti. Los cursos siempre salen de las rutas oficiales de
+            DevTalles.
           </FieldDescription>
           <FieldError errors={[fieldState.error]} />
         </Field>

@@ -1,8 +1,8 @@
 type UsageRule = {
-  title: string
-  wrong: string
-  right: string
-}
+  title: string;
+  wrong: string;
+  right: string;
+};
 
 const USAGE_RULES: UsageRule[] = [
   {
@@ -35,24 +35,24 @@ const USAGE_RULES: UsageRule[] = [
     wrong: "className={`flex ${isActive ? 'bg-primary' : 'bg-muted'}`}",
     right: 'className={cn("flex", isActive ? "bg-primary" : "bg-muted")}',
   },
-]
+];
 
 function UsageRules() {
   return (
     <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
       {USAGE_RULES.map((rule) => (
-        <div key={rule.title} className="border-border flex flex-col gap-2 rounded-lg border p-4">
+        <div key={rule.title} className="flex flex-col gap-2 rounded-lg border border-border p-4">
           <p className="font-heading text-sm font-medium">{rule.title}</p>
-          <code className="bg-level-required/10 text-level-required rounded px-2 py-1 text-xs">
+          <code className="rounded bg-level-required/10 px-2 py-1 text-xs text-level-required">
             ✗ {rule.wrong}
           </code>
-          <code className="bg-level-recommended/10 text-level-recommended rounded px-2 py-1 text-xs">
+          <code className="rounded bg-level-recommended/10 px-2 py-1 text-xs text-level-recommended">
             ✓ {rule.right}
           </code>
         </div>
       ))}
     </div>
-  )
+  );
 }
 
-export { UsageRules }
+export { UsageRules };

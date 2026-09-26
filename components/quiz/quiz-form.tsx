@@ -30,10 +30,10 @@ import { saveAssessment } from "@/app/(app)/quiz/actions";
 const STEPS = [
   { title: "Tu meta", Step: GoalStep },
   { title: "Tu nivel", Step: LevelStep },
-  { title: "Ya dominás", Step: TechnologiesStep },
+  { title: "Ya dominas", Step: TechnologiesStep },
   { title: "Te interesa", Step: InterestsStep },
   { title: "Tu tiempo", Step: TimeStep },
-  { title: "Contanos más", Step: FreeTextStep },
+  { title: "Cuéntanos más", Step: FreeTextStep },
 ] as const;
 
 const LAST_STEP = STEPS.length - 1;
@@ -100,11 +100,7 @@ export function QuizForm() {
             </Alert>
           </CardContent>
           <CardFooter className="justify-between">
-            <Button
-              variant="outline"
-              render={<Link href="/dashboard" />}
-              nativeButton={false}
-            >
+            <Button variant="outline" render={<Link href="/dashboard" />} nativeButton={false}>
               Volver al dashboard
             </Button>
             <Button onClick={handleRetryGeneration} disabled={isPending}>
@@ -150,12 +146,15 @@ export function QuizForm() {
           <Button type="button" variant="outline" onClick={handleBack} disabled={currentStep === 0}>
             Atrás
           </Button>
+          {/* Las `key` distintas obligan a React a crear otro <button> en vez de reusar el mismo
+              cambiándole el `type`: sin ellas, el clic en "Siguiente" del paso 5 terminaba sobre
+              un botón que ya era `submit` y enviaba el formulario, salteando el texto libre. */}
           {isLastStep ? (
-            <Button type="submit" disabled={isPending}>
+            <Button key="submit" type="submit" disabled={isPending}>
               {isPending ? "Guardando…" : "Guardar mis respuestas"}
             </Button>
           ) : (
-            <Button type="button" onClick={handleNext}>
+            <Button key="next" type="button" onClick={handleNext}>
               Siguiente
             </Button>
           )}

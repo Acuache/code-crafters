@@ -10,17 +10,15 @@ Este archivo da contexto a Claude Code (claude.ai/code) para trabajar en este re
 
 Tres nombres, tres cosas distintas — no confundirlos: **DevPathlles** es el producto (este repo), **Code Crafters** es el equipo que lo construye, y **Code Quest** es el concurso de DevTalles para el que se construye (`docs/ENUNCIADO.md`).
 
-Este repo ya salió del scaffold de `create-next-app` en lo visual, pero la aplicación real — **DevPathlles**, un generador de rutas de aprendizaje sobre el catálogo de cursos de DevTalles — todavía no está construida. Lo que ya existe es el sistema de diseño (`app/globals.css`, `app/layout.tsx`, ~22 componentes en `components/ui/`, documentados en la ruta `/sistema-diseno`; ver `docs/decisiones/0002-sistema-de-diseno-devtalles.md`) y los utils de cliente de Supabase (`lib/supabase/{client,server}.ts`, `proxy.ts`) — ver **Notas de arquitectura** para el detalle de ambos. La planificación, los requisitos y la investigación viven en `docs/` y `data/` (contexto de proyecto real, no un scratchpad descartable):
+**DevPathlles** es un generador de rutas de aprendizaje sobre el catálogo de cursos de DevTalles. Ya están implementados los specs 01–15: la landing pública con el recorrido "Cómo funciona" animado con el scroll (spec 05, `components/landing/`, `lib/landing/`), esquema de Supabase y seed del catálogo, login OAuth, motor de rutas por reglas (`lib/paths/`), cuestionario, generación y vista de la ruta (lista + mapa en zigzag), dashboard, panel `/admin`, y la personalización con IA (`lib/ai/`). Encima, los quizzes y la racha que aportó Ariel, integrados según `docs/decisiones/0005-quizzes-y-racha-unificados.md` (`lib/quizzes/`, `lib/gamification/streak.ts`, `components/quizzes/`); desde el spec 13 los quizzes ya no se generan con IA: el admin los escribe en `/admin/courses/[slug]/quiz` (`docs/decisiones/0006-quizzes-de-curso-escritos-por-el-admin.md`). El spec 14 suma XP, niveles e insignias derivados al leer (`lib/gamification/`, `components/gamification/`), la página `/profile` y la celebración al completar; con `docs/decisiones/0007-done-requires-course-quiz.md`, "Hecho" en un curso con quiz exige aprobarlo. El spec 15 deja compartir una ruta con un link público `/shared/[slug]` (con tarjeta OG para Discord) y copiarla a otra cuenta con el progreso en cero (`lib/sharing/`, `components/sharing/`). Qué spec sigue y en qué estado está cada uno: `docs/SPECS-MAP.md` y la línea `**Estado:**` de cada `specs/NN-slug.md`. La planificación, los requisitos y la investigación viven en `docs/` y `data/` (contexto de proyecto real, no un scratchpad descartable):
 
 - `docs/ENUNCIADO.md` — los requisitos oficiales del concurso. Cualquier feature debe cumplirlos.
-- `docs/ROADMAP.md` — el plan MVP detallado: modelo de datos, estructura de carpetas (`app` con route groups, `lib/{supabase,ai,paths,gamification}`, en la raíz del repo — ver **Notas de arquitectura**), cronograma día a día y el stack elegido (Next.js 16 App Router, Tailwind v4 + shadcn/ui, Supabase para auth/DB con Discord OAuth, Vercel AI SDK, React Flow para el mapa de la ruta).
+- `docs/ROADMAP.md` — el plan MVP detallado: modelo de datos, estructura de carpetas (`app` con route groups, `lib/{supabase,ai,paths,gamification}`, en la raíz del repo — ver **Notas de arquitectura**), cronograma día a día y el stack elegido (Next.js 16 App Router, Tailwind v4 + shadcn/ui, Supabase para auth/DB con Discord OAuth, Vercel AI SDK; el roadmap preveía React Flow para el mapa de la ruta, pero el spec 12 lo resolvió con CSS + SVG, sin dependencias nuevas).
 - `docs/decisiones/` — historial de decisiones (formato ADR: contexto, opciones, decisión, consecuencias). `README.md` es el índice; `0000-plantilla.md` es el formato a copiar para una decisión nueva. Antes de proponer un cambio de arquitectura importante, revisar aquí si ya se debatió.
 - `docs/investigacion/ANALISIS-IA.md` — reemplaza una decisión clave del roadmap: en vez de "la IA arma toda la ruta", recomienda un enfoque **híbrido**: un motor por reglas sobre los programas oficiales de DevTalles siempre genera una ruta funcional, y la IA solo personaliza encima (explica elecciones, cambia cursos opcionales, interpreta metas en texto libre). Esto existe para que la app funcione aunque falte o se agote la key de OpenAI — necesario porque, según `ENUNCIADO.md`, un proyecto que no funcione al clonarlo descalifica al equipo.
-- `docs/investigacion/opcion-c.html` — demo interactiva en HTML del enfoque híbrido (reglas + IA); se abre directo en el navegador.
-- `docs/investigacion/ideas-vagas.md` — notas iniciales sueltas (concurso de 18 equipos, 2 semanas de plazo, $10 de crédito de OpenAI).
 - `data/` — el catálogo ya extraído: `courses.json` (74 cursos activos, sin Legacy), `programs.json` (las rutas/programas oficiales de DevTalles), `SUMMARY.md` (referencia de los campos de ambos JSON, incluida la procedencia). Se extrajo con un scraper de un solo uso que ya no vive en el repo — si hace falta regenerarlo, se vuelve a escribir.
 
-Al implementar features, revisar primero `ROADMAP.md` + `ANALISIS-IA.md` + `docs/decisiones/` para la arquitectura y el modelo de datos previstos en vez de inventar uno nuevo — nada de eso está implementado todavía, así que no hay código existente que lo contradiga.
+Al implementar features, revisar primero el spec que toca, `docs/SPECS-MAP.md` (qué archivo es de qué spec y sus excepciones) y `docs/decisiones/` en vez de inventar arquitectura o modelo de datos nuevos. Si el código existente contradice a `ROADMAP.md`, manda el código y los specs implementados: el roadmap es el plan original.
 
 ## Metodología: Spec-Driven Development (SDD)
 
@@ -30,9 +28,9 @@ Las features de tamaño no trivial se desarrollan con las skills `spec` / `spec-
 2. El usuario revisa el spec y cambia manualmente su estado a `Approved` cuando está conforme — el agente nunca se auto-aprueba.
 3. **`/spec-impl NN-slug`** — valida que el estado sea `Approved`, crea (o retoma) la rama `spec-NN-slug` según `specs/.spec-config.yml` (`AutoCreateBranch`, default `true`), y luego implementa el plan del spec paso a paso, pausando después de cada paso para revisión. Nunca commitea automáticamente.
 
-`specs/` todavía no existe en este repo — se crea con el primer `/spec`. El detalle completo de fases y reglas vive en `.agents/skills/spec/SKILL.md` y `.agents/skills/spec-impl/SKILL.md`; no lo dupliques aquí, ya se carga solo al invocar la skill.
+Los specs viven en `specs/NN-slug.md` (estados en español: `Borrador`, `Aprobado`, `Implementado`). El detalle completo de fases y reglas vive en `.agents/skills/spec/SKILL.md` y `.agents/skills/spec-impl/SKILL.md`; no lo dupliques aquí, ya se carga solo al invocar la skill.
 
-El orden acordado de los 13 specs del MVP — numeración, dependencias entre ellos y qué decisión pendiente cierra cada uno — vive en [`docs/SPECS-MAP.md`](docs/SPECS-MAP.md). Consultarlo antes de correr `/spec` para saber qué feature sigue y qué specs previos debe listar en `**Depende de:**`.
+El orden acordado de los 16 specs del MVP — numeración, dependencias entre ellos y qué decisión pendiente cierra cada uno — vive en [`docs/SPECS-MAP.md`](docs/SPECS-MAP.md). Consultarlo antes de correr `/spec` para saber qué feature sigue y qué specs previos debe listar en `**Depende de:**`.
 
 ## Agentes y skills
 
@@ -54,6 +52,8 @@ Skills de terceros instaladas vía `skills-lock.json` (símlinks en `.claude/ski
 | `next-best-practices` | `vercel-labs/openreview` | Al escribir o revisar código de Next.js: convenciones de archivos (incluye el rename `middleware` → `proxy` en v16), límites RSC, patrones async (`cookies()`/`headers()`/`params` con `await`), metadata, route handlers, optimización de imagen/fuentes y bundling. |
 | `ui-ux-pro-max` | `nextlevelbuilder/ui-ux-pro-max-skill` | Al diseñar, construir o revisar UI: accesibilidad, layout responsive, tipografía/color, animación, formularios, navegación y charts, con guía específica por stack. No aplica a lógica de backend ni trabajo no visual. |
 
+Las migraciones se aplican con `npx supabase db push` (CLI vinculada al proyecto), no con `apply_migration` del MCP: el MCP registra la migración con otra versión que la del archivo, y el historial remoto deja de coincidir con `supabase/migrations/`.
+
 El MCP de Supabase está configurado en `.mcp.json` (server remoto `https://mcp.supabase.com/mcp`, apunta al proyecto `gpbwuvvfffvxpkgzjqzk`) y requiere autenticarse una vez por sesión con `/mcp`. Da acceso directo al proyecto real: `list_tables`, `execute_sql`, `apply_migration`, `get_advisors`, `search_docs`, `get_project_url`/`get_publishable_keys` (para no tener que copiar esos valores a mano), logs (`query_logs`) y Edge Functions — preferirlo sobre pedirle al usuario que pegue esos datos.
 
 ## Context7
@@ -73,6 +73,7 @@ Todo código que toque una librería o framework externo — Next.js 16, React 1
 
 **Sí hacer:**
 - Nombres descriptivos aunque sean largos. Identificadores en inglés; textos de UI y comentarios en español (el modelo de datos del `ROADMAP.md` ya usa `courses`, `learning_paths`, `path_steps`).
+- Textos de UI en español neutro y tuteando al usuario ("Prueba de nuevo", "Elige un plazo"), nunca voseo. Los prompts de la IA piden lo mismo.
 - Early returns en vez de anidar condicionales.
 - Funciones con un solo propósito y un nombre que lo diga.
 - Descomponer expresiones largas en pasos con nombre.
@@ -80,7 +81,7 @@ Todo código que toque una librería o framework externo — Next.js 16, React 1
 
 ## UI: componer, no crear
 
-Toda pantalla nueva (specs 03, 05, 06, 08, 09, 10, 12) se arma reusando `components/ui/*`,
+Toda pantalla nueva (specs 03, 05, 06, 08, 09, 10, 12, 13, 14) se arma reusando `components/ui/*`,
 `components/brand/*` y los assets ya catalogados — si algo parece faltar, primero se busca en
 `/sistema-diseno` antes de maquetarlo a mano. Motivo: el concurso se evalúa navegando la app
 desplegada (`ENUNCIADO.md`, criterio 4, "UI agradable y entendible") y leyendo el repo público
@@ -104,7 +105,11 @@ las dos vías a la vez.
 - `npm run build` — build de producción.
 - `npm run start` — corre un build de producción.
 - `npm run lint` — ESLint vía `eslint-config-next` (reglas core-web-vitals + TypeScript), flat config en `eslint.config.mjs`.
-- Todavía no hay un test runner configurado.
+- `npm run typecheck` — `tsc --noEmit`.
+- `npm run format` / `npm run format:check` — Prettier (`.prettierrc.json`, con el plugin de Tailwind que ordena las clases). `components/ui/` y `database.types.ts` quedan fuera por ser generados.
+- `npm run test` — Vitest (`vitest.config.mts`; los tests de componentes usan `// @vitest-environment jsdom` + Testing Library). Los tests viven junto al archivo (`*.test.ts(x)`).
+- `npx supabase test db` — tests pgTAP de `supabase/tests/`. Necesita Docker Desktop corriendo.
+- `npx supabase db push` — aplica las migraciones nuevas al proyecto vinculado (usa `SUPABASE_DB_PASSWORD` y `SUPABASE_ACCESS_TOKEN` de `.env.local`).
 
 ## Notas de arquitectura
 
@@ -112,7 +117,7 @@ las dos vías a la vez.
 - Alias de TypeScript: `@/*` apunta a la raíz del repo (`tsconfig.json`), no a `src/*` — de ahí resuelven tanto imports propios como los alias de `components.json` (`@/components`, `@/lib`, `@/components/ui`, `@/hooks`) que usa `shadcn/ui`. Se decidió no migrar a `src/` (ver `docs/SPECS-MAP.md`), así que `ROADMAP.md` ya describe la estructura en la raíz y no hace falta tocar `tsconfig.json` ni `components.json` por esto.
 - Tailwind v4 vía `@tailwindcss/postcss` (sin `tailwind.config` separado; ver `postcss.config.mjs`).
 - `shadcn/ui` inicializado (`components.json`): estilo `base-vega`, `baseColor` neutral, íconos con `@phosphor-icons/react`, RSC habilitado. El tema (`app/globals.css`) usa la paleta de DevTalles en variables OKLCH (violeta, lavanda, lima; ver `docs/decisiones/0002-sistema-de-diseno-devtalles.md`), con tema claro y oscuro vía `next-themes` (`defaultTheme="dark"`) más `tw-animate-css`; `app/layout.tsx` combina las fuentes Space Grotesk (`--font-heading`) y DM Sans (`--font-sans`) — las mismas que usa cursos.devtalles.com — con Geist Mono (`--font-mono`) vía `next/font/google`, unidas con el helper `cn` (`lib/utils.ts`). La galería completa de tokens, tipografía y ~22 componentes vive en la ruta `/sistema-diseno` (`app/sistema-diseno/`).
-- Clientes de Supabase (`@supabase/ssr` 0.12.7) siguiendo el patrón oficial `getAll`/`setAll` (los métodos `get`/`set`/`remove` están deprecados): `lib/supabase/client.ts` para Client Components (`createBrowserClient`, cookies vía `document.cookie` automático) y `lib/supabase/server.ts` para Server Components/Actions (`createServerClient` + `cookies()` de `next/headers`, con el `setAll` envuelto en `try/catch` porque los Server Components no pueden escribir cookies). `proxy.ts` en la raíz (no `middleware.ts`, ver nota de arriba) hace el refresh de sesión en cada request con `supabase.auth.getClaims()` — método recomendado actualmente por sobre `getSession()`/`getUser()` porque valida el JWT contra las claves de firma en vez de confiar ciegamente en la cookie. Variables de entorno en `.env.example`: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` (la publishable key reemplaza a la legacy `anon` key) y `SUPABASE_DB_PASSWORD` (CLI). Estos tres archivos se quedan en `lib/supabase/` (no `src/lib/supabase/`): `ROADMAP.md` ya refleja esa ubicación, no hay migración a `src/` planeada.
+- Clientes de Supabase (`@supabase/ssr` 0.12.7) siguiendo el patrón oficial `getAll`/`setAll` (los métodos `get`/`set`/`remove` están deprecados): `lib/supabase/client.ts` para Client Components (`createBrowserClient`, cookies vía `document.cookie` automático) y `lib/supabase/server.ts` para Server Components/Actions (`createServerClient` + `cookies()` de `next/headers`, con el `setAll` envuelto en `try/catch` porque los Server Components no pueden escribir cookies). `proxy.ts` en la raíz (no `middleware.ts`, ver nota de arriba) hace el refresh de sesión en cada request con `supabase.auth.getClaims()` — método recomendado actualmente por sobre `getSession()`/`getUser()` porque valida el JWT contra las claves de firma en vez de confiar ciegamente en la cookie — y redirige a `/login` las rutas privadas sin sesión. Ese chequeo es optimista: cada página y cada action sigue llamando a `requireUser()`/`requireAdmin()`. Variables de entorno en `.env.example`: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` (la publishable key reemplaza a la legacy `anon` key), `SUPABASE_DB_PASSWORD` (CLI), y dos opcionales: `OPENAI_API_KEY` (personalización del spec 11; sin ella la ruta se genera igual) y `NEXT_PUBLIC_SITE_URL` (la URL pública, para el `redirectTo` del login y la tarjeta OG del spec 15; sin ella se deduce del entorno). Los quizzes (spec 13) no necesitan ninguna clave extra: el admin los escribe y el usuario los lee con su sesión, protegidos por RLS. Estos tres archivos se quedan en `lib/supabase/` (no `src/lib/supabase/`): `ROADMAP.md` ya refleja esa ubicación, no hay migración a `src/` planeada.
 
 ## Marca y assets
 
@@ -120,11 +125,13 @@ Los assets de marca de DevPathlles viven en `public/` (y `app/` para los iconos)
 
 | Asset | Qué es | Dónde se usa |
 |---|---|---|
-| `public/logo.webp` | Lockup completo: mascota + wordmark "DevPathlles" | Cabeceras, hero de la landing (spec 05 `landing`), README, tarjeta OG al compartir (spec 14 `path-sharing`) |
-| `public/astronauta.webp` | La mascota sola, recorte cuadrado | Avatares, estados vacíos, ilustraciones pequeñas, pantalla de "generando ruta" (spec 07 `path-generation`) |
+| `public/logo.webp` | Lockup completo: mascota + wordmark "DevPathlles" | Cabeceras (incluida la de la landing, spec 05 `landing`), README, cabecera de `/shared/[slug]` (spec 15 `path-sharing`) |
+| `public/og-logo.png` | El mismo lockup en PNG, 360 × 128 | Solo las tarjetas OG de `/` (spec 05) y de `/shared/[slug]` (spec 15): `ImageResponse` no decodifica WebP |
+| `public/astronauta.webp` | La mascota sola, recorte cuadrado | Avatares, estados vacíos, ilustraciones pequeñas, pantalla de "generando ruta" (spec 07 `path-generation`), el astronauta que viaja por el recorrido de la landing y la estación "Cuestionario" (spec 05) |
 | `app/icon.png`, `app/apple-icon.png` | Icono de la app | Los engancha Next por convención de archivo — no se referencian a mano ni van en `metadata.icons` |
-| `public/streak/celebration-{1,2,3,4}.webp` | Cuatro poses de celebración de la mascota | Spec 13 `gamification`: paso completado, ruta completada, subida de nivel, insignia nueva |
-| `public/streak/reminder.webp` | La mascota con la llama de la racha | Spec 13 `gamification`: racha activa / recordatorio de volver |
+| `public/streak/celebration-{1,2,3,4}.webp` | Cuatro poses de celebración de la mascota | Spec 14 `gamification`: paso completado, ruta completada, subida de nivel, insignia nueva. Spec 05: el cohete (`-1`) en el hero y el CTA final; el orbe (`-2`), la antorcha (`-3`) y la órbita (`-4`) en las estaciones IA, Motor y Compartir |
+| `public/streak/reminder.webp` | La mascota con la llama de la racha | Spec 14 `gamification`: racha activa / recordatorio de volver. Spec 05: la estación "Progreso" |
+| `public/code-quest.webp` | Logo de Code Quest 2026 (el concurso), 288 × 124, texto blanco | Solo el footer de la landing (spec 05), dentro de `bg-logo-backdrop` como el wordmark |
 
 Reglas:
 
