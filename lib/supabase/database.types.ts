@@ -64,6 +64,39 @@ export type Database = {
         }
         Relationships: []
       }
+      course_prerequisites: {
+        Row: {
+          course_id: number
+          kind: Database["public"]["Enums"]["course_prerequisite_kind"]
+          prerequisite_course_id: number
+        }
+        Insert: {
+          course_id: number
+          kind: Database["public"]["Enums"]["course_prerequisite_kind"]
+          prerequisite_course_id: number
+        }
+        Update: {
+          course_id?: number
+          kind?: Database["public"]["Enums"]["course_prerequisite_kind"]
+          prerequisite_course_id?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "course_prerequisites_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "course_prerequisites_prerequisite_course_id_fkey"
+            columns: ["prerequisite_course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       courses: {
         Row: {
           areas: string[]
@@ -144,6 +177,32 @@ export type Database = {
           url?: string
         }
         Relationships: []
+      }
+      interest_courses: {
+        Row: {
+          course_id: number
+          interest_slug: string
+          position: number
+        }
+        Insert: {
+          course_id: number
+          interest_slug: string
+          position: number
+        }
+        Update: {
+          course_id?: number
+          interest_slug?: string
+          position?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "interest_courses_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       learning_paths: {
         Row: {
@@ -588,6 +647,7 @@ export type Database = {
     }
     Enums: {
       course_difficulty: "principiante" | "intermedio" | "avanzado"
+      course_prerequisite_kind: "necesita" | "conviene"
       path_step_status: "pending" | "in_progress" | "done" | "discarded"
       program_course_level: "requerido" | "recomendado" | "opcional"
       user_role: "user" | "admin"
@@ -719,6 +779,7 @@ export const Constants = {
   public: {
     Enums: {
       course_difficulty: ["principiante", "intermedio", "avanzado"],
+      course_prerequisite_kind: ["necesita", "conviene"],
       path_step_status: ["pending", "in_progress", "done", "discarded"],
       program_course_level: ["requerido", "recomendado", "opcional"],
       user_role: ["user", "admin"],

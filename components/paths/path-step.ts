@@ -1,5 +1,5 @@
 import type { StepGroup } from "@/lib/progress/group-steps";
-import type { StepOrigin } from "@/lib/paths/types";
+import type { CourseDifficulty, StepOrigin } from "@/lib/paths/types";
 import type { CourseQuiz } from "@/lib/quizzes/schema";
 import {
   summarizePathProgress,
@@ -18,6 +18,7 @@ export type PathStepView = {
   discardReason: string | null;
   courseTitle: string;
   courseHours: number;
+  courseDifficulty: CourseDifficulty;
   courseUrl: string;
   courseImageUrl: string | null;
   // El quiz activo del curso (spec 13), cargado con la página; null si el curso no tiene.

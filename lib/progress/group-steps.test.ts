@@ -1,58 +1,77 @@
 import { describe, expect, it } from "vitest";
 
-import type { StepOrigin } from "@/lib/paths/types";
+import type { CourseDifficulty } from "@/lib/paths/types";
 
-import { groupStepsByProgram } from "./group-steps";
+import { groupStepsByTier } from "./group-steps";
 
-function makeStep(id: string, origin: StepOrigin, programSlug: string | null) {
-  return {
-    id,
-    origin,
-    programSlug,
-    programName: programSlug ? `Programa ${programSlug}` : null,
-  };
+function makeStep(id: string, stage: number, courseDifficulty: CourseDifficulty) {
+  return { id, stage, courseDifficulty };
 }
 
-describe("groupStepsByProgram", () => {
-  it("agrupa por programa en el orden en que aparecen los pasos", () => {
-    const groups = groupStepsByProgram([
-      makeStep("1", "requerido", "fundamentos"),
-      makeStep("2", "requerido", "react"),
-      makeStep("3", "recomendado", "fundamentos"),
+function idsByGroup(groups: ReturnType<typeof groupStepsByTier>) {
+  return groups.map((group) => ({
+    key: group.key,
+    ids: group.steps.map((step) => (step as ReturnType<typeof makeStep>).id),
+  }));
+}
+
+describe("groupStepsByTier", () => {
+  it("abre un tramo nuevo cada vez que la ruta alcanza una dificultad mayor", () => {
+    const groups = groupStepsByTier([
+      makeStep("programacion", 1, "principiante"),
+      makeStep("javascript", 2, "principiante"),
+      makeStep("react", 3, "intermedio"),
+      makeStep("react-pro", 4, "avanzado"),
     ]);
 
-    expect(groups.map((group) => group.key)).toEqual(["fundamentos", "react"]);
-    expect(groups[0].steps.map((step) => step.id)).toEqual(["1", "3"]);
-    expect(groups[0].title).toBe("Programa fundamentos");
+    expect(idsByGroup(groups)).toEqual([
+      { key: "primeros-pasos", ids: ["programacion", "javascript"] },
+      { key: "intermedio", ids: ["react"] },
+      { key: "avanzado", ids: ["react-pro"] },
+    ]);
+    expect(groups.map((group) => group.tierNumber)).toEqual([1, 2, 3]);
   });
 
-  it("deja los pasos de interés en un grupo propio, al final", () => {
-    const groups = groupStepsByProgram([
-      makeStep("1", "interes", null),
-      makeStep("2", "requerido", "react"),
+  it("no retrocede: un curso de principiante después de uno avanzado queda en Avanzado", () => {
+    const groups = groupStepsByTier([
+      makeStep("java", 1, "principiante"),
+      makeStep("java-avanzado", 2, "avanzado"),
+      makeStep("git", 3, "principiante"),
     ]);
 
-    expect(groups.map((group) => group.key)).toEqual(["react", "intereses"]);
-    expect(groups[1].isInterestGroup).toBe(true);
-    expect(groups[1].steps.map((step) => step.id)).toEqual(["1"]);
+    expect(idsByGroup(groups)).toEqual([
+      { key: "primeros-pasos", ids: ["java"] },
+      { key: "avanzado", ids: ["java-avanzado", "git"] },
+    ]);
   });
 
-  it("junta en 'Otros cursos' los pasos oficiales sin programa", () => {
-    const groups = groupStepsByProgram([makeStep("1", "opcional", null)]);
+  it("no parte una etapa: toma el tramo de su curso más difícil", () => {
+    const groups = groupStepsByTier([
+      makeStep("programacion", 1, "principiante"),
+      makeStep("typescript", 2, "principiante"),
+      makeStep("react", 2, "intermedio"),
+    ]);
+
+    expect(idsByGroup(groups)).toEqual([
+      { key: "primeros-pasos", ids: ["programacion"] },
+      { key: "intermedio", ids: ["typescript", "react"] },
+    ]);
+  });
+
+  it("una ruta que arranca en Intermedio empieza por ese tramo", () => {
+    const groups = groupStepsByTier([makeStep("nest", 1, "intermedio")]);
 
     expect(groups).toEqual([
       {
-        key: "sin-programa",
-        title: "Otros cursos",
-        isInterestGroup: false,
-        steps: [makeStep("1", "opcional", null)],
+        key: "intermedio",
+        title: "Intermedio",
+        tierNumber: 1,
+        steps: [makeStep("nest", 1, "intermedio")],
       },
     ]);
   });
 
-  it("no crea el grupo de intereses si no hay pasos de interés", () => {
-    const groups = groupStepsByProgram([makeStep("1", "requerido", "react")]);
-
-    expect(groups.some((group) => group.isInterestGroup)).toBe(false);
+  it("sin pasos no hay tramos", () => {
+    expect(groupStepsByTier([])).toEqual([]);
   });
 });

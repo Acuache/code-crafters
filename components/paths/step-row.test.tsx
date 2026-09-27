@@ -19,6 +19,7 @@ const step: PathStepView = {
   discardReason: null,
   courseTitle: "Curso de React",
   courseHours: 12,
+  courseDifficulty: "intermedio",
   courseUrl: "https://cursos.devtalles.com/courses/react",
   courseImageUrl: null,
   quiz: { id: "quiz-1", courseId: 1, passPercentage: 60, questions: [] },

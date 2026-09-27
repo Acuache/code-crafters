@@ -29,10 +29,14 @@ export type LearnerProfile = {
   deadlineMonths: number;
 };
 
+export type CourseDifficulty = "principiante" | "intermedio" | "avanzado";
+
 export type CatalogCourse = {
   slug: string;
+  title: string;
   hours: number;
-  difficulty?: "principiante" | "intermedio" | "avanzado";
+  difficulty: CourseDifficulty;
+  inConstruction: boolean;
   outcome?: string;
 };
 
@@ -45,7 +49,22 @@ export type ProgramStepInput = {
 
 export type ProgramInput = {
   slug: string;
+  name: string;
   steps: ProgramStepInput[];
+};
+
+// Tabla course_prerequisites: `needs` suma el curso a la ruta; `bestAfter` solo ordena.
+export type CoursePrerequisites = {
+  needs: string[];
+  bestAfter: string[];
+};
+
+// Las reglas que edita el admin (spec 17).
+export type EngineRules = {
+  // Por slug de curso.
+  prerequisites: Record<string, CoursePrerequisites>;
+  // Por slug de interés: sus cursos en orden de preferencia (tabla interest_courses).
+  interestCourses: Record<InterestSlug, string[]>;
 };
 
 export type BuiltStep = {
@@ -61,7 +80,7 @@ export type BuiltStep = {
 export type DiscardedStep = {
   courseSlug: string;
   sourceProgramSlug: string | null;
-  // El stage/position de antes de renumerar: el descarte ocurre antes de renumberStages.
+  // La etapa del programa oficial, o 0 si el curso no venía de uno: nunca llegó a ordenarse.
   stage: number;
   position: number;
   origin: StepOrigin;

@@ -12,6 +12,9 @@ import {
 import type { ActionFailure, ActionResult, ActionResultWithData } from "@/lib/action-result";
 import { findEngineReferences, type EngineReference } from "@/lib/admin/engine-references";
 import { GENERIC_SAVE_ERROR, describePostgresError } from "@/lib/admin/postgres-errors";
+import { wouldCreateCycle } from "@/lib/admin/prerequisite-cycles";
+import { prerequisiteSchema, type PrerequisiteSuggestion } from "@/lib/admin/prerequisite-schema";
+import { isAiConfigured, requestPrerequisiteSuggestions } from "@/lib/ai/personalize-path";
 import { placementSchema, type PlacementInput } from "@/lib/admin/program-schema";
 import { databaseIdSchema, firstIssueMessage } from "@/lib/admin/validation";
 import { assignQuestionIds } from "@/lib/quizzes/question-ids";
@@ -29,6 +32,11 @@ const COURSE_NOT_FOUND: ActionFailure = {
 const PLACEMENT_NOT_FOUND: ActionFailure = {
   ok: false,
   message: "No encontramos esa ubicación. Recarga la página.",
+};
+
+const PREREQUISITE_NOT_FOUND: ActionFailure = {
+  ok: false,
+  message: "No encontramos ese requisito. Recarga la página.",
 };
 
 const QUIZ_NOT_FOUND: ActionFailure = {
@@ -135,16 +143,13 @@ export async function updateCourse(courseId: unknown, input: unknown): Promise<A
   return { ok: true };
 }
 
-function describeEngineReference(reference: EngineReference): string {
-  if (reference.kind === "interest") {
-    return `el interés «${reference.label}»`;
-  }
-  return `la tecnología dominable «${reference.label}»`;
+function quotedLabels(references: EngineReference[]): string {
+  return references.map((reference) => `«${reference.label}»`).join(", ");
 }
 
-// Por qué no se puede desactivar: loadCatalog (spec 07) solo carga cursos activos, pero sí todos
-// los program_courses, e INTERESTS / TECH_TO_SLUGS (spec 04) nombran slugs fijos. Con cualquiera de
-// esas referencias, el motor propondría un curso sin id y generatePath fallaría al insertar.
+// Por qué no se puede desactivar: un curso inactivo sale del catálogo que carga loadCatalog
+// (spec 07), así que los programas, los intereses y las tecnologías que lo nombran lo perderían en
+// silencio. Mejor que el admin lo saque de ahí a conciencia.
 function describeDeactivationBlockers(
   programNames: string[],
   engineReferences: EngineReference[],
@@ -157,10 +162,19 @@ function describeDeactivationBlockers(
     );
   }
 
-  if (engineReferences.length > 0) {
-    const referenceList = engineReferences.map(describeEngineReference).join(", ");
+  const interestReferences = engineReferences.filter((reference) => reference.kind === "interest");
+  if (interestReferences.length > 0) {
     blockers.push(
-      `El motor lo usa en ${referenceList}: hay que quitarlo de lib/paths/interests.ts por código.`,
+      `Lo sugieren los intereses ${quotedLabels(interestReferences)}: quítalo primero desde «Intereses».`,
+    );
+  }
+
+  const technologyReferences = engineReferences.filter(
+    (reference) => reference.kind === "technology",
+  );
+  if (technologyReferences.length > 0) {
+    blockers.push(
+      `Es la tecnología dominable ${quotedLabels(technologyReferences)}: se cambia en lib/paths/interests.ts por código.`,
     );
   }
 
@@ -184,7 +198,7 @@ export async function setCourseActive(courseId: unknown, isActive: unknown): Pro
   if (!parsedIsActive.data) {
     const { data: course, error: loadError } = await supabase
       .from("courses")
-      .select("slug, program_courses(programs(name))")
+      .select("slug, program_courses(programs(name)), interest_courses(interest_slug)")
       .eq("id", parsedId.data)
       .maybeSingle();
 
@@ -196,7 +210,11 @@ export async function setCourseActive(courseId: unknown, isActive: unknown): Pro
     }
 
     const programNames = course.program_courses.map((placement) => placement.programs.name);
-    const blockers = describeDeactivationBlockers(programNames, findEngineReferences(course.slug));
+    const interestSlugs = course.interest_courses.map((row) => row.interest_slug);
+    const blockers = describeDeactivationBlockers(
+      programNames,
+      findEngineReferences(course.slug, interestSlugs),
+    );
     if (blockers) {
       return { ok: false, message: blockers };
     }
@@ -388,6 +406,175 @@ export async function removePlacement(placementId: unknown): Promise<ActionResul
 
   revalidateCatalogPages();
   return { ok: true };
+}
+
+// Todos los requisitos del catálogo, para el chequeo de ciclos: son unas 100 filas.
+async function loadPrerequisiteEdges(supabase: Supabase) {
+  const { data, error } = await supabase
+    .from("course_prerequisites")
+    .select("course_id, prerequisite_course_id");
+
+  if (error) {
+    return null;
+  }
+  return (data ?? []).map((row) => ({
+    courseId: row.course_id,
+    prerequisiteCourseId: row.prerequisite_course_id,
+  }));
+}
+
+// Un requisito entre cursos (spec 17): "necesita" hace que el motor sume el requisito a la ruta, y
+// "conviene" solo ordena. Nunca cierra un ciclo: el motor no podría ordenar esos cursos.
+export async function addPrerequisite(courseId: unknown, input: unknown): Promise<ActionResult> {
+  await requireAdmin();
+
+  const parsedId = databaseIdSchema.safeParse(courseId);
+  if (!parsedId.success) {
+    return COURSE_NOT_FOUND;
+  }
+
+  const parsedInput = prerequisiteSchema.safeParse(input);
+  if (!parsedInput.success) {
+    return { ok: false, message: firstIssueMessage(parsedInput.error) };
+  }
+
+  const newEdge = {
+    courseId: parsedId.data,
+    prerequisiteCourseId: parsedInput.data.prerequisiteCourseId,
+  };
+  const supabase = await createClient();
+
+  const edges = await loadPrerequisiteEdges(supabase);
+  if (!edges) {
+    return { ok: false, message: GENERIC_SAVE_ERROR };
+  }
+  if (wouldCreateCycle(edges, newEdge)) {
+    return {
+      ok: false,
+      message:
+        "Ese curso ya depende de este, directa o indirectamente: no pueden pedirse entre sí.",
+    };
+  }
+
+  const { error } = await supabase.from("course_prerequisites").insert({
+    course_id: newEdge.courseId,
+    prerequisite_course_id: newEdge.prerequisiteCourseId,
+    kind: parsedInput.data.kind,
+  });
+
+  if (error) {
+    return { ok: false, message: describePostgresError(error) };
+  }
+
+  revalidateCatalogPages();
+  return { ok: true };
+}
+
+export async function removePrerequisite(
+  courseId: unknown,
+  prerequisiteCourseId: unknown,
+): Promise<ActionResult> {
+  await requireAdmin();
+
+  const parsedCourseId = databaseIdSchema.safeParse(courseId);
+  const parsedPrerequisiteId = databaseIdSchema.safeParse(prerequisiteCourseId);
+  if (!parsedCourseId.success || !parsedPrerequisiteId.success) {
+    return PREREQUISITE_NOT_FOUND;
+  }
+
+  const supabase = await createClient();
+  const { data: deletedRows, error } = await supabase
+    .from("course_prerequisites")
+    .delete()
+    .eq("course_id", parsedCourseId.data)
+    .eq("prerequisite_course_id", parsedPrerequisiteId.data)
+    .select("course_id");
+
+  if (error) {
+    return { ok: false, message: describePostgresError(error) };
+  }
+  if (!deletedRows || deletedRows.length === 0) {
+    return PREREQUISITE_NOT_FOUND;
+  }
+
+  revalidateCatalogPages();
+  return { ok: true };
+}
+
+// La IA lee los requisitos que escribió el instructor y sugiere cursos del catálogo (spec 17). No
+// guarda nada: el admin agrega a mano las sugerencias que le sirven.
+export async function suggestPrerequisites(
+  courseId: unknown,
+): Promise<ActionResultWithData<PrerequisiteSuggestion[]>> {
+  await requireAdmin();
+
+  const parsedId = databaseIdSchema.safeParse(courseId);
+  if (!parsedId.success) {
+    return COURSE_NOT_FOUND;
+  }
+  if (!isAiConfigured()) {
+    return { ok: false, message: "La IA no está configurada: falta OPENAI_API_KEY." };
+  }
+
+  const supabase = await createClient();
+  const [courseResult, catalogResult, currentResult] = await Promise.all([
+    supabase
+      .from("courses")
+      .select("id, slug, title, difficulty, prerequisites")
+      .eq("id", parsedId.data)
+      .maybeSingle(),
+    supabase.from("courses").select("id, slug, title, difficulty").eq("is_active", true),
+    supabase
+      .from("course_prerequisites")
+      .select("prerequisite_course_id")
+      .eq("course_id", parsedId.data),
+  ]);
+
+  if (courseResult.error || catalogResult.error || currentResult.error) {
+    return { ok: false, message: "No se pudo cargar el catálogo. Intenta de nuevo." };
+  }
+  const course = courseResult.data;
+  if (!course) {
+    return COURSE_NOT_FOUND;
+  }
+
+  const currentPrerequisiteIds = new Set(
+    (currentResult.data ?? []).map((row) => row.prerequisite_course_id),
+  );
+  const candidates = (catalogResult.data ?? []).filter(
+    (candidate) => candidate.id !== course.id && !currentPrerequisiteIds.has(candidate.id),
+  );
+
+  const result = await requestPrerequisiteSuggestions({
+    course: {
+      slug: course.slug,
+      title: course.title,
+      difficulty: course.difficulty,
+      prerequisitesText: course.prerequisites,
+    },
+    candidates,
+  });
+  if (!result) {
+    return { ok: false, message: "La IA no pudo sugerir requisitos ahora. Prueba de nuevo." };
+  }
+
+  const candidatesBySlug = new Map(candidates.map((candidate) => [candidate.slug, candidate]));
+  const suggestions: PrerequisiteSuggestion[] = [];
+  for (const suggestion of result.suggestions) {
+    const candidate = candidatesBySlug.get(suggestion.courseSlug);
+    const isRepeated = suggestions.some((existing) => existing.courseId === candidate?.id);
+    if (!candidate || isRepeated) {
+      continue;
+    }
+    suggestions.push({
+      courseId: candidate.id,
+      title: candidate.title,
+      kind: suggestion.kind,
+      reason: suggestion.reason,
+    });
+  }
+
+  return { ok: true, data: suggestions };
 }
 
 // Crea el quiz del curso o reemplaza sus preguntas y su porcentaje (spec 13). Se edita en el lugar,
