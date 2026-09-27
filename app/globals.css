@@ -324,7 +324,7 @@
 }
 
 .starfield-drifting {
-  position: absolute;
+  position: fixed;
   inset: -8rem;
   pointer-events: none;
 }
