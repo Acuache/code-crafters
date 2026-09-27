@@ -24,6 +24,7 @@ export function DeletePathButton({ pathId, pathTitle }: DeletePathButtonProps) {
       title="¿Eliminar esta ruta?"
       description={`Vas a eliminar «${pathTitle}». Se pierde el progreso marcado. No se puede deshacer.`}
       confirmLabel="Eliminar"
+      illustration={{ src: "/astronauta-eliminar-ruta.png", alt: "Astronauta con una papelera" }}
       onConfirm={() => deletePath(pathId)}
     />
   );

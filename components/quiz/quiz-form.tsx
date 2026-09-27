@@ -2,6 +2,12 @@
 
 import { useState, useTransition } from "react";
 import Link from "next/link";
+import {
+  ArrowCounterClockwiseIcon,
+  ArrowLeftIcon,
+  ArrowRightIcon,
+  CheckIcon,
+} from "@phosphor-icons/react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
@@ -101,9 +107,11 @@ export function QuizForm() {
           </CardContent>
           <CardFooter className="justify-between">
             <Button variant="outline" render={<Link href="/dashboard" />} nativeButton={false}>
+              <ArrowLeftIcon data-icon="inline-start" />
               Volver al dashboard
             </Button>
             <Button onClick={handleRetryGeneration} disabled={isPending}>
+              <ArrowCounterClockwiseIcon data-icon="inline-start" />
               {isPending ? "Reintentando…" : "Reintentar"}
             </Button>
           </CardFooter>
@@ -134,7 +142,11 @@ export function QuizForm() {
           </Progress>
         </CardHeader>
         <CardContent>
-          <CurrentStep control={form.control} />
+          {currentStep === 0 ? (
+            <GoalStep control={form.control} clearGoalError={() => form.clearErrors("goal")} />
+          ) : (
+            <CurrentStep control={form.control} />
+          )}
           {submitError ? (
             <Alert variant="destructive">
               <AlertTitle>No pudimos guardar tus respuestas</AlertTitle>
@@ -143,19 +155,33 @@ export function QuizForm() {
           ) : null}
         </CardContent>
         <CardFooter className="justify-between">
-          <Button type="button" variant="outline" onClick={handleBack} disabled={currentStep === 0}>
-            Atrás
-          </Button>
+          {currentStep === 0 ? (
+            <Button
+              variant="outline"
+              render={<Link href="/dashboard" />}
+              nativeButton={false}
+            >
+              <ArrowLeftIcon data-icon="inline-start" />
+              Atrás
+            </Button>
+          ) : (
+            <Button type="button" variant="outline" onClick={handleBack}>
+              <ArrowLeftIcon data-icon="inline-start" />
+              Atrás
+            </Button>
+          )}
           {/* Las `key` distintas obligan a React a crear otro <button> en vez de reusar el mismo
               cambiándole el `type`: sin ellas, el clic en "Siguiente" del paso 5 terminaba sobre
               un botón que ya era `submit` y enviaba el formulario, salteando el texto libre. */}
           {isLastStep ? (
             <Button key="submit" type="submit" disabled={isPending}>
+              <CheckIcon data-icon="inline-start" />
               {isPending ? "Guardando…" : "Guardar mis respuestas"}
             </Button>
           ) : (
             <Button key="next" type="button" onClick={handleNext}>
               Siguiente
+              <ArrowRightIcon data-icon="inline-end" />
             </Button>
           )}
         </CardFooter>

@@ -295,8 +295,12 @@
       rgb(226 220 255 / 60%) 52%,
       transparent 57%
     );
-  background-size: 100% 100%, 240% 100%;
-  background-position: 0 0, 100% 0;
+  background-size:
+    100% 100%,
+    240% 100%;
+  background-position:
+    0 0,
+    100% 0;
   background-repeat: no-repeat;
 }
 
@@ -308,10 +312,14 @@
 
 @keyframes text-reflection {
   from {
-    background-position: 0 0, 100% 0;
+    background-position:
+      0 0,
+      100% 0;
   }
   to {
-    background-position: 0 0, 0 0;
+    background-position:
+      0 0,
+      0 0;
   }
 }
 
@@ -327,6 +335,20 @@
   position: fixed;
   inset: -8rem;
   pointer-events: none;
+}
+
+.brand-panel-starfield {
+  position: absolute;
+  inset: -8rem;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .brand-panel-starfield {
+    animation:
+      star-drift 15s ease-in-out infinite alternate,
+      twinkle 5s ease-in-out infinite alternate;
+  }
 }
 
 @keyframes star-drift {
@@ -353,6 +375,22 @@
   }
   100% {
     transform: translateY(0) rotate(0) scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .mascot-flight-motion {
+    animation: mascot-flight-motion 2.8s ease-in-out infinite;
+  }
+}
+
+@keyframes mascot-flight-motion {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) rotate(-2deg);
+  }
+  50% {
+    transform: translate3d(6px, -8px, 0) rotate(3deg);
   }
 }
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { type Control, useController } from "react-hook-form";
+import { type Control, type UseFormClearErrors, useController } from "react-hook-form";
 
 import type { AssessmentAnswers } from "@/components/quiz/quiz-schema";
 import {
@@ -33,14 +33,23 @@ const AREA_LABELS: Record<Area, string> = {
 
 const AREA_ITEMS = AREAS.map((area) => ({ value: area, label: AREA_LABELS[area] }));
 
-export function GoalStep({ control }: { control: Control<AssessmentAnswers> }) {
+type GoalStepProps = {
+  control: Control<AssessmentAnswers>;
+  clearGoalError?: UseFormClearErrors<AssessmentAnswers>;
+};
+
+export function GoalStep({ control, clearGoalError }: GoalStepProps) {
   const { field, fieldState } = useController({ control, name: "goal" });
-  const [area, setArea] = useState<Area | null>(null);
+  const [area, setArea] = useState<Area | null>(
+    () => (field.value ? (GOALS[field.value]?.area ?? null) : null),
+  );
+  const hasAreaError = !area && !!fieldState.error;
 
   // Cambiar de área limpia la meta elegida: una meta de otra área ya no es una opción válida.
   function handleAreaChange(nextArea: Area | null) {
     setArea(nextArea);
     field.onChange("");
+    clearGoalError?.("goal");
   }
 
   const goalsInArea = area ? Object.entries(GOALS).filter(([, goal]) => goal.area === area) : [];
@@ -50,10 +59,10 @@ export function GoalStep({ control }: { control: Control<AssessmentAnswers> }) {
     <FieldSet>
       <FieldLegend>¿Qué quieres aprender?</FieldLegend>
       <FieldGroup>
-        <Field>
+        <Field data-invalid={hasAreaError}>
           <FieldLabel htmlFor="quiz-area">Área</FieldLabel>
           <Select items={AREA_ITEMS} value={area} onValueChange={handleAreaChange}>
-            <SelectTrigger id="quiz-area" className="w-full">
+            <SelectTrigger id="quiz-area" className="w-full" aria-invalid={hasAreaError}>
               <SelectValue placeholder="Elige un área" />
             </SelectTrigger>
             <SelectContent>
@@ -66,16 +75,24 @@ export function GoalStep({ control }: { control: Control<AssessmentAnswers> }) {
               </SelectGroup>
             </SelectContent>
           </Select>
+          {hasAreaError ? <FieldError>Elige un área para continuar.</FieldError> : null}
         </Field>
-        <Field data-invalid={!!fieldState.error}>
+        <Field data-invalid={!!area && !!fieldState.error}>
           <FieldLabel htmlFor="quiz-goal">Meta</FieldLabel>
           <Select
             items={goalItems}
             value={field.value || null}
-            onValueChange={(value) => field.onChange(value ?? "")}
+            onValueChange={(value) => {
+              field.onChange(value ?? "");
+              clearGoalError?.("goal");
+            }}
             disabled={!area}
           >
-            <SelectTrigger id="quiz-goal" className="w-full" aria-invalid={!!fieldState.error}>
+            <SelectTrigger
+              id="quiz-goal"
+              className="w-full"
+              aria-invalid={!!area && !!fieldState.error}
+            >
               <SelectValue placeholder={area ? "Elige una meta" : "Elige un área primero"} />
             </SelectTrigger>
             <SelectContent>
@@ -88,7 +105,7 @@ export function GoalStep({ control }: { control: Control<AssessmentAnswers> }) {
               </SelectGroup>
             </SelectContent>
           </Select>
-          <FieldError errors={[fieldState.error]} />
+          {area ? <FieldError errors={[fieldState.error]} /> : null}
         </Field>
       </FieldGroup>
     </FieldSet>

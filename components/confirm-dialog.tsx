@@ -1,5 +1,6 @@
 import { useState, useTransition, type ReactElement, type ReactNode } from "react";
-import { WarningIcon } from "@phosphor-icons/react";
+import Image from "next/image";
+import { TrashIcon, WarningIcon, XIcon } from "@phosphor-icons/react";
 
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -21,6 +22,7 @@ type ConfirmDialogProps = {
   title: string;
   description: ReactNode;
   confirmLabel: string;
+  illustration?: { src: string; alt: string };
   onConfirm: () => Promise<ActionResult>;
 };
 
@@ -31,6 +33,7 @@ export function ConfirmDialog({
   title,
   description,
   confirmLabel,
+  illustration,
   onConfirm,
 }: ConfirmDialogProps) {
   const [isOpen, setIsOpen] = useState(false);
@@ -66,6 +69,17 @@ export function ConfirmDialog({
     <Dialog open={isOpen} onOpenChange={handleOpenChange}>
       <DialogTrigger render={trigger} />
       <DialogContent showCloseButton={false}>
+        {illustration ? (
+          <div className="flex justify-center">
+            <Image
+              src={illustration.src}
+              alt={illustration.alt}
+              width={144}
+              height={144}
+              className="motion-safe:animate-float"
+            />
+          </div>
+        ) : null}
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
           <DialogDescription>{description}</DialogDescription>
@@ -80,10 +94,11 @@ export function ConfirmDialog({
 
         <DialogFooter>
           <DialogClose render={<Button variant="outline" disabled={isConfirming} />}>
+            <XIcon data-icon="inline-start" />
             Cancelar
           </DialogClose>
           <Button variant="destructive" onClick={handleConfirm} disabled={isConfirming}>
-            {isConfirming ? <Spinner data-icon="inline-start" /> : null}
+            {isConfirming ? <Spinner data-icon="inline-start" /> : <TrashIcon data-icon="inline-start" />}
             {confirmLabel}
           </Button>
         </DialogFooter>

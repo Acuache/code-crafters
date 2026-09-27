@@ -15,7 +15,13 @@ export function GeneratingPath() {
     <Empty>
       <EmptyHeader>
         <EmptyMedia>
-          <Image src="/astronauta.webp" alt="" width={160} height={160} />
+          <Image
+            src="/astronauta-vuelo.png"
+            alt=""
+            width={160}
+            height={160}
+            className="mascot-flight-motion"
+          />
         </EmptyMedia>
         <EmptyTitle>Armando tu ruta…</EmptyTitle>
         <EmptyDescription>
