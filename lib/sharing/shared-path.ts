@@ -20,6 +20,7 @@ const sharedStepSchema = z.object({
   reason: z.string(),
   courseTitle: z.string(),
   courseHours: z.number(),
+  courseDifficulty: z.enum(["principiante", "intermedio", "avanzado"]),
   courseUrl: z.string(),
   courseImageUrl: z.string().nullable(),
   programSlug: z.string().nullable(),

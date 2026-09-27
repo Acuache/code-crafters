@@ -1,0 +1,509 @@
+[
+  {
+    "course": "javascript-moderno",
+    "needs": [],
+    "bestAfter": [
+      "programacion-para-principiantes"
+    ]
+  },
+  {
+    "course": "Java",
+    "needs": [],
+    "bestAfter": [
+      "programacion-para-principiantes"
+    ]
+  },
+  {
+    "course": "python",
+    "needs": [],
+    "bestAfter": [
+      "programacion-para-principiantes"
+    ]
+  },
+  {
+    "course": "csharp",
+    "needs": [],
+    "bestAfter": [
+      "programacion-para-principiantes"
+    ]
+  },
+  {
+    "course": "PHP-moderno",
+    "needs": [],
+    "bestAfter": [
+      "programacion-para-principiantes"
+    ]
+  },
+  {
+    "course": "dart-cero-hasta-detalles",
+    "needs": [],
+    "bestAfter": [
+      "programacion-para-principiantes"
+    ]
+  },
+  {
+    "course": "typescript-guia-completa",
+    "needs": [
+      "javascript-moderno"
+    ],
+    "bestAfter": []
+  },
+  {
+    "course": "react-de-cero",
+    "needs": [
+      "javascript-moderno"
+    ],
+    "bestAfter": []
+  },
+  {
+    "course": "react-pro",
+    "needs": [
+      "react-de-cero"
+    ],
+    "bestAfter": []
+  },
+  {
+    "course": "nextjs",
+    "needs": [
+      "react-de-cero"
+    ],
+    "bestAfter": []
+  },
+  {
+    "course": "react-router",
+    "needs": [
+      "react-de-cero"
+    ],
+    "bestAfter": []
+  },
+  {
+    "course": "tanstack-query",
+    "needs": [
+      "react-de-cero",
+      "typescript-guia-completa"
+    ],
+    "bestAfter": []
+  },
+  {
+    "course": "zustand-gestor-de-estado-para-react",
+    "needs": [
+      "react-de-cero"
+    ],
+    "bestAfter": []
+  },
+  {
+    "course": "shadcn-ui",
+    "needs": [
+      "react-de-cero",
+      "typescript-guia-completa"
+    ],
+    "bestAfter": [
+      "tailwindcss-para-desarrolladores"
+    ]
+  },
+  {
+    "course": "react-sockets",
+    "needs": [
+      "react-de-cero"
+    ],
+    "bestAfter": []
+  },
+  {
+    "course": "react-native-expo",
+    "needs": [
+      "react-de-cero"
+    ],
+    "bestAfter": []
+  },
+  {
+    "course": "expo-gemini",
+    "needs": [
+      "react-de-cero"
+    ],
+    "bestAfter": [
+      "react-native-expo"
+    ]
+  },
+  {
+    "course": "openai",
+    "needs": [
+      "react-de-cero",
+      "nest"
+    ],
+    "bestAfter": [
+      "typescript-guia-completa"
+    ]
+  },
+  {
+    "course": "openai-angular-nestjs",
+    "needs": [
+      "angular-moderno",
+      "nest"
+    ],
+    "bestAfter": []
+  },
+  {
+    "course": "vue-cero-a-experto",
+    "needs": [
+      "javascript-moderno"
+    ],
+    "bestAfter": []
+  },
+  {
+    "course": "Vue-intermedio",
+    "needs": [
+      "vue-cero-a-experto"
+    ],
+    "bestAfter": []
+  },
+  {
+    "course": "nuxt",
+    "needs": [
+      "javascript-moderno"
+    ],
+    "bestAfter": [
+      "vue-cero-a-experto"
+    ]
+  },
+  {
+    "course": "angular-moderno",
+    "needs": [
+      "javascript-moderno"
+    ],
+    "bestAfter": [
+      "typescript-guia-completa"
+    ]
+  },
+  {
+    "course": "angular",
+    "needs": [
+      "javascript-moderno"
+    ],
+    "bestAfter": []
+  },
+  {
+    "course": "angular-pro",
+    "needs": [
+      "angular-moderno"
+    ],
+    "bestAfter": [
+      "git-github-control-versiones-desde-cero"
+    ]
+  },
+  {
+    "course": "Angular_socket_bun",
+    "needs": [
+      "angular-moderno"
+    ],
+    "bestAfter": []
+  },
+  {
+    "course": "Astro",
+    "needs": [
+      "javascript-moderno"
+    ],
+    "bestAfter": []
+  },
+  {
+    "course": "qwik-introduccion",
+    "needs": [
+      "typescript-guia-completa"
+    ],
+    "bestAfter": [
+      "react-de-cero"
+    ]
+  },
+  {
+    "course": "nodejs-de-cero-a-experto",
+    "needs": [
+      "javascript-moderno"
+    ],
+    "bestAfter": []
+  },
+  {
+    "course": "node-clean-architecture",
+    "needs": [
+      "nodejs-de-cero-a-experto"
+    ],
+    "bestAfter": [
+      "sql-con-postgres"
+    ]
+  },
+  {
+    "course": "nest",
+    "needs": [
+      "javascript-moderno"
+    ],
+    "bestAfter": [
+      "typescript-guia-completa",
+      "nodejs-de-cero-a-experto"
+    ]
+  },
+  {
+    "course": "nest-graphql",
+    "needs": [
+      "nest"
+    ],
+    "bestAfter": []
+  },
+  {
+    "course": "nestjs-microservicios",
+    "needs": [
+      "nest",
+      "typescript-guia-completa"
+    ],
+    "bestAfter": [
+      "docker-guia-practica"
+    ]
+  },
+  {
+    "course": "nestjs-reportes",
+    "needs": [
+      "nest"
+    ],
+    "bestAfter": []
+  },
+  {
+    "course": "NestJS-Testing",
+    "needs": [
+      "nest"
+    ],
+    "bestAfter": []
+  },
+  {
+    "course": "java-avanzado",
+    "needs": [
+      "Java"
+    ],
+    "bestAfter": []
+  },
+  {
+    "course": "spring-boot",
+    "needs": [
+      "Java"
+    ],
+    "bestAfter": [
+      "java-avanzado"
+    ]
+  },
+  {
+    "course": "spring-boot-patrones-arquitectura",
+    "needs": [
+      "spring-boot"
+    ],
+    "bestAfter": []
+  },
+  {
+    "course": "spring-boot-microservicios",
+    "needs": [
+      "spring-boot",
+      "sql-con-postgres"
+    ],
+    "bestAfter": [
+      "docker-guia-practica"
+    ]
+  },
+  {
+    "course": "springboot-mvc-hexagonal",
+    "needs": [
+      "spring-boot"
+    ],
+    "bestAfter": []
+  },
+  {
+    "course": "kafka-springboot-event-driven",
+    "needs": [
+      "spring-boot"
+    ],
+    "bestAfter": []
+  },
+  {
+    "course": "spring-AI",
+    "needs": [
+      "spring-boot"
+    ],
+    "bestAfter": [
+      "java-avanzado"
+    ]
+  },
+  {
+    "course": "NET-Backend",
+    "needs": [
+      "csharp"
+    ],
+    "bestAfter": [
+      "sql-con-postgres"
+    ]
+  },
+  {
+    "course": "net-pruebascompletas",
+    "needs": [
+      "csharp"
+    ],
+    "bestAfter": [
+      "NET-Backend"
+    ]
+  },
+  {
+    "course": "netfullstack",
+    "needs": [
+      "csharp"
+    ],
+    "bestAfter": [
+      "NET-Backend"
+    ]
+  },
+  {
+    "course": "fastapi",
+    "needs": [
+      "python",
+      "sql-con-postgres"
+    ],
+    "bestAfter": [
+      "git-github-control-versiones-desde-cero"
+    ]
+  },
+  {
+    "course": "django",
+    "needs": [
+      "python"
+    ],
+    "bestAfter": [
+      "sql-con-postgres"
+    ]
+  },
+  {
+    "course": "python-ia-aplicada",
+    "needs": [
+      "python",
+      "sql-con-postgres"
+    ],
+    "bestAfter": [
+      "Ingeniería-de-prompts"
+    ]
+  },
+  {
+    "course": "python-n8n-automatiza-rutinas",
+    "needs": [
+      "python"
+    ],
+    "bestAfter": [
+      "n8n-mcp",
+      "fastapi"
+    ]
+  },
+  {
+    "course": "laravel-ai",
+    "needs": [
+      "PHP-moderno"
+    ],
+    "bestAfter": []
+  },
+  {
+    "course": "golang-fundamentos-lenguaje",
+    "needs": [],
+    "bestAfter": [
+      "programacion-para-principiantes"
+    ]
+  },
+  {
+    "course": "golang-backend-profesional",
+    "needs": [
+      "golang-fundamentos-lenguaje",
+      "sql-con-postgres"
+    ],
+    "bestAfter": [
+      "git-github-control-versiones-desde-cero"
+    ]
+  },
+  {
+    "course": "flutter-movil-cero-a-experto",
+    "needs": [],
+    "bestAfter": [
+      "dart-cero-hasta-detalles"
+    ]
+  },
+  {
+    "course": "flutter-movil-intermedio",
+    "needs": [
+      "flutter-movil-cero-a-experto",
+      "dart-cero-hasta-detalles"
+    ],
+    "bestAfter": []
+  },
+  {
+    "course": "riverpod-con-anotaciones",
+    "needs": [
+      "flutter-movil-cero-a-experto"
+    ],
+    "bestAfter": []
+  },
+  {
+    "course": "flutter-bloc",
+    "needs": [
+      "flutter-movil-cero-a-experto"
+    ],
+    "bestAfter": []
+  },
+  {
+    "course": "Flutter-Gemini",
+    "needs": [
+      "flutter-movil-cero-a-experto"
+    ],
+    "bestAfter": []
+  },
+  {
+    "course": "solid-clean-code",
+    "needs": [
+      "typescript-guia-completa"
+    ],
+    "bestAfter": []
+  },
+  {
+    "course": "patrones-diseno",
+    "needs": [],
+    "bestAfter": [
+      "typescript-guia-completa"
+    ]
+  },
+  {
+    "course": "ia-para-developers",
+    "needs": [
+      "typescript-guia-completa"
+    ],
+    "bestAfter": [
+      "Ingeniería-de-prompts",
+      "nodejs-de-cero-a-experto"
+    ]
+  },
+  {
+    "course": "claude-code-guia-completa",
+    "needs": [],
+    "bestAfter": [
+      "programacion-para-principiantes",
+      "git-github-control-versiones-desde-cero"
+    ]
+  },
+  {
+    "course": "open-code-guia-completa",
+    "needs": [],
+    "bestAfter": [
+      "git-github-control-versiones-desde-cero"
+    ]
+  },
+  {
+    "course": "docker-guia-practica",
+    "needs": [],
+    "bestAfter": [
+      "git-github-control-versiones-desde-cero"
+    ]
+  },
+  {
+    "course": "vibe-coding",
+    "needs": [],
+    "bestAfter": [
+      "javascript-moderno",
+      "python"
+    ]
+  }
+]

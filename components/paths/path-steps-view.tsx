@@ -17,7 +17,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast, Toaster } from "@/components/ui/toast";
 import type { ActionResult } from "@/lib/action-result";
 import { browserTimeZone } from "@/lib/gamification/streak";
-import { groupStepsByProgram } from "@/lib/progress/group-steps";
+import { groupStepsByTier } from "@/lib/progress/group-steps";
 import { USER_DISCARD_REASON } from "@/lib/progress/path-progress";
 
 import { BudgetCard } from "./budget-card";
@@ -84,7 +84,7 @@ export function PathStepsView({ pathId, steps, budgetHours, initialView }: PathS
 
   const activeSteps = optimisticSteps.filter((step) => step.status !== "discarded");
   const discardedSteps = optimisticSteps.filter((step) => step.status === "discarded");
-  const groups = groupStepsByProgram(activeSteps);
+  const groups = groupStepsByTier(activeSteps);
   // Numeración corrida sobre toda la ruta: coincide con el "N de M" de la tarjeta de progreso.
   const stepNumbers = new Map(activeSteps.map((step, index) => [step.id, index + 1]));
   const progress = summarizeStepsProgress(optimisticSteps, budgetHours);

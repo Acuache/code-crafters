@@ -9,6 +9,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { DISCARD_REASONS } from "@/lib/paths/discard-reasons";
 import { isUserDiscarded } from "@/lib/progress/path-progress";
 
 import { CourseCover } from "./course-cover";
@@ -56,6 +57,10 @@ export function DiscardedSteps({ steps, onRestore }: DiscardedStepsProps) {
                         <Badge variant="secondary">{step.discardReason}</Badge>
                         <CourseDuration hours={step.courseHours} />
                       </div>
+                      {/* El badge es corto; qué base le falta se lee acá (spec 17). */}
+                      {step.discardReason === DISCARD_REASONS.missingBase ? (
+                        <p className="text-xs text-pretty text-muted-foreground">{step.reason}</p>
+                      ) : null}
                     </div>
                     {/* Un descarte del motor no se restaura: rompería el presupuesto de horas. */}
                     {isUserDiscarded(step) ? (
