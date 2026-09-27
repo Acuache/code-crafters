@@ -26,6 +26,7 @@ const validSharedPath = {
       reason: "Primero",
       courseTitle: "Curso 1",
       courseHours: 2.5,
+      courseDifficulty: "principiante",
       courseUrl: "https://cursos.devtalles.com/courses/curso-1",
       courseImageUrl: null,
       programSlug: "react",
@@ -116,7 +117,11 @@ describe("authorLabel", () => {
 });
 
 describe("describePathSize", () => {
-  const baseStep: SharedPathStep = { ...validSharedPath.steps[0], origin: "requerido" };
+  const baseStep: SharedPathStep = {
+    ...validSharedPath.steps[0],
+    origin: "requerido",
+    courseDifficulty: "principiante",
+  };
 
   it("cuenta los cursos y suma sus horas", () => {
     const steps = [

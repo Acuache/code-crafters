@@ -37,6 +37,22 @@ Complementa a `courses.json` con los dos campos que el scraping no pudo obtener 
 
 Rutas que publica DevTalles. Cada paso tiene `stage` (orden de arriba hacia abajo; varios pasos pueden compartir etapa), `level` (`requerido` / `recomendado` / `opcional`), `note` (texto de la celda, por ejemplo "EN CUALQUIER MOMENTO") y `courses` (slugs; más de uno = cursos alternativos o complementarios del mismo paso).
 
+Conserva los niveles de la web. En la base, Fundamentos es la base del principiante con otros niveles: Programación `requerido`, Git `recomendado` y el resto `opcional` (migración `20260927120000_engine_rules.sql`, spec 17).
+
+## course-prerequisites.json
+
+El mapa de requisitos entre cursos que usa el motor v2 (spec 17, [ADR 0008](../docs/decisiones/0008-motor-v2-requisitos-y-admin.md)). Se armó a mano leyendo el campo `prerequisites` de cada curso. Siembra la tabla `course_prerequisites`; después se edita desde `/admin/courses/[slug]`. 64 cursos, 101 requisitos.
+
+| Campo | Qué es |
+|---|---|
+| `course` | Slug del curso |
+| `needs` | Sin esto el curso no se puede seguir (`necesita`): el motor lo suma a la ruta y lo pone antes |
+| `bestAfter` | Conviene antes (`conviene`): solo ordena, si los dos ya están en la ruta |
+
+## interest-courses.json
+
+Los cursos que sugiere cada interés del cuestionario, en orden de preferencia (12 intereses, 26 cursos). Siembra la tabla `interest_courses`; después se edita desde `/admin/interests`. Las etiquetas de los intereses siguen en `lib/paths/interests.ts`.
+
 ## Cursos
 
 | # | Curso | slug | Horas | Lecciones | Precio | Etiquetas |

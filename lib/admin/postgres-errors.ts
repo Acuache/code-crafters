@@ -5,7 +5,7 @@ export const GENERIC_SAVE_ERROR = "No se pudo guardar. Intenta de nuevo.";
 
 const UNIQUE_VIOLATION_CODE = "23505";
 
-// Nombres reales de los unique de los specs 02 y 13 (verificados en pg_constraint).
+// Nombres reales de los unique de los specs 02, 13 y 17 (verificados en pg_constraint).
 const UNIQUE_CONSTRAINT_MESSAGES: Record<string, string> = {
   courses_slug_key: "Ya existe un curso con ese slug.",
   programs_slug_key: "Ya existe un programa con ese slug.",
@@ -13,6 +13,8 @@ const UNIQUE_CONSTRAINT_MESSAGES: Record<string, string> = {
   program_courses_program_id_stage_level_position_key:
     "Otro cambio ocupó esa posición. Intenta de nuevo.",
   quizzes_course_id_key: "Este curso ya tiene un quiz. Recarga la página para editarlo.",
+  course_prerequisites_pkey: "Ese curso ya es requisito de este. Quítalo para cambiar el tipo.",
+  interest_courses_pkey: "Ese curso ya está en este interés.",
 };
 
 export function describePostgresError(error: { code?: string; message: string }): string {

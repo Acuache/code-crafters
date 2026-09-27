@@ -1,0 +1,52 @@
+{
+  "docker": [
+    "docker-guia-practica"
+  ],
+  "solid-clean-code": [
+    "solid-clean-code"
+  ],
+  "patrones-diseno": [
+    "patrones-diseno"
+  ],
+  "control-versiones": [
+    "git-github-control-versiones-desde-cero"
+  ],
+  "bases-de-datos-sql": [
+    "sql-con-postgres"
+  ],
+  "testing": [
+    "NestJS-Testing",
+    "net-pruebascompletas"
+  ],
+  "tiempo-real": [
+    "react-sockets",
+    "Angular_socket_bun"
+  ],
+  "ia-aplicada": [
+    "Ingeniería-de-prompts",
+    "spring-AI",
+    "python-ia-aplicada",
+    "ia-para-developers",
+    "Flutter-Gemini",
+    "expo-gemini",
+    "openai",
+    "openai-angular-nestjs"
+  ],
+  "microservicios": [
+    "nestjs-microservicios",
+    "spring-boot-microservicios",
+    "go-microservicios"
+  ],
+  "sitios-de-contenido": [
+    "Astro",
+    "qwik-introduccion"
+  ],
+  "agentes-vibe-coding": [
+    "claude-code-guia-completa",
+    "open-code-guia-completa",
+    "vibe-coding"
+  ],
+  "estilos": [
+    "tailwindcss-para-desarrolladores"
+  ]
+}

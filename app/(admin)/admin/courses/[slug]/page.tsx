@@ -8,6 +8,11 @@ import {
   type PlacementRow,
   type ProgramOption,
 } from "@/components/admin/course-placements";
+import {
+  CoursePrerequisites,
+  type CourseOption,
+  type PrerequisiteRow,
+} from "@/components/admin/course-prerequisites";
 import { CourseStatusCard } from "@/components/admin/course-status-card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -20,6 +25,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { decodeSlugParam } from "@/lib/admin/route-params";
+import { isAiConfigured } from "@/lib/ai/personalize-path";
 import { PROGRAM_LEVEL_ORDER } from "@/lib/paths/levels";
 import { requireAdmin } from "@/lib/supabase/guards";
 import { createClient } from "@/lib/supabase/server";
@@ -103,6 +109,32 @@ export default async function EditCoursePage({ params }: { params: Promise<{ slu
   const programs: ProgramOption[] = programsResult.data ?? [];
   const quiz = course.quizzes;
 
+  // course_prerequisites tiene dos FK a courses: `!prerequisite_course_id` elige el requisito.
+  const [prerequisitesResult, activeCoursesResult] = await Promise.all([
+    supabase
+      .from("course_prerequisites")
+      .select("kind, prerequisite:courses!prerequisite_course_id(id, slug, title)")
+      .eq("course_id", course.id),
+    supabase.from("courses").select("id, title").eq("is_active", true).order("title"),
+  ]);
+
+  if (prerequisitesResult.error || activeCoursesResult.error) {
+    throw new Error("No se pudieron cargar los requisitos del curso.");
+  }
+
+  const prerequisites: PrerequisiteRow[] = (prerequisitesResult.data ?? [])
+    .map((row) => ({
+      courseId: row.prerequisite.id,
+      slug: row.prerequisite.slug,
+      title: row.prerequisite.title,
+      kind: row.kind,
+    }))
+    .sort((a, b) => a.title.localeCompare(b.title));
+  const prerequisiteIds = new Set(prerequisites.map((prerequisite) => prerequisite.courseId));
+  const prerequisiteOptions: CourseOption[] = (activeCoursesResult.data ?? []).filter(
+    (option) => option.id !== course.id && !prerequisiteIds.has(option.id),
+  );
+
   return (
     <div className="flex flex-col gap-6">
       <CourseStatusCard courseId={course.id} isActive={course.is_active} />
@@ -136,6 +168,13 @@ export default async function EditCoursePage({ params }: { params: Promise<{ slu
         courseIsActive={course.is_active}
         placements={placements}
         programs={programs}
+      />
+
+      <CoursePrerequisites
+        courseId={course.id}
+        prerequisites={prerequisites}
+        courseOptions={prerequisiteOptions}
+        isAiEnabled={isAiConfigured()}
       />
 
       <Card>

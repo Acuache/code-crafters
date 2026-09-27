@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeftIcon, PathIcon } from "@phosphor-icons/react/ssr";
+import { ArrowLeftIcon, HourglassIcon, PathIcon } from "@phosphor-icons/react/ssr";
 
 import { AutoPersonalizer } from "@/components/ai/auto-personalizer";
 import { ProfileAdjustmentsNote } from "@/components/ai/profile-adjustments-note";
@@ -11,12 +11,19 @@ import { StreakCard } from "@/components/gamification/streak-card";
 import type { PathStepView, PathView } from "@/components/paths/path-step";
 import { PathStepsView } from "@/components/paths/path-steps-view";
 import { SharePathDialog } from "@/components/sharing/share-path-dialog";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { assessmentAnswersSchema } from "@/components/quiz/quiz-schema";
-import { remainingPersonalizations } from "@/lib/ai/daily-limit";
+import {
+  DAILY_PERSONALIZATION_LIMIT,
+  describeTimeUntil,
+  nextPersonalizationAt,
+  remainingPersonalizations,
+} from "@/lib/ai/daily-limit";
 import {
   countPersonalizationAttemptsForPath,
   countPersonalizationsInLast24h,
+  findOldestPersonalizationInLast24h,
   isAiConfigured,
 } from "@/lib/ai/personalize-path";
 import { computeStreak, todayInTimeZone } from "@/lib/gamification/streak";
@@ -48,30 +55,45 @@ type AutoPersonalizeContext = {
   answers: unknown;
 };
 
+type AiPersonalizationPlan =
+  { kind: "personalize" } | { kind: "limit-reached"; retryAt: Date } | { kind: "none" };
+
 // La IA redacta el texto de la ruta una sola vez, y solo si el usuario escribió texto libre: sin
 // él no tiene nada propio que contar. Las consultas van de la más barata a la más cara.
-async function shouldAutoPersonalize(
+async function planAiPersonalization(
   supabase: Awaited<ReturnType<typeof createClient>>,
   { pathId, isPersonalized, answers }: AutoPersonalizeContext,
-): Promise<boolean> {
+): Promise<AiPersonalizationPlan> {
   if (!isAiConfigured() || isPersonalized) {
-    return false;
+    return { kind: "none" };
   }
 
   const parsedAnswers = assessmentAnswersSchema.safeParse(answers);
   const wroteFreeText = parsedAnswers.success && parsedAnswers.data.freeText.trim() !== "";
   if (!wroteFreeText) {
-    return false;
-  }
-
-  const usedInLast24h = await countPersonalizationsInLast24h(supabase);
-  if (usedInLast24h === null || remainingPersonalizations(usedInLast24h) === 0) {
-    return false;
+    return { kind: "none" };
   }
 
   // Un intento previo, aunque haya fallado, evita reintentar solo en cada visita.
   const attemptsForPath = await countPersonalizationAttemptsForPath(supabase, pathId);
-  return attemptsForPath === 0;
+  if (attemptsForPath !== 0) {
+    return { kind: "none" };
+  }
+
+  const usedInLast24h = await countPersonalizationsInLast24h(supabase);
+  if (usedInLast24h === null) {
+    return { kind: "none" };
+  }
+  if (remainingPersonalizations(usedInLast24h) > 0) {
+    return { kind: "personalize" };
+  }
+
+  // Sin usos: se avisa en vez de callar.
+  const oldestUse = await findOldestPersonalizationInLast24h(supabase);
+  if (!oldestUse) {
+    return { kind: "none" };
+  }
+  return { kind: "limit-reached", retryAt: nextPersonalizationAt(oldestUse) };
 }
 
 // "Hoy" sale de la última zona guardada: el servidor no conoce la del navegador.
@@ -174,7 +196,7 @@ export default async function PathPage({ params, searchParams }: PathPageProps) 
   const { data: rawSteps } = await supabase
     .from("path_steps")
     .select(
-      "id, stage, position, origin, reason, ai_reason, status, discard_reason, courses(id, title, hours, url, image_url), programs(slug, name)",
+      "id, stage, position, origin, reason, ai_reason, status, discard_reason, courses(id, title, hours, difficulty, url, image_url), programs(slug, name)",
     )
     .eq("path_id", path.id)
     .order("stage", { ascending: true })
@@ -187,8 +209,8 @@ export default async function PathPage({ params, searchParams }: PathPageProps) 
   const title = path.ai_title ?? path.title;
   const summary = path.ai_summary ?? path.summary;
   const isPersonalized = path.personalized_at !== null;
-  const [autoPersonalize, streakView, quizzesByCourse, originUsername] = await Promise.all([
-    shouldAutoPersonalize(supabase, {
+  const [aiPlan, streakView, quizzesByCourse, originUsername] = await Promise.all([
+    planAiPersonalization(supabase, {
       pathId: path.id,
       isPersonalized,
       answers: path.assessments?.answers,
@@ -210,6 +232,7 @@ export default async function PathPage({ params, searchParams }: PathPageProps) 
     discardReason: row.discard_reason,
     courseTitle: row.courses.title,
     courseHours: Number(row.courses.hours),
+    courseDifficulty: row.courses.difficulty,
     courseUrl: row.courses.url,
     courseImageUrl: row.courses.image_url,
     quiz: quizzesByCourse.get(row.courses.id) ?? null,
@@ -245,7 +268,20 @@ export default async function PathPage({ params, searchParams }: PathPageProps) 
           {summary ? (
             <p className="max-w-prose text-pretty text-muted-foreground">{summary}</p>
           ) : null}
-          {autoPersonalize ? <AutoPersonalizer pathId={path.id} /> : null}
+          {aiPlan.kind === "personalize" ? <AutoPersonalizer pathId={path.id} /> : null}
+          {aiPlan.kind === "limit-reached" ? (
+            <Alert>
+              <HourglassIcon />
+              <AlertTitle>
+                Ya usaste la IA {DAILY_PERSONALIZATION_LIMIT} veces en las últimas 24 h
+              </AlertTitle>
+              <AlertDescription>
+                Por eso la IA todavía no redactó el título, el resumen ni el porqué de cada curso
+                con lo que contaste. Ábrela de nuevo en{" "}
+                {describeTimeUntil(aiPlan.retryAt, new Date())} y lo hace sola.
+              </AlertDescription>
+            </Alert>
+          ) : null}
           <div>
             <SharePathDialog
               pathId={path.id}

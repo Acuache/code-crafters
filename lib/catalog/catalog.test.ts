@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { groupProgramCourseRows, type ProgramCourseRow } from "./catalog";
+import { buildEngineRules, groupProgramCourseRows, type ProgramCourseRow } from "./catalog";
 
 // Dos pasos en el mismo `stage` (2) con distinto `level` — el caso que obliga a ordenar por
 // LEVEL_RANK y no sólo por `stage` — más un paso con dos alternativas (`react-de-cero`/`react-pro`)
@@ -8,6 +8,7 @@ import { groupProgramCourseRows, type ProgramCourseRow } from "./catalog";
 const rows: ProgramCourseRow[] = [
   {
     programSlug: "react",
+    programName: "React",
     stage: 1,
     level: "requerido",
     position: 1,
@@ -16,6 +17,7 @@ const rows: ProgramCourseRow[] = [
   },
   {
     programSlug: "react",
+    programName: "React",
     stage: 2,
     level: "requerido",
     position: 1,
@@ -24,6 +26,7 @@ const rows: ProgramCourseRow[] = [
   },
   {
     programSlug: "react",
+    programName: "React",
     stage: 2,
     level: "requerido",
     position: 2,
@@ -32,6 +35,7 @@ const rows: ProgramCourseRow[] = [
   },
   {
     programSlug: "react",
+    programName: "React",
     stage: 2,
     level: "recomendado",
     position: 1,
@@ -40,6 +44,7 @@ const rows: ProgramCourseRow[] = [
   },
   {
     programSlug: "nest",
+    programName: "NestJS",
     stage: 1,
     level: "requerido",
     position: 1,
@@ -66,10 +71,12 @@ describe("groupProgramCourseRows", () => {
     expect(first).toEqual([
       {
         slug: "nest",
+        name: "NestJS",
         steps: [{ stage: 1, level: "requerido", note: null, courseSlugs: ["nodejs"] }],
       },
       {
         slug: "react",
+        name: "React",
         steps: [
           { stage: 1, level: "requerido", note: null, courseSlugs: ["javascript-moderno"] },
           {
@@ -82,5 +89,39 @@ describe("groupProgramCourseRows", () => {
         ],
       },
     ]);
+  });
+});
+
+describe("buildEngineRules", () => {
+  it("agrupa los requisitos por curso y separa 'necesita' de 'conviene'", () => {
+    const rules = buildEngineRules(
+      [
+        { courseSlug: "react-de-cero", prerequisiteSlug: "javascript-moderno", kind: "necesita" },
+        { courseSlug: "nest", prerequisiteSlug: "javascript-moderno", kind: "necesita" },
+        { courseSlug: "nest", prerequisiteSlug: "typescript-guia-completa", kind: "conviene" },
+      ],
+      [],
+    );
+
+    expect(rules.prerequisites).toEqual({
+      "react-de-cero": { needs: ["javascript-moderno"], bestAfter: [] },
+      nest: { needs: ["javascript-moderno"], bestAfter: ["typescript-guia-completa"] },
+    });
+  });
+
+  it("ordena los cursos de cada interés por posición, sin importar el orden de llegada", () => {
+    const rules = buildEngineRules(
+      [],
+      [
+        { interestSlug: "testing", courseSlug: "net-pruebascompletas", position: 2 },
+        { interestSlug: "docker", courseSlug: "docker-guia-practica", position: 1 },
+        { interestSlug: "testing", courseSlug: "NestJS-Testing", position: 1 },
+      ],
+    );
+
+    expect(rules.interestCourses).toEqual({
+      docker: ["docker-guia-practica"],
+      testing: ["NestJS-Testing", "net-pruebascompletas"],
+    });
   });
 });

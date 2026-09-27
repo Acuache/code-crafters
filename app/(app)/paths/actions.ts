@@ -56,7 +56,7 @@ export async function generatePath(assessmentId: string): Promise<ActionFailure>
   // El motor no usa `freeText`; el resto ya tiene la forma de LearnerProfile.
   const { freeText, ...answeredProfile } = parsed.data;
 
-  const { catalog, programs, courseIds, programIds } = await loadCatalog(supabase);
+  const { catalog, programs, rules, courseIds, programIds } = await loadCatalog(supabase);
 
   // Sin el seed del catálogo se guardaría una ruta vacía sin ningún error.
   if (catalog.length === 0 || programs.length === 0) {
@@ -71,7 +71,7 @@ export async function generatePath(assessmentId: string): Promise<ActionFailure>
     freeText,
   );
 
-  const built = buildPath(profile, catalog, programs);
+  const built = buildPath(profile, catalog, programs, rules);
 
   const { data: path, error: pathError } = await supabase
     .from("learning_paths")

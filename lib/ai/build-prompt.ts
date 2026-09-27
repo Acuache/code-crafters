@@ -87,12 +87,21 @@ function describeProfile(profile: LearnerContext): string {
   ].join("\n");
 }
 
+// Desde el spec 17, un curso sin programa que no vino por interés entró porque otro lo necesita.
+function describeWhyItIsThere(step: PersonalizationStep): string {
+  if (step.origin !== "interes" && step.programName === null) {
+    return "lo necesita otro curso de la ruta";
+  }
+  const programSuffix = step.programName ? ` (${step.programName})` : "";
+  return `${ORIGIN_DESCRIPTIONS[step.origin]}${programSuffix}`;
+}
+
 function describeStep(step: PersonalizationStep, index: number): string {
   const lines = [
     `${index + 1}. courseSlug: ${step.courseSlug}`,
     `   Título: ${step.courseTitle}`,
     `   Duración: ${step.hours} h`,
-    `   Por qué está: ${ORIGIN_DESCRIPTIONS[step.origin]}${step.programName ? ` (${step.programName})` : ""}`,
+    `   Por qué está: ${describeWhyItIsThere(step)}`,
     `   Razón actual: ${step.templateReason}`,
   ];
 

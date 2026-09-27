@@ -57,6 +57,11 @@ Decisiones de base para todo el mapa:
 | 14 | `gamification` | XP por curso (10 por hora), niveles, 6 insignias como medallas en `/profile`, resumen en el dashboard y celebración (toast o modal con confetti) al completar; "Hecho" exige aprobar el quiz del curso (ADR 0007) | 02, 03, 08, 09, 12, 13 | Semana 2 |
 | 15 | `path-sharing` | Ruta pública en `/shared/[slug]` con tarjeta OG para pegar en Discord, y "Hacer esta ruta": con sesión, otra persona la copia a su cuenta con el progreso en cero | 02, 03, 08, 11, 12, 14 | Semana 2 |
 | 16 | `path-recalculation` | Botón "Ajustar mi ruta": cuestionario prellenado con las respuestas anteriores; con IA, un texto libre se traduce a cambios de chips (nunca de cursos) antes de confirmar; sin IA, se editan los chips a mano. Genera una ruta nueva, no pisa la anterior (COULD, primero en recortarse) | 08, 11 | Semana 2 |
+| 17 | `path-engine-v2` | Motor v2 ([ADR 0008](decisiones/0008-motor-v2-requisitos-y-admin.md)): la ruta se ordena por requisitos entre cursos y dificultad, Fundamentos pasa a ser la base editable del principiante, la ruta se agrupa por tramos, y el admin edita requisitos (con sugerencias de IA) e intereses desde `/admin` | 02, 04, 07, 08, 10, 11, 12, 15 | Semana 3 |
+| 18 | `admin-goals-interests` *(futuro)* | Crear metas, intereses y tecnologías dominables desde el panel (tocan el cuestionario, su zod y los prompts de la IA) | 06, 17 | — |
+
+> El 17 se escribió antes que el 16 y **el número 16 queda reservado** para `path-recalculation`.
+> `/spec` numera con el mayor existente + 1: al escribir el 16 hay que renombrar el archivo a mano.
 
 Ramas resultantes: `spec-01-catalog-enrichment`, `spec-02-supabase-schema`, … (las deriva `/spec-impl`
 del nombre del archivo).
@@ -215,7 +220,25 @@ los anteriores (no depende de nada); y 11 y 12 entre sí una vez cerrado el 08 (
    `next` ni los errores. Todo lo demás de otros specs (`step-meta`, `step-node-style`, `XpBar`,
    `AchievementMedal`, `StreakIndicator`, `launchConfetti`, `lib/path-map/motion.ts`,
    `lib/gamification/xp.ts`, `TECHNOLOGIES`) se importa sin cambios.
-6. **Migraciones nuevas solo en 02, 11, 13, 14 y 15**, y esos cinco no se implementan en paralelo entre sí:
+   **Excepciones explícitas del spec 17 (motor v2):** es dueño de `lib/paths/discard-reasons.ts`,
+   `lib/admin/prerequisite-{schema,cycles}`, `lib/ai/prerequisite-suggestion`,
+   `components/admin/{course-prerequisites,interest-courses}.tsx`, `app/(admin)/admin/interests/*`,
+   `data/{course-prerequisites,interest-courses}.json` y `supabase/tests/engine_rules.sql`. Fuera de
+   eso, del 04: reescribe `lib/paths/build-path{,.test}.ts` y cambia `types.ts`, `goals.ts`
+   (`excludedCourseSlugs`) e `interests.ts` (`INTERESTS` solo con etiquetas). Del 07:
+   `lib/catalog/catalog{,.test}.ts` carga las reglas, y `generatePath` las pasa. Del 08:
+   `lib/progress/group-steps{,.test}.ts` agrupa por tramo, `courseDifficulty` en `path-step.ts` y en
+   `/paths/[id]/page.tsx`, y el detalle de "le falta la base" en `discarded-steps.tsx`. Del 12: el
+   eyebrow "Tramo N" en `step-group-heading.tsx`. Del 10: las actions de requisitos y el bloqueo por
+   intereses en `app/(admin)/admin/courses/actions.ts`, la tarjeta en `/admin/courses/[slug]/page.tsx`,
+   `engine-references.ts`, `postgres-errors.ts` y `admin-nav.tsx`. Del 11:
+   `requestPrerequisiteSuggestions` y `findOldestPersonalizationInLast24h` en
+   `lib/ai/personalize-path.ts`, `describeTimeUntil` en `lib/ai/daily-limit.ts` y el aviso de cupo
+   agotado en `/paths/[id]/page.tsx`; en `lib/ai/build-prompt.ts`, cómo se describe un curso que
+   entró como requisito. Del 05: el orden y las razones de `lib/landing/example-path.ts`
+   (`EXAMPLE_MAIN_COURSE`) y `components/landing/mockups/ai-mockup.tsx`. Del 15: `courseDifficulty` en
+   `lib/sharing/shared-path.ts` y los tramos en `shared-path-steps.tsx`.
+6. **Migraciones nuevas solo en 02, 11, 13, 14, 15 y 17**, y esos seis no se implementan en paralelo entre sí:
    el orden de los archivos de migración depende del orden de merge, y ramas simultáneas lo rompen. El
    02 crea el esquema base —incluye `profiles.role` y las tablas `programs`/`program_courses`—; 11, 13
    y 15 añaden cada uno sus columnas o tablas para poder recortarse sin dejar tablas muertas. El 10
@@ -226,7 +249,9 @@ los anteriores (no depende de nada); y 11 y 12 entre sí una vez cerrado el 08 (
    `20260925140000_seed_course_quizzes.sql`. El 14 solo cambia un FK
    (`20260925150000_keep_streak_days_on_path_delete.sql`: borrar una ruta ya no borra días de racha).
    El 15 agrega `is_public`, `share_slug` y `copied_from_path_id` a `learning_paths` y tres funciones
-   `security definer` acotadas por slug (`20260925160000_path_sharing.sql`).
+   `security definer` acotadas por slug (`20260925160000_path_sharing.sql`). El 17 crea
+   `course_prerequisites` e `interest_courses` con su seed, cambia los niveles de Fundamentos y suma
+   la dificultad a `get_shared_path` (`20260927120000_engine_rules.sql`).
 7. **Antes de cada `/spec-impl`:** estar en `master`, con el árbol limpio y actualizado. La fase 3 del
    skill se detiene si `git status` no está vacío.
 8. **Lo que aparezca fuera de alcance durante un `/spec-impl` va al spec que le toca según el mapa**, no
@@ -521,3 +546,26 @@ las listas cerradas que ya existen — y el usuario confirma antes de aplicar na
 formulario prellenado se edita a mano. Al confirmar, el motor del 04 genera una **ruta nueva**; la
 anterior no se toca, así que el progreso y el XP ya ganados no se pierden. Depende de 08 (necesita la
 vista de progreso) y de 11 (comparte el límite diario de personalizaciones).
+
+### 17 · `path-engine-v2`
+
+> Se implementó sin el ciclo `Borrador` → `Aprobado`, a pedido del usuario. Manda
+> `specs/17-path-engine-v2.md`, que queda como registro.
+
+El motor del 04 armaba rutas sin sentido pedagógico: Fundamentos entero antes del lenguaje, cursos
+de otro stack e incluso sin lo que necesitaban (React Native sin React). El 17 le enseña qué curso
+necesita a cuál. `course_prerequisites` distingue "necesita" (suma y ordena) de "conviene" (solo
+ordena), y ahora las reglas del motor las edita el admin:
+- los requisitos, en `/admin/courses/[slug]`, con un botón que le pide sugerencias a la IA;
+- los cursos de cada interés, en `/admin/interests`;
+- la base del principiante, en el programa Fundamentos.
+
+Programación abre la ruta, Git llega después del primer curso no principiante de la meta, y los intereses van donde
+encajan por dificultad y solo si tienen su base. La lista y el mapa se agrupan por tramo (Primeros
+pasos, Intermedio o Avanzado). La IA no elige cursos. Decisión en el
+[ADR 0008](decisiones/0008-motor-v2-requisitos-y-admin.md).
+
+### 18 · `admin-goals-interests` *(futuro)*
+
+Crear metas, intereses y tecnologías dominables desde el panel. Quedó fuera del 17 porque toca el
+cuestionario del 06, su zod y los prompts de la IA del 11.
