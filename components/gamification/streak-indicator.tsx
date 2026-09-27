@@ -28,7 +28,7 @@ function describeStreak(streak: StreakSummary): string {
   return "Ya avanzaste hoy";
 }
 
-function getStreakImageSource(streakDays: number): string {
+export function getStreakImageSource(streakDays: number): string {
   if (streakDays === 0) {
     return "/streak/reminder.webp";
   }

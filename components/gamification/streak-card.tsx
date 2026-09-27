@@ -1,5 +1,7 @@
+import Image from "next/image";
 import { FireIcon } from "@phosphor-icons/react/ssr";
 
+import { getStreakImageSource } from "@/components/gamification/streak-indicator";
 import { Card, CardContent } from "@/components/ui/card";
 import { MS_PER_DAY, type StreakSummary } from "@/lib/gamification/streak";
 import { cn } from "@/lib/utils";
@@ -37,28 +39,37 @@ export function StreakCard({ streak, activityDates, today }: StreakCardProps) {
   const activeDates = new Set(activityDates);
 
   return (
-    <Card size="sm">
-      <CardContent className="flex flex-wrap items-center justify-between gap-4">
-        <div className="flex items-center gap-3">
-          <FireIcon
-            weight="fill"
-            className={cn(
-              "size-9",
-              streak.current > 0 ? "text-primary-bright" : "text-muted-foreground",
-            )}
-            aria-hidden="true"
-          />
-          <div className="flex flex-col">
-            <span className="font-heading text-2xl font-semibold tabular-nums">
-              {formatDays(streak.current)}
-            </span>
-            <span className="text-xs text-muted-foreground">
-              Racha actual · récord {formatDays(streak.best)}
-            </span>
+    <Card size="sm" className="border border-border/70 shadow-sm ring-0">
+      <CardContent className="gap-4">
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex min-w-0 items-center gap-3">
+            <FireIcon
+              weight="fill"
+              className={cn(
+                "size-8 shrink-0",
+                streak.current > 0 ? "text-primary-bright" : "text-muted-foreground",
+              )}
+              aria-hidden="true"
+            />
+            <div className="flex min-w-0 flex-col">
+              <span className="font-heading text-2xl font-semibold tabular-nums">
+                {formatDays(streak.current)}
+              </span>
+              <span className="text-xs text-muted-foreground">
+                Racha actual · récord {formatDays(streak.best)}
+              </span>
+            </div>
           </div>
+          <Image
+            src={getStreakImageSource(streak.current)}
+            alt=""
+            width={48}
+            height={60}
+            className="streak-mascot-motion shrink-0"
+          />
         </div>
 
-        <ol className="flex gap-1.5" aria-label="Tu actividad de la última semana">
+        <ol className="flex justify-between gap-1.5" aria-label="Tu actividad de la última semana">
           {lastWeek(today).map((date) => {
             const isoDate = date.toISOString().slice(0, 10);
             const hadActivity = activeDates.has(isoDate);

@@ -10,11 +10,20 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { DISCARD_REASONS } from "@/lib/paths/discard-reasons";
-import { isUserDiscarded } from "@/lib/progress/path-progress";
+import { isUserDiscarded, USER_DISCARD_REASON } from "@/lib/progress/path-progress";
 
 import { CourseCover } from "./course-cover";
 import type { PathStepView } from "./path-step";
 import { CourseDuration } from "./step-meta";
+
+const DISCARD_REASON_LABELS: Record<string, string> = {
+  [DISCARD_REASONS.mastered]: "Ya lo dominas",
+  [DISCARD_REASONS.inConstruction]: "Aún no está disponible",
+  [DISCARD_REASONS.missingBase]: "Falta una base previa",
+  [DISCARD_REASONS.interestQuota]: "Priorizamos otros temas",
+  [DISCARD_REASONS.budget]: "No cabía en el tiempo disponible",
+  [USER_DISCARD_REASON]: "Lo quitaste de tu ruta",
+};
 
 type DiscardedStepsProps = {
   steps: PathStepView[];
@@ -34,7 +43,7 @@ export function DiscardedSteps({ steps, onRestore }: DiscardedStepsProps) {
             <AccordionTrigger>
               <span className="flex items-center gap-2">
                 <ProhibitIcon className="text-muted-foreground" aria-hidden="true" />
-                Qué quitamos y por qué ({steps.length})
+                Cursos fuera de tu ruta ({steps.length})
               </span>
             </AccordionTrigger>
             <AccordionContent>
@@ -54,7 +63,11 @@ export function DiscardedSteps({ steps, onRestore }: DiscardedStepsProps) {
                     <div className="flex min-w-0 flex-1 flex-col gap-1">
                       <span className="text-sm font-medium text-pretty">{step.courseTitle}</span>
                       <div className="flex flex-wrap items-center gap-2">
-                        <Badge variant="secondary">{step.discardReason}</Badge>
+                        <Badge variant="secondary">
+                          {step.discardReason
+                            ? (DISCARD_REASON_LABELS[step.discardReason] ?? step.discardReason)
+                            : "Fuera de la ruta"}
+                        </Badge>
                         <CourseDuration hours={step.courseHours} />
                       </div>
                       {/* El badge es corto; qué base le falta se lee acá (spec 17). */}
@@ -66,7 +79,7 @@ export function DiscardedSteps({ steps, onRestore }: DiscardedStepsProps) {
                     {isUserDiscarded(step) ? (
                       <Button variant="outline" size="sm" onClick={() => onRestore(step.id)}>
                         <ArrowCounterClockwiseIcon data-icon="inline-start" />
-                        Restaurar
+                        Volver a incluir
                       </Button>
                     ) : null}
                   </li>
