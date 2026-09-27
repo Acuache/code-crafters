@@ -2,10 +2,16 @@ import { useState, type CSSProperties } from "react";
 import { CheckIcon } from "@phosphor-icons/react";
 
 import { ARRIVAL_DELAY_MS } from "@/lib/path-map/motion";
-import { LABEL_WIDTH, NODE_SIZE, type NodePosition } from "@/lib/path-map/zigzag-layout";
+import {
+  ACTIVE_NODE_SIZE,
+  LABEL_WIDTH,
+  NODE_SIZE,
+  type NodePosition,
+} from "@/lib/path-map/zigzag-layout";
 import { cn } from "@/lib/utils";
 
 import type { PathStepView } from "./path-step";
+import { CourseDuration } from "./step-meta";
 import { stepNodeClassName } from "./step-node-style";
 
 const STATUS_LABELS: Record<PathStepView["status"], string> = {
@@ -26,6 +32,7 @@ type PathMapNodeProps = {
   position: NodePosition;
   // Lleva halo y globo. La mascota la dibuja path-map.tsx, porque viaja de un nodo a otro.
   isNext: boolean;
+  isSelected: boolean;
   // Posición en el orden de aparición del mapa completo, para la entrada escalonada.
   entranceIndex: number;
   // Sin él, el nodo no se abre: la ruta compartida es de solo lectura (spec 15).
@@ -40,6 +47,7 @@ export function PathMapNode({
   totalSteps,
   position,
   isNext,
+  isSelected,
   entranceIndex,
   onOpen,
   buttonRef,
@@ -56,11 +64,14 @@ export function PathMapNode({
   const isDone = step.status === "done";
   const isInProgress = step.status === "in_progress";
   const stepLabel = `Paso ${stepNumber} de ${totalSteps}: ${step.courseTitle}`;
-  const accessibleName = `${stepLabel}, ${STATUS_LABELS[step.status]}. Abrir detalle`;
+  const accessibleName = `${stepLabel}, ${STATUS_LABELS[step.status]}. Ver detalle`;
   const bubbleText = isInProgress ? "Continuar" : "Empezar";
   const circleClassName = cn(
     "relative flex size-16 items-center justify-center rounded-full border-2 font-heading text-xl font-bold tabular-nums shadow-md",
     stepNodeClassName(step.status),
+    isNext &&
+      "size-20 border-primary-bright bg-primary-bright text-primary-bright-foreground shadow-brand-glow",
+    isSelected && !isNext && "ring-4 ring-primary/40",
     shouldPop && "motion-safe:animate-step-pop",
   );
   const circleContent = isDone ? (
@@ -71,7 +82,7 @@ export function PathMapNode({
 
   const placement: CSSProperties = {
     left: position.x - LABEL_WIDTH / 2,
-    top: position.y - NODE_SIZE / 2,
+    top: position.y - (isNext ? ACTIVE_NODE_SIZE : NODE_SIZE) / 2,
     width: LABEL_WIDTH,
     animationDelay: `${Math.min(entranceIndex * ENTRANCE_STEP_MS, MAX_ENTRANCE_DELAY_MS)}ms`,
   };
@@ -102,6 +113,7 @@ export function PathMapNode({
             type="button"
             ref={buttonRef}
             aria-label={accessibleName}
+            aria-current={isNext ? "step" : undefined}
             onClick={(event) => onOpen(event.currentTarget)}
             className={cn(
               circleClassName,
@@ -136,15 +148,19 @@ export function PathMapNode({
         )}
       </div>
 
-      <span
-        aria-hidden="true"
-        className={cn(
-          "mt-2 line-clamp-2 rounded-md bg-background/85 px-1.5 text-center text-xs leading-snug font-medium text-balance",
-          isDone ? "text-muted-foreground" : "text-foreground",
-        )}
-      >
-        {step.courseTitle}
-      </span>
+      <div className="mt-2 flex w-full flex-col items-center gap-0.5" aria-hidden="true">
+        <span
+          className={cn(
+            "line-clamp-2 rounded-md bg-background/85 px-1.5 text-center text-xs leading-snug font-medium text-balance",
+            isNext &&
+              "border border-primary/30 bg-card px-2 py-0.5 font-semibold text-foreground shadow-sm",
+            isDone ? "text-muted-foreground" : "text-foreground",
+          )}
+        >
+          {step.courseTitle}
+        </span>
+        <CourseDuration hours={step.courseHours} />
+      </div>
     </li>
   );
 }

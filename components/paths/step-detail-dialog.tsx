@@ -75,6 +75,7 @@ export function StepDetailDialog({
       >
         {step ? (
           <StepDetail
+            mode="dialog"
             step={step}
             stepNumber={stepNumber}
             onStatusChange={onStatusChange}
@@ -88,6 +89,7 @@ export function StepDetailDialog({
 }
 
 type StepDetailProps = {
+  mode: "dialog" | "panel";
   step: PathStepView;
   stepNumber: number;
   onStatusChange: (status: SelectableStepStatus) => void;
@@ -95,7 +97,14 @@ type StepDetailProps = {
   onOpenQuiz: () => void;
 };
 
-function StepDetail({ step, stepNumber, onStatusChange, onDiscard, onOpenQuiz }: StepDetailProps) {
+export function StepDetail({
+  mode,
+  step,
+  stepNumber,
+  onStatusChange,
+  onDiscard,
+  onOpenQuiz,
+}: StepDetailProps) {
   // Mismo guard que step-row.tsx: el toggle no tiene opción para un paso descartado.
   if (step.status === "discarded") {
     return null;
@@ -109,7 +118,7 @@ function StepDetail({ step, stepNumber, onStatusChange, onDiscard, onOpenQuiz }:
       <CourseCover
         imageUrl={step.courseImageUrl}
         alt={`Portada del curso ${step.courseTitle}`}
-        sizes="(min-width: 640px) 512px, 100vw"
+        sizes={mode === "panel" ? "336px" : "(min-width: 640px) 512px, 100vw"}
         isDimmed={isDone}
         className="w-full"
         iconClassName="size-10"
@@ -122,28 +131,41 @@ function StepDetail({ step, stepNumber, onStatusChange, onDiscard, onOpenQuiz }:
             <CourseDuration hours={step.courseHours} />
           </span>
         </div>
-        {/* Cerrar propio: va sobre la portada y necesita fondo sólido para no perderse. */}
-        <DialogClose
-          render={
-            <Button
-              variant="secondary"
-              size="icon-sm"
-              className="absolute top-3 right-3 rounded-full shadow-md"
-            />
-          }
-        >
-          <XIcon />
-          <span className="sr-only">Cerrar</span>
-        </DialogClose>
+        {mode === "dialog" ? (
+          <DialogClose
+            render={
+              <Button
+                variant="secondary"
+                size="icon-sm"
+                className="absolute top-3 right-3 rounded-full shadow-md"
+              />
+            }
+          >
+            <XIcon />
+            <span className="sr-only">Cerrar</span>
+          </DialogClose>
+        ) : null}
       </CourseCover>
 
       <div className="flex flex-col gap-4 p-5 sm:p-6">
-        <DialogHeader className="gap-2">
-          <DialogTitle className="text-xl leading-snug font-semibold text-pretty">
-            {step.courseTitle}
-          </DialogTitle>
-          <DialogDescription className="text-pretty">{step.reason}</DialogDescription>
-        </DialogHeader>
+        {mode === "dialog" ? (
+          <DialogHeader className="gap-2">
+            <DialogTitle className="text-xl leading-snug font-semibold text-pretty">
+              {step.courseTitle}
+            </DialogTitle>
+            <DialogDescription className="text-pretty">{step.reason}</DialogDescription>
+          </DialogHeader>
+        ) : (
+          <div className="flex flex-col gap-2">
+            <h2
+              aria-live="polite"
+              className="font-heading text-xl leading-snug font-semibold text-pretty"
+            >
+              {step.courseTitle}
+            </h2>
+            <p className="text-sm text-pretty text-muted-foreground">{step.reason}</p>
+          </div>
+        )}
 
         <div className="flex flex-col gap-3">
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -167,7 +189,11 @@ function StepDetail({ step, stepNumber, onStatusChange, onDiscard, onOpenQuiz }:
         ) : null}
 
         <div className="h-px bg-border/70" aria-hidden="true" />
-        <DialogFooter className={canBeDiscarded ? "grid grid-cols-2 gap-2" : "grid grid-cols-1"}>
+        <DialogFooter
+          className={
+            canBeDiscarded && mode === "dialog" ? "grid grid-cols-2 gap-2" : "grid grid-cols-1"
+          }
+        >
           {canBeDiscarded ? (
             <Button
               variant="outline"

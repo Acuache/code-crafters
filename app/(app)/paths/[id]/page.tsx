@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeftIcon, HourglassIcon, PathIcon } from "@phosphor-icons/react/ssr";
+import { ArrowLeftIcon, FireIcon, HourglassIcon, PathIcon } from "@phosphor-icons/react/ssr";
 
 import { AutoPersonalizer } from "@/components/ai/auto-personalizer";
 import { ProfileAdjustmentsNote } from "@/components/ai/profile-adjustments-note";
@@ -12,6 +12,7 @@ import type { PathStepView, PathView } from "@/components/paths/path-step";
 import { PathStepsView } from "@/components/paths/path-steps-view";
 import { SharePathDialog } from "@/components/sharing/share-path-dialog";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { assessmentAnswersSchema } from "@/components/quiz/quiz-schema";
 import {
@@ -244,7 +245,7 @@ export default async function PathPage({ params, searchParams }: PathPageProps) 
   const budgetHours = path.budget_hours === null ? null : Number(path.budget_hours);
 
   return (
-    <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-6 px-4 py-10 sm:px-6">
+    <div className="mx-auto flex w-full max-w-7xl flex-1 flex-col gap-5 px-4 py-6 sm:px-6">
       <div>
         <Button variant="ghost" size="sm" render={<Link href="/dashboard" />} nativeButton={false}>
           <ArrowLeftIcon data-icon="inline-start" />
@@ -252,8 +253,8 @@ export default async function PathPage({ params, searchParams }: PathPageProps) 
         </Button>
       </div>
 
-      <header className="relative flex items-center gap-6 overflow-hidden rounded-3xl border brand-gradient-soft p-6 shadow-brand sm:p-8">
-        <div className="flex min-w-0 flex-1 flex-col gap-3">
+      <header className="relative flex items-center gap-4 overflow-hidden rounded-3xl border brand-gradient-soft p-5 shadow-brand sm:p-6">
+        <div className="flex min-w-0 flex-1 flex-col gap-2">
           <div className="flex flex-wrap items-center gap-2">
             <Eyebrow className="flex items-center gap-2">
               <PathIcon />
@@ -261,13 +262,19 @@ export default async function PathPage({ params, searchParams }: PathPageProps) 
             </Eyebrow>
             {isPersonalized ? <AiBadge /> : null}
           </div>
-          <h1 className="text-title text-balance">{title}</h1>
+          <h1 className="font-heading text-2xl font-bold text-balance sm:text-3xl">{title}</h1>
           {originAuthor ? (
             <p className="text-sm text-muted-foreground">Basada en la ruta de {originAuthor}</p>
           ) : null}
           {summary ? (
-            <p className="max-w-prose text-pretty text-muted-foreground">{summary}</p>
+            <p className="line-clamp-2 max-w-prose text-sm text-pretty text-muted-foreground">
+              {summary}
+            </p>
           ) : null}
+          <Badge variant="secondary" className="w-fit gap-1.5 lg:hidden">
+            <FireIcon weight="fill" aria-hidden="true" />
+            {streakView.streak.current} {streakView.streak.current === 1 ? "día" : "días"} de racha
+          </Badge>
           {aiPlan.kind === "personalize" ? <AutoPersonalizer pathId={path.id} /> : null}
           {aiPlan.kind === "limit-reached" ? (
             <Alert>
@@ -294,26 +301,27 @@ export default async function PathPage({ params, searchParams }: PathPageProps) 
         <Image
           src="/astronauta.webp"
           alt=""
-          width={144}
-          height={144}
-          className="hidden shrink-0 drop-shadow-xl sm:block"
+          width={96}
+          height={96}
+          className="mascot-flight-motion hidden shrink-0 drop-shadow-xl sm:block"
         />
       </header>
-
-      {path.ai_adjustments ? <ProfileAdjustmentsNote adjustments={path.ai_adjustments} /> : null}
-
-      <StreakCard
-        streak={streakView.streak}
-        activityDates={streakView.activityDates}
-        today={streakView.today}
-      />
 
       <PathStepsView
         pathId={path.id}
         steps={steps}
         budgetHours={budgetHours}
         initialView={initialView}
+        streakCard={
+          <StreakCard
+            streak={streakView.streak}
+            activityDates={streakView.activityDates}
+            today={streakView.today}
+          />
+        }
       />
+
+      {path.ai_adjustments ? <ProfileAdjustmentsNote adjustments={path.ai_adjustments} /> : null}
     </div>
   );
 }

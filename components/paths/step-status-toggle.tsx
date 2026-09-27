@@ -48,7 +48,7 @@ export function StepStatusToggle({
       aria-label={`Estado de ${courseTitle}`}
       className={
         isSegmented
-          ? "max-w-full flex-wrap rounded-full border border-primary/20 bg-primary/5 p-1"
+          ? "max-w-full flex-nowrap rounded-full border border-primary/20 bg-primary/5 p-1"
           : undefined
       }
     >
@@ -60,7 +60,7 @@ export function StepStatusToggle({
           className={cn(
             "aria-pressed:bg-primary aria-pressed:text-primary-foreground aria-pressed:hover:bg-primary/90 aria-pressed:hover:text-primary-foreground",
             isSegmented &&
-              "rounded-full px-3 text-muted-foreground hover:bg-primary/10 hover:text-foreground aria-pressed:bg-linear-[135deg] aria-pressed:from-primary aria-pressed:to-primary-end aria-pressed:text-primary-foreground aria-pressed:shadow-brand-glow aria-pressed:hover:brightness-110",
+              "rounded-full px-2 text-muted-foreground hover:bg-primary/10 hover:text-foreground aria-pressed:bg-linear-[135deg] aria-pressed:from-primary aria-pressed:to-primary-end aria-pressed:text-primary-foreground aria-pressed:shadow-brand-glow aria-pressed:hover:brightness-110",
           )}
         >
           {isSegmented ? (

@@ -6,7 +6,7 @@ import { FOLLOW_DELAY_MS, TRAVEL_DURATION_MS } from "@/lib/path-map/motion";
 import {
   buildSegmentPath,
   computeNodePositions,
-  NODE_SIZE,
+  ACTIVE_NODE_SIZE,
   TRACK_WIDTH,
   trackHeight,
   type NodePosition,
@@ -22,12 +22,19 @@ type PathMapProps = {
   groups: PathStepGroup[];
   stepNumbers: Map<string, number>;
   totalSteps: number;
+  selectedStepId?: string | null;
   // Sin él, el mapa es de solo lectura (ruta compartida, spec 15): sin próximo paso ni avance.
   onOpenStep?: (stepId: string, trigger: HTMLButtonElement) => void;
 };
 
 // Sin "use client" a propósito: recibe callbacks y solo se importa desde componentes cliente.
-export function PathMap({ groups, stepNumbers, totalSteps, onOpenStep }: PathMapProps) {
+export function PathMap({
+  groups,
+  stepNumbers,
+  totalSteps,
+  selectedStepId,
+  onOpenStep,
+}: PathMapProps) {
   const nodeButtons = useRef(new Map<string, HTMLButtonElement>());
   const isReadOnly = onOpenStep === undefined;
 
@@ -105,6 +112,7 @@ export function PathMap({ groups, stepNumbers, totalSteps, onOpenStep }: PathMap
                       totalSteps={totalSteps}
                       position={positions[index]}
                       isNext={step.id === nextStepId}
+                      isSelected={step.id === selectedStepId}
                       entranceIndex={stepNumber - 1}
                       onOpen={onOpenStep ? (trigger) => onOpenStep(step.id, trigger) : undefined}
                       buttonRef={(element) => registerNodeButton(step.id, element)}
@@ -129,7 +137,7 @@ function UnitBanner({ group, showProgress }: UnitBannerProps) {
   const groupProgress = summarizeStepsProgress(group.steps, null);
 
   return (
-    <div className="flex flex-col gap-3 rounded-3xl border brand-gradient-soft p-5 shadow-brand">
+    <div className="flex flex-col gap-3 rounded-2xl border border-primary/30 bg-linear-to-r from-primary/20 via-primary/10 to-card p-5 shadow-brand">
       <StepGroupHeading group={group} progress={groupProgress} showDoneCount={showProgress} />
       {showProgress ? (
         <Progress
@@ -167,7 +175,7 @@ const MASCOT_GAP = 16;
 function Mascot({ nodePosition }: { nodePosition: NodePosition }) {
   // Del lado contrario al desplazamiento del nodo, donde queda espacio libre en la pista.
   const isOnLeft = nodePosition.x > TRACK_WIDTH / 2;
-  const nodeEdgeOffset = NODE_SIZE / 2 + MASCOT_GAP;
+  const nodeEdgeOffset = ACTIVE_NODE_SIZE / 2 + MASCOT_GAP;
   const left = isOnLeft
     ? nodePosition.x - nodeEdgeOffset - MASCOT_SIZE
     : nodePosition.x + nodeEdgeOffset;
@@ -184,14 +192,16 @@ function Mascot({ nodePosition }: { nodePosition: NodePosition }) {
       }}
     >
       {/* Decorativa: el globo del próximo nodo ya dice qué es (CLAUDE.md §Marca). */}
-      <Image
-        src="/astronauta.webp"
-        alt=""
-        width={MASCOT_SIZE}
-        height={MASCOT_SIZE}
-        className="size-16 max-w-none drop-shadow-lg motion-safe:animate-in motion-safe:duration-300 motion-safe:fill-mode-both motion-safe:zoom-in-75 motion-safe:fade-in"
-        style={{ animationDelay: `${FOLLOW_DELAY_MS}ms` }}
-      />
+      <div className="mascot-flight-motion">
+        <Image
+          src="/astronauta.webp"
+          alt=""
+          width={MASCOT_SIZE}
+          height={MASCOT_SIZE}
+          className="size-16 max-w-none drop-shadow-lg motion-safe:animate-in motion-safe:duration-300 motion-safe:fill-mode-both motion-safe:zoom-in-75 motion-safe:fade-in"
+          style={{ animationDelay: `${FOLLOW_DELAY_MS}ms` }}
+        />
+      </div>
     </div>
   );
 }

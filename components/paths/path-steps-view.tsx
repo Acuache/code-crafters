@@ -1,8 +1,8 @@
 "use client";
 
-import { startTransition, useOptimistic, useRef, useState } from "react";
+import { startTransition, useOptimistic, useRef, useState, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
-import { ListBulletsIcon, MapTrifoldIcon } from "@phosphor-icons/react";
+import { CaretDownIcon, ListBulletsIcon, MapTrifoldIcon, WarningIcon } from "@phosphor-icons/react";
 
 import {
   discardStep,
@@ -12,13 +12,17 @@ import {
 } from "@/app/(app)/paths/[id]/actions";
 import { CelebrationDialog } from "@/components/gamification/celebration-dialog";
 import { useCelebration } from "@/components/gamification/use-celebration";
+import { Eyebrow } from "@/components/brand/eyebrow";
 import { QuizDialog, type QuizSession } from "@/components/quizzes/quiz-dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Progress } from "@/components/ui/progress";
 import { toast, Toaster } from "@/components/ui/toast";
 import type { ActionResult } from "@/lib/action-result";
 import { browserTimeZone } from "@/lib/gamification/streak";
 import { groupStepsByTier } from "@/lib/progress/group-steps";
-import { USER_DISCARD_REASON } from "@/lib/progress/path-progress";
+import { formatHours, USER_DISCARD_REASON } from "@/lib/progress/path-progress";
+import { findNextStep } from "@/lib/progress/next-step";
+import { cn } from "@/lib/utils";
 
 import { BudgetCard } from "./budget-card";
 import { DiscardedSteps } from "./discarded-steps";
@@ -31,7 +35,7 @@ import {
   type PathView,
 } from "./path-step";
 import { PathStepsList } from "./path-steps-list";
-import { StepDetailDialog } from "./step-detail-dialog";
+import { StepDetail, StepDetailDialog } from "./step-detail-dialog";
 import type { SelectableStepStatus } from "./step-status-toggle";
 
 type OptimisticChange =
@@ -62,15 +66,22 @@ type PathStepsViewProps = {
   steps: PathStepView[];
   budgetHours: number | null;
   initialView: PathView;
+  streakCard: ReactNode;
 };
 
-export function PathStepsView({ pathId, steps, budgetHours, initialView }: PathStepsViewProps) {
+export function PathStepsView({
+  pathId,
+  steps,
+  budgetHours,
+  initialView,
+  streakCard,
+}: PathStepsViewProps) {
   const router = useRouter();
   // Si una action falla, el servidor no cambió nada: al terminar la transición la vista vuelve sola
   // a lo que dicen las props, sin rollback manual.
   const [optimisticSteps, applyOptimisticChange] = useOptimistic(steps, applyChange);
   const [view, setView] = useState<PathView>(initialView);
-  // Se guarda el id y no el paso: el modal lee el paso de optimisticSteps y refleja cada cambio.
+  // El panel y el modal leen el paso optimista por id para reflejar cada cambio.
   const [selectedStepId, setSelectedStepId] = useState<string | null>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   // El nodo que abrió el modal, para devolverle el foco al cerrarlo.
@@ -88,7 +99,11 @@ export function PathStepsView({ pathId, steps, budgetHours, initialView }: PathS
   // Numeración corrida sobre toda la ruta: coincide con el "N de M" de la tarjeta de progreso.
   const stepNumbers = new Map(activeSteps.map((step, index) => [step.id, index + 1]));
   const progress = summarizeStepsProgress(optimisticSteps, budgetHours);
-  const selectedStep = optimisticSteps.find((step) => step.id === selectedStepId) ?? null;
+  const selectedStep =
+    activeSteps.find((step) => step.id === selectedStepId) ??
+    findNextStep(activeSteps) ??
+    activeSteps.at(-1) ??
+    null;
 
   function runStepAction(
     change: OptimisticChange,
@@ -123,18 +138,22 @@ export function PathStepsView({ pathId, steps, budgetHours, initialView }: PathS
     // El modal de logro espera la coreografía del mapa, que arranca con el cambio optimista.
     const mapChoreographyStartedAt = status === "done" && view === "mapa" ? Date.now() : null;
 
-    runStepAction({ type: "status", stepId, status }, async () => {
-      const result = await setStepStatus(stepId, status, browserTimeZone());
-      if (result.ok && result.gamification) {
-        celebrate({
-          events: result.gamification,
-          courseTitle: step.courseTitle,
-          mapChoreographyStartedAt,
-        });
-      }
+    runStepAction(
+      { type: "status", stepId, status },
+      async () => {
+        const result = await setStepStatus(stepId, status, browserTimeZone());
+        if (result.ok && result.gamification) {
+          celebrate({
+            events: result.gamification,
+            courseTitle: step.courseTitle,
+            mapChoreographyStartedAt,
+          });
+        }
 
-      return result;
-    });
+        return result;
+      },
+      status === "done" ? () => setSelectedStepId(null) : undefined,
+    );
   }
 
   function handleRestore(stepId: string) {
@@ -145,7 +164,10 @@ export function PathStepsView({ pathId, steps, budgetHours, initialView }: PathS
     runStepAction(
       { type: "discard", stepId: step.id },
       () => discardStep(step.id),
-      () => showUndoToast(step),
+      () => {
+        setSelectedStepId(null);
+        showUndoToast(step);
+      },
     );
   }
 
@@ -174,7 +196,7 @@ export function PathStepsView({ pathId, steps, budgetHours, initialView }: PathS
   function openStepDetail(stepId: string, trigger: HTMLButtonElement) {
     detailTriggerRef.current = trigger;
     setSelectedStepId(stepId);
-    setIsDetailOpen(true);
+    setIsDetailOpen(!window.matchMedia("(min-width: 64rem)").matches);
   }
 
   // Marcar "Hecho" cierra el modal para que se vea el pop del nodo y cómo se rellena el camino.
@@ -209,44 +231,124 @@ export function PathStepsView({ pathId, steps, budgetHours, initialView }: PathS
 
   return (
     <Toaster>
-      <div className="flex flex-col gap-10">
-        <BudgetCard progress={progress} budgetHours={budgetHours} />
-
-        <Tabs value={view} onValueChange={handleViewChange} className="gap-8">
-          <TabsList className="self-center">
-            <TabsTrigger value="mapa" className="px-4">
-              <MapTrifoldIcon data-icon="inline-start" />
-              Mapa
-            </TabsTrigger>
-            <TabsTrigger value="lista" className="px-4">
-              <ListBulletsIcon data-icon="inline-start" />
-              Lista
-            </TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="mapa">
-            <PathMap
-              groups={groups}
-              stepNumbers={stepNumbers}
-              totalSteps={activeSteps.length}
-              onOpenStep={openStepDetail}
+      <div className="grid gap-6 lg:grid-cols-[208px_minmax(320px,1fr)_320px] xl:grid-cols-[232px_minmax(320px,1fr)_336px]">
+        <section
+          className={cn(
+            "order-1 flex min-w-0 flex-col gap-6 lg:order-2",
+            view === "lista" && "lg:col-span-2",
+          )}
+        >
+          <div className="flex flex-col gap-2 lg:hidden">
+            <div className="flex items-center justify-between gap-3 text-sm">
+              <span className="font-semibold">Tu avance</span>
+              <span className="text-muted-foreground tabular-nums">
+                {progress.doneCount} de {progress.activeCount} cursos · {progress.percentDone} %
+              </span>
+            </div>
+            <Progress
+              value={progress.percentDone}
+              aria-label={`Avance de tu ruta: ${progress.percentDone} %`}
             />
-          </TabsContent>
+            {!progress.fitsInBudget ? (
+              <p className="text-xs text-destructive">
+                Tu plan supera el tiempo disponible por {formatHours(progress.overflowHours)}.
+              </p>
+            ) : null}
+          </div>
 
-          <TabsContent value="lista">
-            <PathStepsList
-              groups={groups}
-              stepNumbers={stepNumbers}
-              ownerActions={{
-                onStatusChange: handleStatusChange,
-                onDiscard: handleDiscard,
-                onOpenQuiz: openQuiz,
-              }}
-            />
-          </TabsContent>
-        </Tabs>
+          <Tabs value={view} onValueChange={handleViewChange} className="gap-4">
+            <TabsList className="self-center lg:self-end">
+              <TabsTrigger value="mapa" className="px-4">
+                <MapTrifoldIcon data-icon="inline-start" />
+                Mapa
+              </TabsTrigger>
+              <TabsTrigger value="lista" className="px-4">
+                <ListBulletsIcon data-icon="inline-start" />
+                Lista
+              </TabsTrigger>
+            </TabsList>
 
-        <DiscardedSteps steps={discardedSteps} onRestore={handleRestore} />
+            <TabsContent value="mapa">
+              <PathMap
+                groups={groups}
+                stepNumbers={stepNumbers}
+                totalSteps={activeSteps.length}
+                selectedStepId={selectedStepId}
+                onOpenStep={openStepDetail}
+              />
+            </TabsContent>
+
+            <TabsContent value="lista">
+              <PathStepsList
+                groups={groups}
+                stepNumbers={stepNumbers}
+                ownerActions={{
+                  onStatusChange: handleStatusChange,
+                  onDiscard: handleDiscard,
+                  onOpenQuiz: openQuiz,
+                }}
+              />
+            </TabsContent>
+          </Tabs>
+
+          <DiscardedSteps steps={discardedSteps} onRestore={handleRestore} />
+        </section>
+
+        <aside className="order-2 flex flex-col gap-4 lg:sticky lg:top-6 lg:order-1 lg:max-h-[calc(100dvh-3rem)] lg:self-start lg:overflow-y-auto">
+          <div className="hidden lg:block">
+            <BudgetCard progress={progress} budgetHours={budgetHours} compact />
+          </div>
+          <details className="group rounded-2xl border bg-card lg:hidden">
+            <summary className="flex cursor-pointer list-none items-center gap-3 px-4 py-3 text-sm font-medium [&::-webkit-details-marker]:hidden">
+              <span className="flex-1">Tu plan de estudio</span>
+              {!progress.fitsInBudget ? (
+                <WarningIcon aria-hidden="true" className="text-destructive" />
+              ) : null}
+              <span className="text-muted-foreground tabular-nums">
+                {formatHours(progress.activeHours)}
+              </span>
+              <CaretDownIcon
+                aria-hidden="true"
+                className="group-open:rotate-180 motion-safe:transition-transform"
+              />
+            </summary>
+            <div className="px-3 pb-3">
+              <BudgetCard progress={progress} budgetHours={budgetHours} />
+            </div>
+          </details>
+          {streakCard}
+        </aside>
+
+        <aside
+          aria-label="Detalle del curso"
+          className={cn(
+            "order-3 hidden lg:sticky lg:top-6 lg:block lg:max-h-[calc(100dvh-3rem)] lg:self-start lg:overflow-y-auto",
+            view === "lista" && "lg:hidden",
+          )}
+        >
+          <div className="overflow-hidden rounded-2xl border bg-card shadow-brand">
+            <div className="border-b px-5 py-3">
+              <Eyebrow>Explora tu curso</Eyebrow>
+            </div>
+            {selectedStep ? (
+              <div
+                key={selectedStep.id}
+                className="motion-safe:animate-in motion-safe:duration-200 motion-safe:fade-in"
+              >
+                <StepDetail
+                  mode="panel"
+                  step={selectedStep}
+                  stepNumber={stepNumbers.get(selectedStep.id) ?? 0}
+                  onStatusChange={(status) => changeStatusFromDetail(selectedStep.id, status)}
+                  onDiscard={() => discardFromDetail(selectedStep)}
+                  onOpenQuiz={() => openQuiz(selectedStep)}
+                />
+              </div>
+            ) : (
+              <p className="p-5 text-sm text-muted-foreground">Esta ruta aún no tiene cursos.</p>
+            )}
+          </div>
+        </aside>
       </div>
 
       <StepDetailDialog
@@ -279,6 +381,9 @@ export function PathStepsView({ pathId, steps, budgetHours, initialView }: PathS
         // El servidor pudo marcar el paso y sumar la racha.
         onAttemptSaved={(result) => {
           router.refresh();
+          if (result.passed) {
+            setSelectedStepId(null);
+          }
           if (result.gamification && quizSession) {
             celebrate({
               events: result.gamification,

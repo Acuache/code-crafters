@@ -5,10 +5,12 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Card, CardContent } from "@/components/ui/card";
 import { Progress, ProgressLabel, ProgressValue } from "@/components/ui/progress";
 import { formatHours, type PathProgress } from "@/lib/progress/path-progress";
+import { cn } from "@/lib/utils";
 
 type BudgetCardProps = {
   progress: PathProgress;
   budgetHours: number | null;
+  compact?: boolean;
 };
 
 type StatProps = {
@@ -31,14 +33,14 @@ function Stat({ icon, label, value, detail }: StatProps) {
   );
 }
 
-export function BudgetCard({ progress, budgetHours }: BudgetCardProps) {
+export function BudgetCard({ progress, budgetHours, compact = false }: BudgetCardProps) {
   const hoursDetail =
     budgetHours === null ? "sin tope de tiempo" : `de ${formatHours(budgetHours)} disponibles`;
 
   return (
-    <Card>
+    <Card size={compact ? "sm" : "default"}>
       <CardContent className="flex flex-col gap-5">
-        <div className="grid gap-3 sm:grid-cols-3">
+        <div className={cn("grid gap-3", !compact && "sm:grid-cols-3")}>
           <Stat
             icon={<ClockIcon />}
             label="Tu plan"

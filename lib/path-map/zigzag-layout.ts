@@ -4,9 +4,10 @@
 // En px. Ancho fijo: cabe en un móvil de 360 px con 16 px de margen y el SVG no se deforma.
 export const TRACK_WIDTH = 320;
 export const NODE_SIZE = 64;
+export const ACTIVE_NODE_SIZE = 80;
 export const LABEL_WIDTH = 128;
-// Nodo + título de dos líneas + aire hasta el siguiente nodo.
-export const ROW_HEIGHT = 128;
+// Nodo + título de dos líneas + duración + aire hasta el siguiente globo.
+export const ROW_HEIGHT = 176;
 // Espacio para el globo "Empezar"/"Continuar" sobre el primer nodo, sin pisar el banner.
 export const TRACK_PADDING_TOP = 48;
 

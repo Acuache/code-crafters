@@ -144,7 +144,7 @@ export default async function DashboardPage() {
                 nextLevelXp={gamification.level.xpForNextLevel}
               />
             </div>
-            <StreakIndicator streak={gamification.streak} />
+            <StreakIndicator streak={gamification.streak} variant="dashboard" />
           </div>
         ) : null}
       </header>
@@ -175,7 +175,14 @@ export default async function DashboardPage() {
           <EmptyHeader>
             <EmptyMedia>
               {/* Decorativa: el título del estado vacío ya está al lado (CLAUDE.md §Marca). */}
-              <Image src="/astronauta.webp" alt="" width={128} height={128} />
+              <Image
+                src="/astronauta-primera-ruta.png"
+                alt=""
+                aria-hidden="true"
+                width={160}
+                height={160}
+                className="size-40 max-w-none drop-shadow-xl mascot-flight-motion"
+              />
             </EmptyMedia>
             <EmptyTitle>Todavía no tienes rutas</EmptyTitle>
             <EmptyDescription>
@@ -184,6 +191,7 @@ export default async function DashboardPage() {
           </EmptyHeader>
           <EmptyContent>
             <Button variant="brand" render={<Link href="/quiz" />} nativeButton={false}>
+              <PlusIcon data-icon="inline-start" />
               Crear mi primera ruta
             </Button>
           </EmptyContent>
