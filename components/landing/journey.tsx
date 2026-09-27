@@ -116,6 +116,8 @@ export function Journey({ stations }: { stations: JourneyStation[] }) {
   const nodeRefs = useRef<(HTMLSpanElement | null)[]>([]);
 
   const [currentIndex, setCurrentIndex] = useState(0);
+  const previousStationIndexRef = useRef(0);
+  const [mascotMovementKey, setMascotMovementKey] = useState(0);
   const [reachedIndexes, setReachedIndexes] = useState<ReadonlySet<number>>(() => new Set());
   const [nodeCenters, setNodeCenters] = useState<Point[]>([]);
 
@@ -151,6 +153,11 @@ export function Journey({ stations }: { stations: JourneyStation[] }) {
 
   useEffect(() => {
     function arriveAt(stationIndex: number) {
+      if (previousStationIndexRef.current !== stationIndex) {
+        previousStationIndexRef.current = stationIndex;
+        setMascotMovementKey((previous) => previous + 1);
+      }
+
       setCurrentIndex(stationIndex);
       setReachedIndexes((previous) => {
         if (previous.has(stationIndex)) {
@@ -244,6 +251,7 @@ export function Journey({ stations }: { stations: JourneyStation[] }) {
           <JourneyMascot
             position={mascotPosition(nodeCenters[currentIndex], currentIndex, isDesktop)}
             size={mascotSize}
+            movementKey={mascotMovementKey}
           />
         </>
       ) : null}
@@ -343,8 +351,16 @@ export function Journey({ stations }: { stations: JourneyStation[] }) {
   );
 }
 
-// El mismo astronauta que viaja por el mapa del spec 12, con la misma duración.
-function JourneyMascot({ position, size }: { position: Point; size: number }) {
+// La pose de vuelo acompaña el avance por el mapa del spec 12.
+function JourneyMascot({
+  position,
+  size,
+  movementKey,
+}: {
+  position: Point;
+  size: number;
+  movementKey: number;
+}) {
   return (
     <div
       aria-hidden="true"
@@ -354,13 +370,18 @@ function JourneyMascot({ position, size }: { position: Point; size: number }) {
         transitionDuration: `${TRAVEL_DURATION_MS}ms`,
       }}
     >
-      <Image
-        src="/astronauta.webp"
-        alt=""
-        width={size}
-        height={size}
-        className="max-w-none drop-shadow-lg"
-      />
+      <div
+        key={movementKey}
+        className={movementKey > 0 ? "mascot-scroll-motion" : undefined}
+      >
+        <Image
+          src="/astronauta-vuelo.png"
+          alt=""
+          width={size}
+          height={size}
+          className="max-w-none drop-shadow-lg"
+        />
+      </div>
     </div>
   );
 }

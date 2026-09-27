@@ -338,6 +338,24 @@
   }
 }
 
+@media (prefers-reduced-motion: no-preference) {
+  .mascot-scroll-motion {
+    animation: mascot-scroll-motion 700ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  }
+}
+
+@keyframes mascot-scroll-motion {
+  0% {
+    transform: translateY(6px) rotate(-12deg) scale(0.84);
+  }
+  45% {
+    transform: translateY(-7px) rotate(9deg) scale(1.13);
+  }
+  100% {
+    transform: translateY(0) rotate(0) scale(1);
+  }
+}
+
 /* Spec 14: el toast por encima de los diálogos. Sin capa para ganarle al z-50 de utilities. */
 [data-slot="toast-viewport"] {
   z-index: 60;

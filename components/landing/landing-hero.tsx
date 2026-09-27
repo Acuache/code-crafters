@@ -14,11 +14,7 @@ type LandingHeroProps = {
 
 export function LandingHero({ primaryCta, isSignedIn }: LandingHeroProps) {
   return (
-    <section className="relative overflow-hidden brand-gradient-soft">
-      <div
-        aria-hidden="true"
-        className="starfield-drifting starfield opacity-60"
-      />
+    <section className="relative overflow-hidden">
       <div className="relative mx-auto grid max-w-6xl items-center gap-8 px-4 py-16 sm:px-6 lg:grid-cols-2 lg:gap-12 lg:py-24">
         <div className="flex flex-col items-start gap-6">
           <Eyebrow>Rutas de aprendizaje · Cursos de DevTalles</Eyebrow>

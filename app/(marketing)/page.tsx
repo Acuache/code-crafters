@@ -45,16 +45,19 @@ export default async function LandingPage() {
   const ctas = landingCtas(isSignedIn);
 
   return (
-    <>
-      <LandingHeader cta={ctas.header} />
-      <main className="flex flex-1 flex-col">
-        <LandingHero primaryCta={ctas.primary} isSignedIn={isSignedIn} />
-        <TechStrip />
-        <HowItWorks />
-        <LandingFaq />
-        <FinalCta primaryCta={ctas.primary} />
-      </main>
-      <LandingFooter />
-    </>
+    <div className="relative isolate flex flex-1 flex-col brand-gradient-soft">
+      <div aria-hidden="true" className="starfield-drifting starfield opacity-60" />
+      <div className="relative z-10 flex flex-1 flex-col">
+        <LandingHeader cta={ctas.header} />
+        <main className="flex flex-1 flex-col">
+          <LandingHero primaryCta={ctas.primary} isSignedIn={isSignedIn} />
+          <TechStrip />
+          <HowItWorks />
+          <LandingFaq />
+          <FinalCta primaryCta={ctas.primary} />
+        </main>
+        <LandingFooter />
+      </div>
+    </div>
   );
 }
