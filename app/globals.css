@@ -263,12 +263,79 @@
 @utility starfield {
   background-image:
     radial-gradient(1.5px 1.5px at 24px 36px, var(--foreground), transparent),
+    radial-gradient(2px 2px at 42px 24px, var(--chart-2), transparent),
+    radial-gradient(1.5px 1.5px at 64px 88px, var(--chart-2), transparent),
     radial-gradient(2px 2px at 96px 128px, var(--chart-2), transparent),
+    radial-gradient(1px 1px at 22px 212px, var(--foreground), transparent),
+    radial-gradient(2.5px 2.5px at 124px 24px, var(--primary-bright), transparent),
+    radial-gradient(1.5px 1.5px at 54px 156px, var(--foreground), transparent),
+    radial-gradient(2px 2px at 80px 194px, var(--primary-bright), transparent),
+    radial-gradient(1.5px 1.5px at 206px 30px, var(--chart-2), transparent),
     radial-gradient(1.5px 1.5px at 168px 64px, var(--foreground), transparent),
+    radial-gradient(1.5px 1.5px at 150px 114px, var(--chart-2), transparent),
+    radial-gradient(2px 2px at 194px 182px, var(--foreground), transparent),
     radial-gradient(2.5px 2.5px at 236px 176px, var(--primary-bright), transparent),
+    radial-gradient(1.5px 1.5px at 280px 28px, var(--foreground), transparent),
     radial-gradient(1.5px 1.5px at 304px 96px, var(--chart-2), transparent),
-    radial-gradient(1px 1px at 140px 200px, var(--foreground), transparent);
+    radial-gradient(2.5px 2.5px at 280px 210px, var(--primary-bright), transparent),
+    radial-gradient(1px 1px at 140px 200px, var(--foreground), transparent),
+    radial-gradient(2px 2px at 250px 72px, var(--chart-2), transparent),
+    radial-gradient(1.5px 1.5px at 306px 186px, var(--foreground), transparent);
   background-size: 320px 224px;
+}
+
+.text-reflection {
+  background-image:
+    linear-gradient(to right, var(--primary-bright), var(--chart-2)),
+    linear-gradient(
+      110deg,
+      transparent 43%,
+      rgb(226 220 255 / 60%) 48%,
+      rgb(255 255 255 / 98%) 50%,
+      rgb(226 220 255 / 60%) 52%,
+      transparent 57%
+    );
+  background-size: 100% 100%, 240% 100%;
+  background-position: 0 0, 100% 0;
+  background-repeat: no-repeat;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .text-reflection {
+    animation: text-reflection 5s ease-in-out infinite;
+  }
+}
+
+@keyframes text-reflection {
+  from {
+    background-position: 0 0, 100% 0;
+  }
+  to {
+    background-position: 0 0, 0 0;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .starfield-drifting {
+    animation:
+      star-drift 15s ease-in-out infinite alternate,
+      twinkle 5s ease-in-out infinite alternate;
+  }
+}
+
+.starfield-drifting {
+  position: absolute;
+  inset: -8rem;
+  pointer-events: none;
+}
+
+@keyframes star-drift {
+  from {
+    transform: translate3d(-104px, -60px, 0);
+  }
+  to {
+    transform: translate3d(104px, 60px, 0);
+  }
 }
 
 /* Spec 14: el toast por encima de los diálogos. Sin capa para ganarle al z-50 de utilities. */

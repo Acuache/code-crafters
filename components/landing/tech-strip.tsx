@@ -1,10 +1,29 @@
+import Image from "next/image";
+
 import { Eyebrow } from "@/components/brand/eyebrow";
 import { Badge } from "@/components/ui/badge";
 import { TECHNOLOGIES } from "@/lib/paths/interests";
+import type { TechnologySlug } from "@/lib/paths/types";
 import { cn } from "@/lib/utils";
 
 // Las mismas 15 del cuestionario (spec 04): la franja no puede prometer una tecnología que no hay.
-const TECHNOLOGY_LABELS = Object.values(TECHNOLOGIES).map((technology) => technology.label);
+const TECHNOLOGY_ICON_PATHS: Partial<Record<TechnologySlug, string>> = {
+  angular: "/languages-icons/angular.svg",
+  csharp: "/languages-icons/c.svg",
+  dart: "/languages-icons/dart.svg",
+  docker: "/languages-icons/docker.svg",
+  go: "/languages-icons/go.svg",
+  git: "/languages-icons/git.svg",
+  java: "/languages-icons/java.svg",
+  javascript: "/languages-icons/javaScript.svg",
+  node: "/languages-icons/nodejs.svg",
+  php: "/languages-icons/php.svg",
+  python: "/languages-icons/python.svg",
+  react: "/languages-icons/react.svg",
+  sql: "/languages-icons/sql.svg",
+  typescript: "/languages-icons/typeScript.svg",
+  vue: "/languages-icons/vue.svg",
+};
 
 function TechnologyList({ isMarqueeCopy }: { isMarqueeCopy: boolean }) {
   return (
@@ -16,10 +35,20 @@ function TechnologyList({ isMarqueeCopy }: { isMarqueeCopy: boolean }) {
         isMarqueeCopy && "motion-reduce:hidden",
       )}
     >
-      {TECHNOLOGY_LABELS.map((label) => (
-        <li key={label}>
+      {Object.entries(TECHNOLOGIES).map(([slug, technology]) => (
+        <li key={slug}>
           <Badge variant="secondary" className="h-8 px-3 text-sm">
-            {label}
+            {TECHNOLOGY_ICON_PATHS[slug] ? (
+              <Image
+                src={TECHNOLOGY_ICON_PATHS[slug]}
+                alt=""
+                aria-hidden="true"
+                width={18}
+                height={18}
+                className="size-4 object-contain"
+              />
+            ) : null}
+            {technology.label}
           </Badge>
         </li>
       ))}

@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { PathIcon } from "@phosphor-icons/react/ssr";
 
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -35,7 +36,10 @@ export function FinalCta({ primaryCta }: { primaryCta: LandingLink }) {
               render={<Link href={primaryCta.href} />}
               nativeButton={false}
             >
-              {primaryCta.label}
+              <span className="inline-flex items-center justify-center gap-2">
+                <PathIcon aria-hidden="true" />
+                {primaryCta.label}
+              </span>
             </Button>
           </div>
         </div>

@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { ArrowRightIcon, SignInIcon } from "@phosphor-icons/react/ssr";
 
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
@@ -47,7 +48,14 @@ export function LandingHeader({ cta }: { cta: LandingLink }) {
         <div className="ml-auto flex items-center gap-2 sm:ml-0">
           <ThemeToggle />
           <Button render={<Link href={cta.href} />} nativeButton={false}>
-            {cta.label}
+            <span className="inline-flex items-center justify-center gap-1.5">
+              {cta.label === "Entrar" ? (
+                <SignInIcon aria-hidden="true" />
+              ) : (
+                <ArrowRightIcon aria-hidden="true" />
+              )}
+              {cta.label}
+            </span>
           </Button>
         </div>
       </div>
