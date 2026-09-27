@@ -9,10 +9,12 @@ export type GoalDefinition = {
   label: string;
   area: Area;
   programSlugs: string[]; // uno de los 15 valores de `programs.slug` (spec 02) por entrada
+  // Cursos de esos programas que no encajan con la meta (spec 17): nunca entran por el programa.
+  excludedCourseSlugs?: string[];
 };
 
-// 19 metas. `fundamentos` y `dart-web` quedan fuera a propósito (ver Decisiones del spec):
-// `fundamentos` se antepone automáticamente, nunca se elige; `dart-web` es degenerado, su único
+// 19 metas. `fundamentos` y `dart-web` quedan fuera a propósito (ver Decisiones del spec 04):
+// `fundamentos` es la base del principiante (spec 17), nunca se elige; `dart-web` es degenerado, su único
 // curso ya está en `dart-movil`.
 export const GOALS: Record<GoalSlug, GoalDefinition> = {
   react: { label: "React", area: "frontend", programSlugs: ["react"] },
@@ -33,5 +35,18 @@ export const GOALS: Record<GoalSlug, GoalDefinition> = {
   "react-native": { label: "React Native", area: "movil", programSlugs: ["react-native"] },
   ia: { label: "IA / Automatizaciones", area: "ia", programSlugs: ["ia"] },
   "ia-node": { label: "IA con Node", area: "ia", programSlugs: ["ia", "node"] },
-  "ia-python": { label: "IA con Python", area: "ia", programSlugs: ["ia", "python"] },
+  // El programa IA trae un stack JavaScript (Node, Nest, frontends) que choca con Python.
+  "ia-python": {
+    label: "IA con Python",
+    area: "ia",
+    programSlugs: ["ia", "python"],
+    excludedCourseSlugs: [
+      "nodejs-de-cero-a-experto",
+      "nest",
+      "ia-para-developers",
+      "angular-moderno",
+      "react-de-cero",
+      "vue-cero-a-experto",
+    ],
+  },
 };

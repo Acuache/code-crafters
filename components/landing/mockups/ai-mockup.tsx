@@ -1,11 +1,9 @@
 import { AiBadge } from "@/components/brand/ai-badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { EXAMPLE_AI, EXAMPLE_COURSES, EXAMPLE_FREE_TEXT } from "@/lib/landing/example-path";
+import { EXAMPLE_AI, EXAMPLE_FREE_TEXT, EXAMPLE_MAIN_COURSE } from "@/lib/landing/example-path";
 import { cn } from "@/lib/utils";
 
 import { afterArrival, FADE_IN_ON_ARRIVAL } from "./reveal";
-
-const firstCourse = EXAMPLE_COURSES[0];
 
 // Lo que escribió el usuario, cómo lo explica el motor y cómo lo explica la IA con sus palabras.
 export function AiMockup() {
@@ -21,9 +19,9 @@ export function AiMockup() {
 
         <div className="flex flex-col gap-1">
           <span className="text-xs font-medium text-muted-foreground">
-            Motor · {firstCourse.title}
+            Motor · {EXAMPLE_MAIN_COURSE.title}
           </span>
-          <p className="text-muted-foreground">{firstCourse.engineReason}</p>
+          <p className="text-muted-foreground">{EXAMPLE_MAIN_COURSE.engineReason}</p>
         </div>
 
         <div
@@ -36,7 +34,7 @@ export function AiMockup() {
         >
           <AiBadge />
           <p className="font-heading font-medium">{EXAMPLE_AI.title}</p>
-          <p className="text-pretty">{EXAMPLE_AI.firstCourseReason}</p>
+          <p className="text-pretty">{EXAMPLE_AI.mainCourseReason}</p>
         </div>
       </CardContent>
     </Card>

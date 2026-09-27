@@ -12,7 +12,7 @@ import {
 } from "@/components/paths/path-step";
 import { PathStepsList } from "@/components/paths/path-steps-list";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { groupStepsByProgram } from "@/lib/progress/group-steps";
+import { groupStepsByTier } from "@/lib/progress/group-steps";
 import type { SharedPathStep } from "@/lib/sharing/shared-path";
 
 // Todo pendiente y sin quiz: la página pública no muestra el avance del autor. El curso sirve de id
@@ -28,6 +28,7 @@ function toReadOnlyStep(step: SharedPathStep): PathStepView {
     discardReason: null,
     courseTitle: step.courseTitle,
     courseHours: step.courseHours,
+    courseDifficulty: step.courseDifficulty,
     courseUrl: step.courseUrl,
     courseImageUrl: step.courseImageUrl,
     quiz: null,
@@ -46,7 +47,7 @@ export function SharedPathSteps({ steps, initialView }: SharedPathStepsProps) {
   const [view, setView] = useState<PathView>(initialView);
 
   const readOnlySteps = steps.map(toReadOnlyStep);
-  const groups = groupStepsByProgram(readOnlySteps);
+  const groups = groupStepsByTier(readOnlySteps);
   const stepNumbers = new Map(readOnlySteps.map((step, index) => [step.id, index + 1]));
 
   function handleViewChange(value: unknown) {

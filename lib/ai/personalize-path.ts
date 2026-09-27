@@ -11,6 +11,12 @@ import { buildPersonalizationPrompt, type PersonalizationInput } from "./build-p
 import { remainingPersonalizations } from "./daily-limit";
 import { buildPersonalizationSchema, type Personalization } from "./personalization-schema";
 import {
+  buildPrerequisiteSuggestionPrompt,
+  buildPrerequisiteSuggestionSchema,
+  type PrerequisiteSuggestionInput,
+  type PrerequisiteSuggestions,
+} from "./prerequisite-suggestion";
+import {
   applyProfileAdjustment,
   buildProfileAdjustmentPrompt,
   profileAdjustmentSchema,
@@ -55,6 +61,27 @@ export async function countPersonalizationsInLast24h(
   }
 
   return count ?? 0;
+}
+
+// El uso más viejo de las últimas 24 h: de ahí sale cuándo vuelve la IA.
+export async function findOldestPersonalizationInLast24h(
+  supabase: SupabaseClient<Database>,
+): Promise<Date | null> {
+  const since = new Date(Date.now() - DAY_IN_MS).toISOString();
+
+  const { data, error } = await supabase
+    .from("ai_personalizations")
+    .select("created_at")
+    .gt("created_at", since)
+    .order("created_at", { ascending: true })
+    .limit(1)
+    .maybeSingle();
+
+  if (error || !data) {
+    return null;
+  }
+
+  return new Date(data.created_at);
 }
 
 // La personalización automática de /paths/[id] solo corre si esto da 0.
@@ -129,6 +156,38 @@ export async function requestProfileAdjustment(
     return output;
   } catch (error) {
     logAiError("ai-profile-adjustment", error);
+    return null;
+  }
+}
+
+// Para el admin (spec 17): sugiere requisitos de un curso. Sin límite diario, porque solo lo usa el
+// admin. Ante cualquier falla devuelve null y el panel lo dice.
+export async function requestPrerequisiteSuggestions(
+  input: PrerequisiteSuggestionInput,
+): Promise<PrerequisiteSuggestions | null> {
+  if (!isAiConfigured()) {
+    return null;
+  }
+
+  const [firstSlug, ...otherSlugs] = input.candidates.map((candidate) => candidate.slug);
+  if (!firstSlug) {
+    return { suggestions: [] };
+  }
+
+  const schema = buildPrerequisiteSuggestionSchema([firstSlug, ...otherSlugs]);
+  const { system, prompt } = buildPrerequisiteSuggestionPrompt(input);
+
+  try {
+    const { output } = await generateText({
+      ...modelSettings(PERSONALIZATION_TIMEOUT_MS),
+      instructions: system,
+      prompt,
+      output: Output.object({ schema }),
+    });
+
+    return output;
+  } catch (error) {
+    logAiError("ai-prerequisite-suggestions", error);
     return null;
   }
 }
