@@ -11,8 +11,7 @@
 ## Por qué existe este spec
 
 La lista del spec 08 es completa, pero se lee como un documento: diez tarjetas iguales una debajo de
-otra. El concurso se evalúa **navegando la app desplegada** (`docs/ENUNCIADO.md`, criterio 4, "UI
-agradable y entendible"), y una ruta de aprendizaje se entiende mejor como un camino que se recorre
+otra. La app se juzga **navegándola** (una UI agradable y entendible), y una ruta de aprendizaje se entiende mejor como un camino que se recorre
 que como una tabla. Durante el spec 08 el usuario pidió explícitamente un recorrido estilo Duolingo.
 
 `docs/SPECS-MAP.md` planeaba este spec con **React Flow + dagre**. Se descarta (ver Decisiones): la

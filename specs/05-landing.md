@@ -12,9 +12,9 @@
 ## Por qué existe este spec
 
 La landing de hoy (`app/page.tsx`) es el placeholder del scaffold: un título, un botón hacia
-`/sistema-diseno` y "Empezar el cuestionario" deshabilitado. Es la primera pantalla que ve el jurado
-(`ENUNCIADO.md`, criterio 4: "UI agradable y entendible") y la que más puntos da en el criterio 1
-("Idea"), porque es donde se explica que la ruta no la inventa una IA, sino que sale de un motor sobre
+`/sistema-diseno` y "Empezar el cuestionario" deshabilitado. Es la primera pantalla que ve quien
+prueba la app, la que tiene que ser más agradable y entendible, y la que mejor cuenta la idea,
+porque es donde se explica que la ruta no la inventa una IA, sino que sale de un motor sobre
 las rutas oficiales de DevTalles, con la IA encima (`docs/investigacion/ANALISIS-IA.md`, ADR 0001).
 
 El mapa agendaba el 05 sin dependencias y "sobre el sistema de diseño". Ahora, con los specs 01–15
@@ -208,7 +208,7 @@ Ciclo del easter egg del hero: cohete → astronauta → orbe → antorcha → �
 | 2 | `PathIcon` | El motor arma tu ruta | "Parte de las rutas oficiales de DevTalles: quita lo que ya dominas, suma tus intereses y recorta hasta que quepa en tu tiempo. Cada curso dice por qué entró, y los que salieron, por qué salieron." | `engine-mockup.tsx`: `Card` "Los primeros pasos de una ruta de ejemplo" con los 3 `EXAMPLE_COURSES` (título, `StepOriginBadge` y horas, de `components/paths/step-meta.tsx`) y el curso de `EXAMPLE_DISCARDED`, cuya tachadura se dibuja al llegar y que muestra su motivo ("ya lo dominas") |
 | 3 | `SparkleIcon` | La IA la hace tuya | "Si escribes qué buscas, la IA ajusta tu ruta a eso y te la explica con tus palabras. ¿Sin IA? Tu ruta se arma igual: la IA suma, nunca decide sola." | `ai-mockup.tsx`: la cita de `EXAMPLE_FREE_TEXT`; debajo, "Motor:" con la razón por plantilla del primer curso (`text-muted-foreground`), y después `AiBadge` con el título y la razón que escribe la IA, que aparecen después de la línea del motor |
 | 4 | `TrophyIcon` | Avanza curso a curso | "Tu ruta es un mapa: marca tu avance, aprueba el quiz de cada curso, gana XP, sube de nivel, desbloquea insignias y cuida tu racha." | `progress-mockup.tsx` (cliente): `XpBar`, que se llena de 0 al XP de ejemplo; `AchievementMedal` de `first-course` ganada con su nombre; "+N XP · «curso»"; y `FireIcon` con "5 días de racha" |
-| 5 | `ShareNetworkIcon` | Compártela en Discord | "Publica tu ruta con un link. En Discord se ve con su tarjeta, y quien la abra puede copiarla a su cuenta y empezarla desde cero." | `share-mockup.tsx`: una tarjeta de link genérica (borde izquierdo `border-primary-bright`, "DevPathlles", el título de la IA de ejemplo y "de tu_nombre"). No imita la interfaz de Discord |
+| 5 | `ShareNetworkIcon` | Compártela en Discord | "Publica tu ruta con un link. En Discord se ve con su tarjeta, y quien la abra puede copiarla a su cuenta y empezarla desde cero." | `share-mockup.tsx`: una tarjeta de link genérica (borde izquierdo `border-primary-bright`, "DevPathlles", el título de la IA de ejemplo y "de tu_nombre"). No imita la interfaz de Discord. _Retirado después: el recorrido actual tiene tres estaciones (cuestionario, IA y progreso) y el motor pasó a `route-preview.tsx`_ |
 
 ### Preguntas frecuentes (`components/landing/landing-faq.tsx`)
 
@@ -531,7 +531,7 @@ export function nextHeroPose(current: MascotPoseId): MascotPoseId; // después d
   movimiento permitido. **No:** partir de `opacity-0` en el HTML del servidor, porque sin JS la sección
   quedaría en blanco.
 - **Sí:** con sesión, la landing se ve igual y los CTAs pasan a "Ir a mi panel". **No:** redirigir a
-  `/dashboard`, porque el jurado y quien ya entró no podrían volver a ver la landing.
+  `/dashboard`, porque quien ya entró no podría volver a ver la landing.
 - **Sí:** el CTA principal va a `/login?next=/quiz`, porque una persona nueva llega un clic antes a su
   ruta. "Entrar" en la cabecera sigue yendo a `/login` → `/dashboard`, para quien vuelve.
 - **Sí:** `landingCtas` en `lib/landing/cta.ts`, porque la misma condición se decidía en tres

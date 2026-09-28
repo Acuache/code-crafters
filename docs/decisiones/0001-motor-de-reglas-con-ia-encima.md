@@ -5,7 +5,7 @@
 
 ## Contexto
 
-`docs/ROADMAP.md` (sección "Decisiones ya tomadas") partía de que "la IA arma la ruta": el modelo
+El roadmap original (sección "Decisiones ya tomadas") partía de que "la IA arma la ruta": el modelo
 recibe el catálogo completo y el perfil del usuario, y decide cursos, orden y etapas, con un plan B
 por reglas solo para cuando falla. Esa decisión se tomó **antes** de extraer los datos.
 
@@ -31,7 +31,7 @@ primera: cambió qué construye la app, no solo dónde interviene el modelo.
 
 ### Sobre dónde va la IA (las tres de `ANALISIS-IA.md` §5)
 
-1. **A — La IA arma la ruta** (lo que decía el ROADMAP): el modelo decide cursos, orden y etapas desde
+1. **A — La IA arma la ruta** (lo que decía el roadmap original): el modelo decide cursos, orden y etapas desde
    el catálogo completo; reglas solo como plan B.
 2. **B — Sin IA**: cuestionario → reglas → rutas oficiales filtradas, razones por plantilla.
 3. **C — Híbrido, tal como lo describía `ANALISIS-IA.md`**: motor por reglas siempre + IA que en la
@@ -53,7 +53,7 @@ primera: cambió qué construye la app, no solo dónde interviene el modelo.
 
 **Corrida 1 — dónde va la IA. Veredicto: ARRÉGLALA.** La columna vertebral (reglas primero) es
 correcta y A es peor que C, pero C tal como estaba escrita concentraba toda su diferenciación en la
-capa que el evaluador puede no ver nunca. Fallos más graves:
+capa que quien prueba la app puede no ver nunca. Fallos más graves:
 
 - La propia demo del equipo, `docs/investigacion/opcion-c.html`, produce el efecto completo de la
   Capa 2 (título personalizado, razones, skip, add) **sin llamar a ninguna API** — `fetch(` aparece 0
@@ -78,7 +78,7 @@ cálculo verificado en este repo: aplicando las reglas del motor al perfil "Reac
 tecnologías previas), el resultado es
 `javascript-moderno → react-de-cero → typescript-guia-completa → react-pro → sql-con-postgres →
 nextjs` — **idéntico, en el mismo orden**, a `/pages/programas-react`. Delta: cero cursos. Y React es
-lo primero que un evaluador de DevTalles va a teclear.
+lo primero que alguien de DevTalles va a probar.
 
 El agente fue explícito en que esto no se arregla con una feature nueva, sino con qué output enseña la
 app: de "una lista de cursos" a "un plan que cabe en tu tiempo", verificado con otro cálculo — el
@@ -100,15 +100,15 @@ contra `data/courses.json` y `data/programs.json`:
 **1. El motor por reglas es el plan A, no el plan B.** Corre siempre, sobre los programas oficiales de
 DevTalles. `lib/paths/fallback.ts` deja de existir como tarea de respaldo separada: pasa a ser
 `lib/paths/build-path.ts`, función pura y testeable, y es la única vía por la que se genera una ruta.
-La app funciona entera sin `OPENAI_API_KEY` — requisito literal de `ENUNCIADO.md` ("al clonar el
-proyecto este debe funcionar") y lo que evita el riesgo de descalificación.
+La app funciona entera sin `OPENAI_API_KEY`: al clonar el proyecto tiene que funcionar, tenga o no
+quien la clona una key de IA.
 
 **2. El output es un plan con presupuesto de horas, con procedencia visible, no una lista de cursos.**
 Este es el cambio que responde a la objeción "esto ya está hecho, es reinventar la rueda": mientras el
 motor solo filtrara un programa oficial y lo mostrara, el delta con la web de DevTalles podía ser
-cero, medido. `ENUNCIADO.md` obliga a usar **los cursos** de DevTalles (requisito 2, literal), no sus
-**rutas**: los 13 programas oficiales son un insumo que el equipo eligió, no un requisito, y la
-descripción de la quest pide una ruta basada en *"intereses, metas profesionales y nivel de
+cero, medido. El requisito es usar **los cursos** de DevTalles, no sus **rutas**: los 13 programas
+oficiales son un insumo que el equipo eligió, no un requisito, y la idea del producto es una ruta
+basada en *"intereses, metas profesionales y nivel de
 conocimientos actual"* — las tres entradas que la página oficial no usa (está organizada por
 tecnología: el estudiante entra a "React" porque ya sabe que quiere React). Que
 `qwik-introduccion` y `go-microservicios` estén disponibles en el catálogo pero en ningún programa
@@ -129,7 +129,7 @@ registra como limitación conocida.
 
 ## Consecuencias
 
-Se gana: la app deja de arriesgarse a que un evaluador de DevTalles vea, en el primer caso que
+Se gana: la app deja de arriesgarse a que alguien de DevTalles vea, en el primer caso que
 prueba, su propia ruta oficial con login encima — el presupuesto de horas y la procedencia visible son
 algo que la página oficial no ofrece. La Capa 0 pasa de 296 juicios a 148, lo que hace creíble
 revisarla a mano en el tiempo estimado. El motor por reglas, al ser el plan A y no un respaldo, es
@@ -139,7 +139,7 @@ implementaciones de "elegir cursos" en la semana 1.
 Se sacrifica generalidad en la Capa 2: sin `skip`/`add`, la IA ya no puede ajustar cursos individuales
 dentro de la ruta — solo escribe texto y sugiere qué programas combinar.
 
-El día 10 del roadmap (compartir ruta con `share_slug` + `opengraph-image`) se había recortado en un
+El día 10 del roadmap original (compartir ruta con `share_slug` + `opengraph-image`) se había recortado en un
 primer borrador de esta sesión para pagar las ~4-6h que cuesta el presupuesto de horas, pero el usuario
 revirtió ese trueque el 2026-09-18: prefiere mantener "compartir" en el alcance y encontrar el tiempo
 del presupuesto de horas por otra vía (sin especificar cuál todavía). Queda como riesgo de cronograma,

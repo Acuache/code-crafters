@@ -12,11 +12,11 @@
 Hoy `/dashboard` es el placeholder del spec 03 (`app/dashboard/page.tsx`): una tarjeta con avatar,
 el rol, "Crear mi ruta" (agregado por el 06) y "Cerrar sesión". Un usuario puede generar varias rutas
 (spec 07) y marcar su progreso en cada una (spec 08), pero **no tiene ninguna pantalla que las
-liste**: la única forma de volver a una ruta vieja es guardar su URL. La mitad de "guardar varias
-rutas y marcar progreso" de `docs/ENUNCIADO.md` está hecha en datos y falta en pantalla.
+liste**: la única forma de volver a una ruta vieja es guardar su URL. La mitad del requisito
+"guardar varias rutas y marcar progreso" está hecha en datos y falta en pantalla.
 
-Con este spec mergeado se cierra el **Hito 1** de `docs/SPECS-MAP.md`: los cinco requisitos
-obligatorios del enunciado quedan cumplidos sin `OPENAI_API_KEY` ni rol `admin`.
+Con este spec mergeado se cierra el **Hito 1** de `docs/SPECS-MAP.md`: los requisitos básicos del
+producto quedan cumplidos sin `OPENAI_API_KEY` ni rol `admin`.
 
 **Dependencias, una por motivo distinto:**
 

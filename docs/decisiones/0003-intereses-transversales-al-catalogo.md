@@ -11,14 +11,13 @@ la web muestra (`slug`, `title`, `hours`, `areas`, `prerequisites` en texto libr
 `courses`. No contiene ninguna regla propia del proyecto: ni etiquetas normalizadas por curso, ni
 slugs de tecnologías, ni un mapeo interés → cursos que cruce programas.
 
-Esas reglas existen, pero escritas a mano dentro de una maqueta
-(`docs/maquetas/0001-motor-de-reglas-con-ia-encima/0001-motor-de-reglas-con-ia-encima.js`:
-`META_STACKS`, `STACK_SKILLS`, `STACK_INTERESTS`), que declara en su primera línea que no calcula
-nada — es solo para ver cómo se vería la pantalla.
+Esas reglas existían, pero escritas a mano dentro de una maqueta HTML del cuestionario (ya retirada
+del repo; sus tablas eran `META_STACKS`, `STACK_SKILLS` y `STACK_INTERESTS`), que declaraba en su
+primera línea que no calculaba nada — era solo para ver cómo se vería la pantalla.
 
 La consecuencia, planteada por un miembro del equipo: el cuestionario, tal como está especificado,
 elige **un programa oficial y lo filtra**. No puede recomendar un curso que ese programa no contenga.
-`docs/ENUNCIADO.md` pide una ruta basada en *"intereses, metas profesionales y nivel de conocimientos
+La idea del producto es una ruta basada en *"intereses, metas profesionales y nivel de conocimientos
 actual"*, y el ADR 0001 ya había medido el caso peor: para el perfil "React desde cero" el motor
 devuelve una ruta **idéntica y en el mismo orden** a `/pages/programas-react`.
 
@@ -52,7 +51,7 @@ propuesta y aportó dos hallazgos verificados contra `data/courses.json` y `data
   `react-de-cero`: sus `topics` reales incluyen Docker, tres líneas de testing especializado
   (componentes, mocks/spies/snapshots, integración), Tailwind, Zustand, React Router y JWT. Cualquier
   taxonomía honesta lo etiqueta `testing` y `docker`. Con esas etiquetas, el chip "me interesa Docker"
-  recomendaría **46 horas de React completo** a un evaluador que sabe exactamente qué enseña ese
+  recomendaría **46 horas de React completo** a alguien de DevTalles que sabe exactamente qué enseña ese
   curso — un fallo peor que el que el ADR 0001 ya había anticipado para el texto generado por IA
   ("una respuesta válida y falsa sobre el contenido de un curso, mostrada al instructor que lo
   grabó"), porque aquí el error sale del párrafo y entra en la lista de cursos de la ruta.

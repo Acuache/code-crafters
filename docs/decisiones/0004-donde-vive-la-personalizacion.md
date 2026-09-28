@@ -7,9 +7,8 @@
 
 Un miembro del equipo planteó, durante la revisión de `specs/01-catalog-enrichment.md`, una objeción
 sobre el diseño de dos capas del ADR 0001: *"creo que hay poca personalización porque la IA solo va a
-explicar un resumen, el título y la razón"*. La preocupación es directa contra `docs/ENUNCIADO.md`,
-que pide una ruta *"basada en sus intereses, metas profesionales y nivel de conocimientos actual"*, y
-contra el hecho de competir con otros 18 equipos.
+explicar un resumen, el título y la razón"*. La preocupación va directo contra la idea del producto:
+una ruta *"basada en sus intereses, metas profesionales y nivel de conocimientos actual"*.
 
 La misma conversación derivó en una segunda propuesta, también del equipo: que una ruta ya generada se
 pueda ajustar hablando con la IA en texto libre, y que sea la IA quien decida cómo cambiarla.
@@ -83,13 +82,13 @@ correcta —la personalización se percibe fina— pero la causa no es el techo 
   individual, aunque el conjunto de varios chips sí sume diferencia, como confirma la medición de
   arriba.
 - La pieza que el ADR 0001 declaró como respuesta a "esto ya está hecho" —procedencia **y descarte**
-  visibles, mencionado tres veces en `docs/ROADMAP.md`— no tiene dónde vivir: `path_steps` no modela
+  visibles, mencionado tres veces en el roadmap original— no tiene dónde vivir: `path_steps` no modela
   un paso descartado, y `docs/SPECS-MAP.md` describía el spec 08 solo con "por qué entró" un curso. Si
   el spec 02 se escribía sin esto, la pieza se volvía imposible de construir sin romper la regla 6 del
   mapa (migraciones solo en 02, 11, 13 y 15).
 - Darle a la IA `skip`/`add` (opción 2) cuesta una migración y ~11-15 h de trabajo de P2, y produce una
-  ruta distinta según haya o no `OPENAI_API_KEY` — exactamente lo que el criterio 3 del `ENUNCIADO.md`
-  evalúa al clonar el proyecto sin key.
+  ruta distinta según haya o no `OPENAI_API_KEY` — justo lo que se nota al clonar el proyecto sin
+  key.
 - Lo que sí hace ver poca la personalización es la plantilla: en la maqueta, la razón por defecto
   repite la misma frase para varios pasos ("Requerido en la ruta oficial de Fundamentos.") cuando el
   motor ya tiene, sin llamar a nadie, el plazo del usuario, qué tecnologías domina y si fusionó más de
@@ -101,8 +100,8 @@ original, con una versión mínima que sobrevive:
 - Los 5 ejemplos de petición en texto libre que motivaron la propuesta ("no quiero tanto backend",
   "sácame Docker", "tengo menos tiempo", "agrégame testing", "empezar más fácil") ya tienen respuesta
   sin IA: la pregunta de meta, el chip de interés correspondiente, el presupuesto de horas y el nivel
-  declarado, respectivamente. Y "generar otra ruta" no es una feature a construir: es el requisito 3
-  del `ENUNCIADO.md`, ya cubierto por los specs 06, 07 y 09 del Hito 1.
+  declarado, respectivamente. Y "generar otra ruta" no es una feature a construir: es un requisito
+  básico del producto, ya cubierto por los specs 06, 07 y 09 del Hito 1.
 - Si la IA agrega cursos después de que el motor ya recortó contra el presupuesto de horas, se rompe
   el invariante que sostiene la única frase de venta del producto ("un plan que cabe en tu tiempo"): o
   el cartel de horas deja de ser cierto, o el motor recorta en silencio lo que el usuario acaba de

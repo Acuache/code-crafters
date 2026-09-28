@@ -23,8 +23,8 @@ en el video (`docs/investigacion/ANALISIS-IA.md` §3 y §9).
 La IA **no agrega, no quita y no reordena cursos** (ADR 0001 punto 3 y ADR 0004 punto 5). Solo
 escribe texto sobre los pasos que ya existen, y los slugs que puede nombrar están acotados con
 `z.enum` a los de la ruta. Si no hay `OPENAI_API_KEY`, la llamada tarda más de 15 s o la respuesta
-no valida contra el schema, la ruta queda exactamente como estaba. `docs/ENUNCIADO.md` descalifica un
-proyecto que no funcione al clonarlo, y el evaluador lo clona sin key.
+no valida contra el schema, la ruta queda exactamente como estaba. La app tiene que funcionar al
+clonarla, y quien la clona no tiene key.
 
 **Dependencias, una por motivo distinto:**
 
@@ -51,8 +51,8 @@ proyecto que no funcione al clonarlo, y el evaluador lo clona sin key.
     resumen y las razones en una sola transacción.
 - Regenerar `lib/supabase/database.types.ts` con el MCP de Supabase (`generate_typescript_types`)
   después de aplicar la migración. Es la única modificación a `lib/supabase/*`.
-- Dependencias nuevas en `package.json`: `ai` y `@ai-sdk/openai` (Vercel AI SDK, el stack de
-  `docs/ROADMAP.md`).
+- Dependencias nuevas en `package.json`: `ai` y `@ai-sdk/openai` (Vercel AI SDK, el stack del
+  roadmap original).
 - `lib/ai/personalization-schema.ts`: `buildPersonalizationSchema(courseSlugs)`, el schema zod de la
   respuesta del modelo, con los slugs acotados a los de la ruta.
 - `lib/ai/build-prompt.ts`: `buildPersonalizationPrompt(input)`, función pura que arma el prompt a
@@ -588,7 +588,7 @@ ruta por lo que contaste", la `explanation` y una lista de `Badge`: "Meta: React
   válidas.
 - **Sí:** se acepta que, con key y texto libre, la ruta pueda ser distinta que sin key. **No:**
   mantener la ruta idéntica en los dos casos (objeción del ADR 0004). Sin key la ruta sigue siendo
-  completa y válida (requisito de `ENUNCIADO.md`); con key se ajusta a algo que el usuario pidió
+  completa y válida (requisito del producto); con key se ajusta a algo que el usuario pidió
   explícitamente, y el aviso lo hace visible.
 - **Sí:** el ajuste se muestra después, en la ruta, sin confirmación previa. **No:** confirmar
   antes de generar. Sumaría una pantalla al camino crítico del Hito 1; la confirmación y la edición
@@ -617,7 +617,7 @@ ruta por lo que contaste", la `explanation` y una lista de `Badge`: "Meta: React
   solo los éxitos. Una llamada fallida también gasta crédito, y contar solo los éxitos dejaría
   reintentar sin límite contra una API que está fallando.
 - **Sí:** Vercel AI SDK (`ai` + `@ai-sdk/openai`) con salida estructurada validada con zod.
-  **No:** el SDK oficial de OpenAI. Es el stack de `docs/ROADMAP.md`. Decisión del usuario.
+  **No:** el SDK oficial de OpenAI. Es el stack del roadmap original. Decisión del usuario.
 - **Sí:** `gpt-6-luna` con `reasoningEffort: "low"`, y un prompt que exige retomar el texto libre
   y los datos concretos del perfil, sin frases de relleno. **No:** `gpt-4o-mini` (elegido en el
   paso 1) ni `gpt-4.1-mini`. Con el mismo perfil ("trabajo en soporte técnico, ya hice cosas con
@@ -625,7 +625,7 @@ ruta por lo que contaste", la `explanation` y una lista de `Badge`: "Meta: React
   s); `gpt-4.1-mini` lo retomaba pero con alguna frase hecha (4.5 s); `gpt-6-luna` lo retoma en
   título, resumen y razones, cita las horas reales contra el presupuesto y no mete relleno (5.8 s),
   y es el más barato ($0.10/$0.50 por 1M tokens). Es un modelo de razonamiento: el esfuerzo por
-  defecto (`medium`) arriesga el timeout, por eso `low`. La IA es un valor agregado para el concurso
+  defecto (`medium`) arriesga el timeout, por eso `low`. La IA es un valor agregado
   solo si la ruta se nota hecha para esa persona y es coherente con el último paso del
   cuestionario. Modelo elegido por el usuario durante la implementación.
 - **Sí:** respuesta completa en una server action, con timeout de 15 s. **No:** streaming. Un

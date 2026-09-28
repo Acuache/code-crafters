@@ -9,8 +9,8 @@
 
 ## Por qué existe este spec
 
-`docs/ENUNCIADO.md` pide que la app "permita la adición de nuevas características en el futuro" y
-que se adapte "a las necesidades cambiantes de la comunidad". Hoy, sumar un curso nuevo de
+Uno de los requisitos del producto es que la app "permita la adición de nuevas características en el
+futuro" y que se adapte "a las necesidades cambiantes de la comunidad". Hoy, sumar un curso nuevo de
 DevTalles exige escribir SQL a mano contra `courses` y `program_courses`. El motor de reglas (spec 04) arma las rutas a partir de los programas oficiales, no del catálogo suelto, así que un curso que
 no está ubicado en ningún programa nunca aparece en una ruta generada. Ya pasa con
 `qwik-introduccion` y `go-microservicios`. Por eso este panel gestiona cursos **y** su ubicación en
@@ -443,7 +443,7 @@ filtro de `.or()`.
   `not null` y no hay migración. Un programa creado desde el panel no sale de ninguna entrada de
   `data/programs.json`, así que se le toma a sí mismo como origen.
 - **Sí:** excepción explícita a la regla 5 para agregar el link en `app/(app)/dashboard/page.tsx`.
-  **No:** entrar solo tecleando `/admin`. El jurado evalúa navegando la app desplegada, y el spec 09
+  **No:** entrar solo tecleando `/admin`. La app se prueba navegándola, no tecleando URLs, y el spec 09
   ya dejó este link fuera de su alcance "para el 10".
 - **Sí:** las rutas ya generadas no se recalculan cuando cambia el catálogo. **No:** propagar
   cambios. Los `path_steps` ya guardados son el plan del usuario; "Ajustar mi ruta" (spec 16)

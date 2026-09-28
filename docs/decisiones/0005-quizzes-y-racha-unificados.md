@@ -7,8 +7,7 @@
 
 ## Contexto
 
-Ariel Tonato construyó en `develop` (13 commits del 2026-09-23, diseño en
-`docs/superpowers/specs/2026-09-23-quizzes-progress-streak-design.md`) quizzes generados con IA por
+Ariel Tonato construyó en `develop` (13 commits del 2026-09-23) quizzes generados con IA por
 curso y por capítulo, intentos guardados y una racha diaria. Partió de una base anterior a los specs
 08, 11 y 12, así que además rehizo la pantalla `/paths/[id]` por su cuenta. Al unir las ramas había
 dos pantallas para la misma ruta, dos proveedores de IA (OpenAI y OpenRouter), el spec de
@@ -38,7 +37,7 @@ Opción 2, y una sola racha: la de Ariel (`streak_activities`). En detalle:
   ("Rendir quiz del curso", "Practicar por capítulo") con el `QuizDialog` de Ariel. Su `StreakCard`
   va arriba de la ruta.
 - **Completar un curso, dos formas:** el toggle "Hecho" o aprobar el quiz del curso (60 %). El
-  toggle es lo que garantiza que la app funcione sin IA (`ENUNCIADO.md`).
+  toggle es lo que garantiza que la app funcione sin IA.
 - **Sin bloqueo por orden:** el quiz no puede ser más estricto que el toggle.
 - **IA:** OpenAI con el mismo modelo que la personalización (`PERSONALIZATION_MODEL`); una sola
   key. Sale `@openrouter/ai-sdk-provider`.

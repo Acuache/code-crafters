@@ -7,9 +7,9 @@
 
 El repo seguía siendo el scaffold de `create-next-app`: `app/page.tsx` era la plantilla de Vercel, el
 tema de `app/globals.css` era el neutral con `--primary` verde que dejó `shadcn init`, y solo existía un
-componente en `components/ui/` (`button.tsx`). `docs/ROADMAP.md` pone "shadcn + tema + layout + landing"
-en el día 1, y `docs/ENUNCIADO.md` evalúa "Interfaz de Usuario (UI): agradable y entendible" como
-criterio 4. Sin tokens de marca, cada pantalla que se construyera después (quiz, ruta, dashboard) iba a
+componente en `components/ui/` (`button.tsx`). El roadmap original ponía "shadcn + tema + layout +
+landing" en el día 1, y una UI agradable y entendible es de lo primero que se nota al usar la app.
+Sin tokens de marca, cada pantalla que se construyera después (quiz, ruta, dashboard) iba a
 improvisar colores propios y habría que rehacerla.
 
 Se pidió que la app se pareciera a [cursos.devtalles.com](https://cursos.devtalles.com/), reusando el
@@ -72,12 +72,12 @@ Decisiones de detalle:
 
 Se gana: cualquier componente que se agregue con `npx shadcn@latest add` de acá en adelante hereda la
 marca sin tocarlo, y `/sistema-diseno` documenta la paleta, la tipografía, los radios, las sombras, ~22
-componentes y las reglas de uso — evidencia concreta para el criterio 4 de `ENUNCIADO.md`.
+componentes y las reglas de uso — evidencia concreta de una UI cuidada y consistente.
 
 Se sacrifica: mantener dos juegos de tokens (uno por tema) duplica las 45 líneas de `:root` y `.dark` en
 `app/globals.css`, y el tema claro no tiene referencia real en DevTalles — es una derivación propia que
 habría que revisar si el equipo decide, más adelante, que el producto es oscuro-únicamente.
 
-Qué haría revisar esto: que el jurado o el equipo prefiera un tema único (en ese caso, sacar
+Qué haría revisar esto: que el equipo o los usuarios prefieran un tema único (en ese caso, sacar
 `next-themes` y fijar `class="dark"` es un cambio menor); o que aparezca una nueva paleta oficial de
 DevTalles que reemplace la extraída del CSS de `cursos.devtalles.com` en 2026-09-16.

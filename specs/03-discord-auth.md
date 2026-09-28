@@ -21,9 +21,8 @@ Google, GitHub) tienen botón ya o solo Discord, y cómo se documenta el deploy 
 que hoy no hay ningún proyecto vinculado (`.vercel/` no existe en el repo). Es además el primer spec
 con UI propia después de la 02: sus dos pantallas (`/login`, `/dashboard`) fijan el precedente de
 que toda pantalla nueva **compone** el sistema de diseño ya construido en vez de maquetar a mano —
-el concurso evalúa por dos vías a la vez (`docs/ENUNCIADO.md`, criterio 4 "UI agradable y
-entendible" navegando la app desplegada, criterio 5 "código limpio" leyendo el repo público), y una
-pantalla que improvisa sus propios botones pierde en las dos.
+la app se juzga por dos vías a la vez (una UI agradable y entendible, navegando la app desplegada, y
+código limpio, leyendo el repo público), y una pantalla que improvisa sus propios botones pierde en las dos.
 
 ## Alcance
 
@@ -230,11 +229,11 @@ provider)}>` con `provider-button.tsx`, lee `searchParams` (es una `Promise` en 
   botón (`outline`) para los tres. **No:** solo Discord, ni destacar visualmente a Discord sobre los
   otros dos. El trigger de la spec 02 ya lee metadatos de los tres, las tres apps ya están
   configuradas en Supabase, y la ruta de callback es genérica — dejar solo Discord hubiera sido una
-  excepción especial, no un ahorro real de trabajo; y nada en `docs/ENUNCIADO.md` (que solo exige
+  excepción especial, no un ahorro real de trabajo; y nada en los requisitos (que solo exigen
   Discord "al menos") justifica privilegiar un proveedor sobre otro en el diseño.
 - **Sí:** `app/dashboard/page.tsx` placeholder mínimo, plano en la raíz de `app/` (sin route group
   `(app)` todavía). **No:** dejar `/dashboard` en 404 hasta el spec 09, ni crear ya el route group
-  `(app)/` que sugiere `docs/ROADMAP.md`. Sin una página que mostrar no hay forma de verificar el
+  `(app)/` que sugería el roadmap original. Sin una página que mostrar no hay forma de verificar el
   flujo completo a mano; pero agrupar carpetas es una decisión de layout que le corresponde al spec
   09, que sabe qué más va a vivir ahí (quiz, paths). **Consecuencia que el spec 09 debe resolver
   explícitamente:** si crea `app/(app)/dashboard/page.tsx` sin borrar o mover este placeholder, dos

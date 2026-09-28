@@ -53,6 +53,19 @@ El mapa de requisitos entre cursos que usa el motor v2 (spec 17, [ADR 0008](../d
 
 Los cursos que sugiere cada interés del cuestionario, en orden de preferencia (12 intereses, 26 cursos). Siembra la tabla `interest_courses`; después se edita desde `/admin/interests`. Las etiquetas de los intereses siguen en `lib/paths/interests.ts`.
 
+## quizzes.json
+
+El quiz inicial de cada curso (spec 13, [ADR 0006](../docs/decisiones/0006-quizzes-de-curso-escritos-por-el-admin.md)): 74 quizzes de 3 preguntas básicas, redactadas a partir del `summary`, los `topics` y los `outcomes` de `courses.json` y revisadas por el equipo. Siembra la tabla `quizzes` (migración `20260925140000_seed_course_quizzes.sql`); después se edita desde `/admin/courses/[slug]/quiz`. `lib/quizzes/seed-data.test.ts` comprueba que haya un quiz por curso y que cada pregunta pase el mismo schema que el formulario del admin (`lib/quizzes/schema.ts`).
+
+| Campo | Qué es |
+|---|---|
+| `courseSlug` | Slug del curso |
+| `questions[].id` | Identificador de la pregunta, único dentro del quiz |
+| `questions[].prompt` | El enunciado de la pregunta |
+| `questions[].options` | Las cuatro opciones, todas distintas |
+| `questions[].correctOption` | Índice (0–3) de la opción correcta |
+| `questions[].explanation` | Por qué esa es la respuesta correcta; se muestra al responder |
+
 ## Cursos
 
 | # | Curso | slug | Horas | Lecciones | Precio | Etiquetas |

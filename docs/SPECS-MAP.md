@@ -13,7 +13,7 @@ Decisiones de base para todo el mapa:
 - Granularidad fina: un spec por entregable, 16 en total.
 - Rama única `master`. Cada spec sale de `master` y vuelve ahí como `spec-NN-slug`
   (`specs/.spec-config.yml` con `AutoCreateBranch: true`, el default que crea el primer `/spec`).
-- **Dos roles: `user` y `admin`.** `ENUNCIADO.md` pide que la app "permita la adición de nuevas
+- **Dos roles: `user` y `admin`.** Uno de los requisitos es que la app "permita la adición de nuevas
   características en el futuro para brindar más opciones a los miembros de la comunidad" — se
   interpreta como que un administrador debe poder dar de alta un curso nuevo de DevTalles sin tocar
   código ni SQL a mano.
@@ -27,13 +27,11 @@ Decisiones de base para todo el mapa:
   insumo del seed inicial, no como fuente de verdad en runtime, porque es en la base de datos donde
   escribe el admin.
 - **El panel de administración se agenda después del Hito 1 (semana 2), no en la semana 1.** Es un
-  requisito interpretado de la descripción de la quest, no uno de los 5 numerados en `ENUNCIADO.md`; el
-  camino crítico (login → cuestionario → ruta → guardar → progreso) manda primero.
+  requisito interpretado de la idea del producto, no uno de los básicos; el camino crítico (login →
+  cuestionario → ruta → guardar → progreso) manda primero.
 
-> ⚠️ `docs/ROADMAP.md` todavía no refleja que el panel de administración se agenda después del Hito 1
-> en vez de quedar fuera del MVP: sigue listándolo en WON'T. Su modelo de datos ya incluye `role` y
-> `programs`/`program_courses` desde el spec 02. Para el alcance y el orden de los specs manda este
-> archivo.
+> Para el alcance y el orden de los specs manda este archivo; el roadmap original ya no está en el
+> repo.
 
 ---
 
@@ -114,7 +112,7 @@ los anteriores (no depende de nada); y 11 y 12 entre sí una vez cerrado el 08 (
 - **10 depende de 02 y 03 solo por el esquema y la sesión, no por el calendario.** Técnicamente podría
   escribirse tan pronto el 02 (tablas + RLS de escritura) y el 03 (rol en sesión) estén mergeados, en
   paralelo con la semana 1. El mapa lo agenda igual después del Hito 1 porque responde a un requisito
-  interpretado del enunciado, no a uno de los 5 numerados — es una decisión de prioridad, no una
+  interpretado de la idea del producto, no a uno de los básicos — es una decisión de prioridad, no una
   dependencia técnica que falte.
 
 ## 3. Reglas de concordancia
@@ -159,11 +157,11 @@ los anteriores (no depende de nada); y 11 y 12 entre sí una vez cerrado el 08 (
    `app/(app)/paths/[id]/page.tsx` que dejó el spec 07 — mismo precedente que 03→09, no crea un archivo
    al lado del anterior. **Excepción explícita al link del dashboard:** el spec 06 agrega el
    botón "Crear mi ruta" en el `app/dashboard/page.tsx` del spec 03 — si no, `/quiz` solo se puede
-   probar tecleando la URL a mano, y el concurso evalúa navegando la app desplegada. Fue barata porque
+   probar tecleando la URL a mano, y la app se prueba navegándola. Fue barata porque
    el spec 09 reescribió ese archivo entero (hoy el acceso es "Crear nueva ruta" en el dashboard).
    **Excepción explícita al link del panel:** el spec 10 agrega en `app/(app)/dashboard/page.tsx`
    (del 09) solo el botón "Panel de administración", visible para `role = 'admin'` — el 09 lo dejó
-   fuera de su alcance esperando al 10, y el jurado evalúa navegando la app, no tecleando `/admin`.
+   fuera de su alcance esperando al 10, y la app se prueba navegándola, no tecleando `/admin`.
    **Excepciones explícitas del spec 11 (IA):** en `app/(app)/paths/actions.ts` (del 07), el ajuste de
    respuestas con IA justo antes de `buildPath()` y la columna `ai_adjustments` en el insert; en
    `app/(app)/paths/[id]/page.tsx` (del 08), la lectura de las columnas `ai_*`, el `AiBadge`, el
@@ -243,7 +241,7 @@ los anteriores (no depende de nada); y 11 y 12 entre sí una vez cerrado el 08 (
    02 crea el esquema base —incluye `profiles.role` y las tablas `programs`/`program_courses`—; 11, 13
    y 15 añaden cada uno sus columnas o tablas para poder recortarse sin dejar tablas muertas. El 10
    (`admin-catalog`) **no crea ninguna migración propia**: usa el esquema que ya dejó el 02. Fuera
-   de la numeración, los quizzes y la racha de Ariel (`20260923120000_quizzes_progress_streak.sql`)
+   de la numeración, los quizzes y la racha (`20260923120000_quizzes_progress_streak.sql`)
    y su integración (`20260924130000_unify_streak.sql`, ADR 0005) ya están en el repo. El 13 los
    simplifica con `20260925130000_course_quizzes.sql` y siembra los quizzes con
    `20260925140000_seed_course_quizzes.sql`. El 14 solo cambia un FK
@@ -287,9 +285,8 @@ Las que siguen sin marcar en `docs/investigacion/ANALISIS-IA.md` §11 y en las c
 
 ## 5. Qué NO pasa por SDD
 
-README, `LICENSE` MIT, `.env.example`, capturas, guion y grabación del video, QA final del día 12 y
-correcciones de una línea. Son trabajo de entrega, no features; van directo a `master` con commit
-convencional.
+README, `LICENSE` MIT, `.env.example`, capturas, video de demo, QA final y correcciones de una
+línea. Son trabajo de entrega, no features; van directo a `master` con commit convencional.
 
 ## 6. Insumos que ya existen y cada spec debe reusar (no reinventar)
 
@@ -311,11 +308,6 @@ convencional.
 - `lib/supabase/{client,server}.ts` y `proxy.ts` — clientes SSR ya escritos con `getAll`/`setAll` y
   refresh con `getClaims()`. Entrada del 03; el 03 añade login/callback y el rol en sesión, no reescribe
   esto.
-- `docs/maquetas/0001-motor-de-reglas-con-ia-encima/` — maqueta HTML del cuestionario y de la pantalla
-  de ruta con sus tres estados (cargando, con IA, sin key). Entrada **visual** de 06, 07 y 08: sus
-  tablas de datos (`META_STACKS`, `STACK_SKILLS`, `STACK_INTERESTS`) no se copian al código real.
-  `STACK_INTERESTS` en particular queda **reemplazada** por la tabla plana de `lib/paths/interests.ts`
-  (ADR 0003) — el paso de intereses del 06 no depende del stack elegido.
 - `docs/decisiones/0001-*.md` — el diseño de dos capas y el presupuesto de horas ya están decididos; el
   spec 04 los implementa, no los rediscute. El ADR 0003 lo matiza en un punto (el presupuesto de horas
   no cierra el delta cero en perfiles de un solo stack), sin reemplazarlo.
@@ -332,7 +324,7 @@ convencional.
 
 ## 7. Qué construye cada spec
 
-Desarrollo en prosa de la columna "Objetivo" de la §1, para leer el mapa sin abrir `ROADMAP.md` ni los
+Desarrollo en prosa de la columna "Objetivo" de la §1, para leer el mapa sin abrir los
 ADRs. Fija expectativas, no alcance: cuando un spec ya está escrito en `specs/NN-slug.md`, manda el spec
 y esto pasa a ser un resumen.
 
@@ -456,7 +448,7 @@ cero. Su primer paso movió el placeholder `app/dashboard/page.tsx` que dejó el
 rutas resolvieran `/dashboard`. El progreso de cada ruta
 se calcula con `summarizePathProgress` de `lib/progress/path-progress.ts` (spec 08), por horas y sin
 contar los pasos descartados — no se reimplementa en el dashboard. Cierra el **Hito 1**: con
-este spec mergeado a `master`, los cinco requisitos obligatorios del `ENUNCIADO.md` (cuestionario,
+este spec mergeado a `master`, los cinco requisitos básicos del producto (cuestionario,
 rutas dinámicas con cursos reales, guardar varias rutas y marcar progreso, login con Discord,
 tecnologías de DevTalles) ya están cumplidos — sin necesitar `OPENAI_API_KEY`, que recién entra en el
 11, ni el rol `admin`, que recién se usa en el 10.
@@ -464,8 +456,8 @@ tecnologías de DevTalles) ya están cumplidos — sin necesitar `OPENAI_API_KEY
 ### 10 · `admin-catalog`
 
 El panel `/admin`: CRUD de `courses` y de su ubicación en programas (`program_courses` — stage, level,
-position, note), protegido por el helper de rol `admin` del spec 03. Responde a la línea de
-`ENUNCIADO.md` sobre "adaptarse a las necesidades cambiantes de la comunidad": permite dar de alta un
+position, note), protegido por el helper de rol `admin` del spec 03. Responde al requisito de
+"adaptarse a las necesidades cambiantes de la comunidad": permite dar de alta un
 curso nuevo de DevTalles sin tocar código ni SQL, y que ese curso pueda aparecer de verdad en una
 ruta generada porque queda ligado a un programa — a diferencia de un CRUD de solo cursos, que sería
 decorativo. **No crea ninguna migración propia**, usa las tablas y RLS que ya dejó el 02. Depende de 02 y
@@ -537,7 +529,7 @@ sesión, el login vuelve al link gracias a `next`. Las RLS no cambian: `anon` si
 ### 16 · `path-recalculation`
 
 El único spec **COULD** del mapa — el primero en recortarse si el tiempo aprieta. Descartado tanto el
-mini-quiz de re-evaluación adaptativa de `ROADMAP.md` como que la IA decida cursos sobre la ruta ya
+mini-quiz de re-evaluación adaptativa del roadmap original como que la IA decida cursos sobre la ruta ya
 armada (ver [ADR 0004](decisiones/0004-donde-vive-la-personalizacion.md)): la versión adoptada es un
 botón "Ajustar mi ruta" que abre el cuestionario del spec 06 **prellenado** con las respuestas
 anteriores, más un campo de texto libre. Si hay `OPENAI_API_KEY`, ese texto se traduce a cambios en

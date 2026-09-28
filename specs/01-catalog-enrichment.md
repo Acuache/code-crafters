@@ -32,7 +32,7 @@ administración del spec 10.
 - Escribir `outcome` para cada curso a partir de sus propios `outcomes`, `topics` y `chapters`.
 - Revisión humana de las 74 filas antes de mergear.
 - Documentar los dos campos nuevos en `data/SUMMARY.md`.
-- Corregir las dos menciones que quedan desactualizadas: la línea de `docs/ROADMAP.md` que define
+- Corregir las dos menciones que quedan desactualizadas: la línea del roadmap original que define
   `courses` con `level (beginner/intermediate/advanced)`, y las filas del spec 01 en
   `docs/SPECS-MAP.md` (§1 y §7), que hablan de `level` y de un script.
 
@@ -106,7 +106,7 @@ aparece en la etapa 1 de algún programa no se marca `avanzado`.
    `qwik-introduccion` y `go-microservicios`, que además no aparecen en ningún programa).
 7. Revisión humana de las 74 filas completas y aplicación de las correcciones.
 8. Documentar `difficulty` y `outcome` en la tabla de campos de `data/SUMMARY.md`, y corregir las
-   menciones a `level` y al script en `docs/ROADMAP.md` y `docs/SPECS-MAP.md`.
+   menciones a `level` y al script en el roadmap original y en `docs/SPECS-MAP.md`.
 
 ## Criterios de aceptación
 
@@ -120,7 +120,7 @@ aparece en la etapa 1 de algún programa no se marca `avanzado`.
 - [x] Los 36 cursos que hoy no tienen `outcomes` en `courses.json` tienen su `outcome` escrito.
 - [x] Ningún curso que aparezca en la etapa 1 de algún programa quedó marcado `avanzado`.
 - [x] `data/SUMMARY.md` documenta los dos campos nuevos.
-- [x] `docs/ROADMAP.md` ya no define `courses` con `level (beginner/intermediate/advanced)`.
+- [x] El roadmap original ya no define `courses` con `level (beginner/intermediate/advanced)`.
 - [x] El usuario revisó las 74 filas y sus correcciones están aplicadas.
 
 Los ocho primeros criterios se verifican con este comando:
