@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-8 px-4 py-10 sm:px-6">
-      <header className="flex flex-col gap-4 rounded-3xl border brand-gradient-soft p-6 shadow-brand sm:p-8">
+      <header className="flex flex-col gap-5 rounded-3xl border brand-gradient-soft p-6 shadow-brand sm:p-8">
         <div>
           <Button variant="ghost" render={<Link href="/dashboard" />} nativeButton={false}>
             <ArrowLeftIcon data-icon="inline-start" />
@@ -21,6 +21,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         <div className="flex flex-col gap-1">
           <Eyebrow>Administración</Eyebrow>
           <h1 className="text-title">Panel de administración</h1>
+          <p className="max-w-2xl text-sm text-muted-foreground">
+            Organiza el catálogo y las reglas que dan forma a las rutas de aprendizaje.
+          </p>
         </div>
         <AdminNav />
       </header>

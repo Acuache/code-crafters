@@ -8,7 +8,9 @@ export default async function NewCoursePage() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Nuevo curso</CardTitle>
+        <CardTitle>
+          <h2>Nuevo curso</h2>
+        </CardTitle>
         <CardDescription>
           Después de crearlo, ubicalo en un programa para que pueda aparecer en las rutas generadas.
         </CardDescription>

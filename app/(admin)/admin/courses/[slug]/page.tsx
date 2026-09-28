@@ -137,31 +137,43 @@ export default async function EditCoursePage({ params }: { params: Promise<{ slu
 
   return (
     <div className="flex flex-col gap-6">
-      <CourseStatusCard courseId={course.id} isActive={course.is_active} />
+      <div className="flex flex-col gap-2">
+        <p className="text-xs font-semibold tracking-wider text-primary-bright uppercase">
+          Curso · {course.slug}
+        </p>
+        <h2 className="font-heading text-2xl font-semibold text-balance">{course.title}</h2>
+        <p className="text-sm text-muted-foreground">
+          Revisa su disponibilidad, su quiz y las reglas con las que entra en las rutas.
+        </p>
+      </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            Quiz
-            {quiz?.is_active ? <Badge>Activo</Badge> : null}
-            {quiz && !quiz.is_active ? <Badge variant="secondary">Inactivo</Badge> : null}
-            {quiz ? null : <Badge variant="outline">Sin quiz</Badge>}
-          </CardTitle>
-          <CardDescription>
-            Aprobarlo marca el curso como hecho en la ruta del alumno, igual que el botón «Hecho».
-          </CardDescription>
-          <CardAction>
-            <Button
-              variant="outline"
-              render={<Link href={`/admin/courses/${encodeURIComponent(course.slug)}/quiz`} />}
-              nativeButton={false}
-            >
-              <ExamIcon data-icon="inline-start" />
-              {quiz ? "Editar quiz" : "Crear quiz"}
-            </Button>
-          </CardAction>
-        </CardHeader>
-      </Card>
+      <div className="grid gap-6 lg:grid-cols-2">
+        <CourseStatusCard courseId={course.id} isActive={course.is_active} />
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              Quiz
+              {quiz?.is_active ? <Badge>Activo</Badge> : null}
+              {quiz && !quiz.is_active ? <Badge variant="secondary">Inactivo</Badge> : null}
+              {quiz ? null : <Badge variant="outline">Sin quiz</Badge>}
+            </CardTitle>
+            <CardDescription>
+              Aprobarlo marca el curso como hecho en la ruta del alumno, igual que el botón «Hecho».
+            </CardDescription>
+            <CardAction>
+              <Button
+                variant="outline"
+                render={<Link href={`/admin/courses/${encodeURIComponent(course.slug)}/quiz`} />}
+                nativeButton={false}
+              >
+                <ExamIcon data-icon="inline-start" />
+                {quiz ? "Editar quiz" : "Crear quiz"}
+              </Button>
+            </CardAction>
+          </CardHeader>
+        </Card>
+      </div>
 
       <CoursePlacements
         courseId={course.id}
@@ -179,7 +191,7 @@ export default async function EditCoursePage({ params }: { params: Promise<{ slu
 
       <Card>
         <CardHeader>
-          <CardTitle>{course.title}</CardTitle>
+          <CardTitle>Datos del curso</CardTitle>
           <CardDescription>
             Los cambios valen para las rutas nuevas. Las horas se leen en vivo: cambiarlas también
             cambia el avance de las rutas ya generadas.

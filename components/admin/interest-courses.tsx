@@ -88,9 +88,14 @@ export function InterestCourses({
   }
 
   return (
-    <Card>
+    <Card className="motion-safe:transition-shadow motion-safe:duration-200 motion-safe:hover:shadow-md">
       <CardHeader>
-        <CardTitle>{label}</CardTitle>
+        <CardTitle className="flex flex-wrap items-center gap-2">
+          <h3>{label}</h3>
+          <Badge variant="secondary">
+            {courses.length} {courses.length === 1 ? "curso" : "cursos"}
+          </Badge>
+        </CardTitle>
         <CardDescription>
           Entra el primero que tenga su base en la ruta; si sobra tiempo, los siguientes.
         </CardDescription>
@@ -101,7 +106,10 @@ export function InterestCourses({
         ) : (
           <ol className="flex flex-col gap-2">
             {courses.map((course, index) => (
-              <li key={course.courseId} className="flex items-center gap-2 rounded-xl border p-2">
+              <li
+                key={course.courseId}
+                className="flex flex-wrap items-center gap-2 rounded-xl border bg-muted/20 p-2 hover:bg-muted/40 motion-safe:transition-colors motion-safe:duration-200"
+              >
                 <span className="w-6 text-center text-sm text-muted-foreground tabular-nums">
                   {index + 1}
                 </span>

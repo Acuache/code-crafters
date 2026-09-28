@@ -31,13 +31,17 @@ export function AdminNav() {
   const current = activeSection(usePathname());
 
   return (
-    <nav aria-label="Secciones del panel" className="flex flex-wrap gap-2">
+    <nav
+      aria-label="Secciones del panel"
+      className="grid grid-cols-1 gap-2 border-t pt-4 sm:grid-cols-3 lg:flex"
+    >
       {SECTIONS.map(({ section, href, label, Icon }) => {
         const isCurrent = section === current;
         return (
           <Button
             key={section}
             variant={isCurrent ? "secondary" : "ghost"}
+            className="w-full justify-start sm:justify-center lg:w-auto"
             render={<Link href={href} aria-current={isCurrent ? "page" : undefined} />}
             nativeButton={false}
           >

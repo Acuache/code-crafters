@@ -3,7 +3,7 @@
 import { useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { CheckCircleIcon, WarningIcon } from "@phosphor-icons/react";
+import { CheckCircleIcon, CheckIcon, PlusIcon, WarningIcon } from "@phosphor-icons/react";
 import { z } from "zod";
 
 import { createProgram, updateProgram } from "@/app/(admin)/admin/programs/actions";
@@ -64,7 +64,7 @@ export function ProgramForm(props: ProgramFormProps) {
     <form
       onSubmit={form.handleSubmit(handleValidSubmit)}
       noValidate
-      className="flex flex-col gap-6"
+      className="flex max-w-xl flex-col gap-6"
     >
       <FieldGroup>
         <Field data-invalid={!!errors.slug} data-disabled={isEditing || undefined}>
@@ -122,7 +122,13 @@ export function ProgramForm(props: ProgramFormProps) {
 
       <div>
         <Button type="submit" variant="brand" disabled={isSaving}>
-          {isSaving ? <Spinner data-icon="inline-start" /> : null}
+          {isSaving ? (
+            <Spinner data-icon="inline-start" />
+          ) : isEditing ? (
+            <CheckIcon data-icon="inline-start" aria-hidden="true" />
+          ) : (
+            <PlusIcon data-icon="inline-start" aria-hidden="true" />
+          )}
           {isEditing ? "Guardar cambios" : "Crear programa"}
         </Button>
       </div>

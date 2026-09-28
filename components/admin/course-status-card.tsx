@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { WarningIcon } from "@phosphor-icons/react";
+import { PowerIcon, WarningIcon } from "@phosphor-icons/react";
 
 import { setCourseActive } from "@/app/(admin)/admin/courses/actions";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -53,7 +53,11 @@ export function CourseStatusCard({ courseId, isActive }: CourseStatusCardProps) 
         </CardDescription>
         <CardAction>
           <Button variant="outline" onClick={handleToggle} disabled={isSaving}>
-            {isSaving ? <Spinner data-icon="inline-start" /> : null}
+            {isSaving ? (
+              <Spinner data-icon="inline-start" />
+            ) : (
+              <PowerIcon data-icon="inline-start" aria-hidden="true" />
+            )}
             {isActive ? "Desactivar" : "Reactivar"}
           </Button>
         </CardAction>

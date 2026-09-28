@@ -58,6 +58,16 @@ export default async function EditProgramPage({ params }: { params: Promise<{ sl
 
   return (
     <div className="flex flex-col gap-6">
+      <div className="flex flex-col gap-2">
+        <p className="text-xs font-semibold tracking-wider text-primary-bright uppercase">
+          Programa · {program.slug}
+        </p>
+        <h2 className="font-heading text-2xl font-semibold text-balance">{program.name}</h2>
+        <p className="text-sm text-muted-foreground">
+          {placements.length} {placements.length === 1 ? "curso" : "cursos"} en este programa.
+        </p>
+      </div>
+
       {isReachable ? null : (
         <Alert>
           <WarningIcon />
@@ -71,7 +81,7 @@ export default async function EditProgramPage({ params }: { params: Promise<{ sl
 
       <Card>
         <CardHeader>
-          <CardTitle>{program.name}</CardTitle>
+          <CardTitle>Datos del programa</CardTitle>
           <CardDescription>El nombre y la posición se pueden editar; el slug no.</CardDescription>
         </CardHeader>
         <CardContent>

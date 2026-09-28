@@ -20,7 +20,9 @@ export default async function NewProgramPage() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Nuevo programa</CardTitle>
+        <CardTitle>
+          <h2>Nuevo programa</h2>
+        </CardTitle>
         <CardDescription>
           Un programa nuevo no aparece en el cuestionario hasta que alguna meta de
           lib/paths/goals.ts lo nombre. Eso se hace por código.

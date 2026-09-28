@@ -1,9 +1,16 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { Controller, useForm, type UseFormRegisterReturn } from "react-hook-form";
+import { Controller, useForm, type FieldErrors, type UseFormRegisterReturn } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { CheckCircleIcon, WarningIcon } from "@phosphor-icons/react";
+import {
+  ArrowLeftIcon,
+  ArrowRightIcon,
+  CheckCircleIcon,
+  CheckIcon,
+  PlusIcon,
+  WarningIcon,
+} from "@phosphor-icons/react";
 import { z } from "zod";
 
 import { createCourse, updateCourse } from "@/app/(admin)/admin/courses/actions";
@@ -20,6 +27,7 @@ import {
   FieldSet,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { Progress, ProgressLabel } from "@/components/ui/progress";
 import {
   Select,
   SelectContent,
@@ -91,6 +99,33 @@ const LINE_LIST_FIELDS = [
   { name: "related", label: "Cursos relacionados (slugs)", placeholder: "react-pro" },
 ] as const;
 
+const COURSE_STEPS: { title: string; fields: (keyof CourseFormFields)[] }[] = [
+  {
+    title: "Datos principales",
+    fields: ["slug", "title", "summary", "outcome", "difficulty", "instructor"],
+  },
+  {
+    title: "Oferta y enlaces",
+    fields: [
+      "url",
+      "imageUrl",
+      "hours",
+      "lessons",
+      "price",
+      "isFree",
+      "isPro",
+      "isNew",
+      "inConstruction",
+    ],
+  },
+  {
+    title: "Contenido",
+    fields: ["areas", "prerequisites", "topics", "outcomes", "chapters", "related"],
+  },
+];
+
+const LAST_STEP = COURSE_STEPS.length - 1;
+
 type CourseFormProps =
   | { mode: "create"; initialValues: CourseFormFields }
   | { mode: "edit"; courseId: number; initialValues: CourseFormFields };
@@ -116,6 +151,8 @@ function LinesField({ id, label, placeholder, registration }: LinesFieldProps) {
 
 export function CourseForm(props: CourseFormProps) {
   const isEditing = props.mode === "edit";
+  const [currentStep, setCurrentStep] = useState(0);
+  const [stepError, setStepError] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
   const [wasSaved, setWasSaved] = useState(false);
   const [isSaving, startSaving] = useTransition();
@@ -124,10 +161,38 @@ export function CourseForm(props: CourseFormProps) {
     resolver: zodResolver(isEditing ? courseEditSchema : courseSchema),
     defaultValues: props.initialValues,
     mode: "onTouched",
+    shouldFocusError: false,
   });
   const { errors } = form.formState;
 
+  function showStep(step: number) {
+    setCurrentStep(step);
+    setStepError(false);
+    requestAnimationFrame(() => document.getElementById("course-step-title")?.focus());
+  }
+
+  async function handleNext() {
+    const isValid = await form.trigger(COURSE_STEPS[currentStep].fields, { shouldFocus: true });
+    if (isValid) {
+      showStep(Math.min(currentStep + 1, LAST_STEP));
+      return;
+    }
+    setStepError(true);
+  }
+
+  function handleInvalidSubmit(fieldErrors: FieldErrors<CourseFormFields>) {
+    const invalidStep = COURSE_STEPS.findIndex(({ fields }) =>
+      fields.some((field) => fieldErrors[field]),
+    );
+    if (invalidStep < 0) {
+      throw new Error("No se pudo identificar el paso con errores del curso.");
+    }
+    showStep(invalidStep);
+    setStepError(true);
+  }
+
   function handleValidSubmit(values: CourseInput) {
+    setStepError(false);
     setServerError(null);
     setWasSaved(false);
 
@@ -151,11 +216,34 @@ export function CourseForm(props: CourseFormProps) {
 
   return (
     <form
-      onSubmit={form.handleSubmit(handleValidSubmit)}
+      onSubmit={form.handleSubmit(handleValidSubmit, handleInvalidSubmit)}
       noValidate
-      className="flex flex-col gap-8"
+      className="flex max-w-3xl flex-col gap-8"
     >
-      <FieldSet>
+      <div className="flex flex-col gap-3">
+        <Progress value={((currentStep + 1) / COURSE_STEPS.length) * 100}>
+          <ProgressLabel>
+            Paso {currentStep + 1} de {COURSE_STEPS.length}
+          </ProgressLabel>
+        </Progress>
+        <h3
+          key={currentStep}
+          id="course-step-title"
+          tabIndex={-1}
+          className="font-heading text-lg font-semibold outline-none motion-safe:animate-in motion-safe:duration-200 motion-safe:fade-in motion-safe:slide-in-from-right-2"
+        >
+          {COURSE_STEPS[currentStep].title}
+        </h3>
+      </div>
+
+      {stepError ? (
+        <Alert variant="destructive">
+          <WarningIcon />
+          <AlertDescription>Revisa los campos señalados antes de continuar.</AlertDescription>
+        </Alert>
+      ) : null}
+
+      <FieldSet className={currentStep === 0 ? undefined : "hidden"}>
         <FieldLegend>Datos del curso</FieldLegend>
         <FieldGroup>
           <Field data-invalid={!!errors.slug} data-disabled={isEditing || undefined}>
@@ -237,7 +325,7 @@ export function CourseForm(props: CourseFormProps) {
         </FieldGroup>
       </FieldSet>
 
-      <FieldSet>
+      <FieldSet className={currentStep === 1 ? undefined : "hidden"}>
         <FieldLegend>Enlaces</FieldLegend>
         <FieldGroup>
           <Field data-invalid={!!errors.url}>
@@ -270,7 +358,7 @@ export function CourseForm(props: CourseFormProps) {
         </FieldGroup>
       </FieldSet>
 
-      <FieldSet>
+      <FieldSet className={currentStep === 1 ? undefined : "hidden"}>
         <FieldLegend>Duración y precio</FieldLegend>
         <FieldGroup>
           <Field data-invalid={!!errors.hours}>
@@ -320,7 +408,7 @@ export function CourseForm(props: CourseFormProps) {
         </FieldGroup>
       </FieldSet>
 
-      <FieldSet>
+      <FieldSet className={currentStep === 1 ? undefined : "hidden"}>
         <FieldLegend>Etiquetas</FieldLegend>
         <FieldGroup data-slot="checkbox-group">
           {FLAG_FIELDS.map((flag) => (
@@ -343,7 +431,7 @@ export function CourseForm(props: CourseFormProps) {
         </FieldGroup>
       </FieldSet>
 
-      <FieldSet>
+      <FieldSet className={currentStep === 2 ? undefined : "hidden"}>
         <FieldLegend>Contenido</FieldLegend>
         <FieldGroup>
           {LINE_LIST_FIELDS.map((listField) => (
@@ -372,11 +460,32 @@ export function CourseForm(props: CourseFormProps) {
         </Alert>
       ) : null}
 
-      <div>
-        <Button type="submit" variant="brand" disabled={isSaving}>
-          {isSaving ? <Spinner data-icon="inline-start" /> : null}
-          {isEditing ? "Guardar cambios" : "Crear curso"}
-        </Button>
+      <div className="flex flex-wrap justify-between gap-3">
+        {currentStep > 0 ? (
+          <Button type="button" variant="outline" onClick={() => showStep(currentStep - 1)}>
+            <ArrowLeftIcon data-icon="inline-start" aria-hidden="true" />
+            Atrás
+          </Button>
+        ) : (
+          <span />
+        )}
+        {currentStep === LAST_STEP ? (
+          <Button key="submit" type="submit" variant="brand" disabled={isSaving}>
+            {isSaving ? (
+              <Spinner data-icon="inline-start" />
+            ) : isEditing ? (
+              <CheckIcon data-icon="inline-start" aria-hidden="true" />
+            ) : (
+              <PlusIcon data-icon="inline-start" aria-hidden="true" />
+            )}
+            {isEditing ? "Guardar cambios" : "Crear curso"}
+          </Button>
+        ) : (
+          <Button key="next" type="button" variant="brand" onClick={handleNext}>
+            Siguiente
+            <ArrowRightIcon data-icon="inline-end" aria-hidden="true" />
+          </Button>
+        )}
       </div>
     </form>
   );

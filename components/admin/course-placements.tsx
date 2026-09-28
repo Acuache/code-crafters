@@ -4,7 +4,14 @@ import { useState, useTransition } from "react";
 import Link from "next/link";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { PencilSimpleIcon, PlusIcon, TrashIcon, WarningIcon } from "@phosphor-icons/react";
+import {
+  CheckIcon,
+  PencilSimpleIcon,
+  PlusIcon,
+  TrashIcon,
+  WarningIcon,
+  XIcon,
+} from "@phosphor-icons/react";
 
 import {
   addPlacement,
@@ -253,10 +260,15 @@ function PlacementDialog({
 
           <DialogFooter>
             <DialogClose render={<Button type="button" variant="outline" disabled={isSaving} />}>
+              <XIcon data-icon="inline-start" aria-hidden="true" />
               Cancelar
             </DialogClose>
             <Button type="submit" variant="brand" disabled={isSaving}>
-              {isSaving ? <Spinner data-icon="inline-start" /> : null}
+              {isSaving ? (
+                <Spinner data-icon="inline-start" />
+              ) : (
+                <CheckIcon data-icon="inline-start" aria-hidden="true" />
+              )}
               {submitLabel}
             </Button>
           </DialogFooter>

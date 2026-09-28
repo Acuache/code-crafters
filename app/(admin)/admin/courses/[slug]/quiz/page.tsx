@@ -64,7 +64,9 @@ export default async function CourseQuizPage({ params }: { params: Promise<{ slu
 
       <Card>
         <CardHeader>
-          <CardTitle>Quiz de «{course.title}»</CardTitle>
+          <CardTitle>
+            <h2>Quiz de «{course.title}»</h2>
+          </CardTitle>
           <CardDescription>
             {savedQuiz
               ? "Los cambios se ven en las rutas apenas los guardas. Los intentos anteriores conservan su puntaje."

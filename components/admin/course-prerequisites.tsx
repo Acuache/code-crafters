@@ -4,7 +4,7 @@ import { useState, useTransition } from "react";
 import Link from "next/link";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { PlusIcon, SparkleIcon, TrashIcon, WarningIcon } from "@phosphor-icons/react";
+import { PlusIcon, SparkleIcon, TrashIcon, WarningIcon, XIcon } from "@phosphor-icons/react";
 
 import {
   addPrerequisite,
@@ -237,10 +237,15 @@ function AddPrerequisiteDialog({ courseId, courseOptions }: AddPrerequisiteDialo
 
           <DialogFooter>
             <DialogClose render={<Button type="button" variant="outline" disabled={isSaving} />}>
+              <XIcon data-icon="inline-start" aria-hidden="true" />
               Cancelar
             </DialogClose>
             <Button type="submit" variant="brand" disabled={isSaving}>
-              {isSaving ? <Spinner data-icon="inline-start" /> : null}
+              {isSaving ? (
+                <Spinner data-icon="inline-start" />
+              ) : (
+                <PlusIcon data-icon="inline-start" aria-hidden="true" />
+              )}
               Agregar
             </Button>
           </DialogFooter>

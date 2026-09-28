@@ -7,7 +7,9 @@ import {
   ArrowDownIcon,
   ArrowUpIcon,
   CheckCircleIcon,
+  CheckIcon,
   PlusIcon,
+  PowerIcon,
   TrashIcon,
   WarningIcon,
 } from "@phosphor-icons/react";
@@ -120,7 +122,11 @@ export function QuizStatusCard({ quizId, isActive }: QuizStatusCardProps) {
         </CardDescription>
         <CardAction>
           <Button variant="outline" onClick={handleToggle} disabled={isSaving}>
-            {isSaving ? <Spinner data-icon="inline-start" /> : null}
+            {isSaving ? (
+              <Spinner data-icon="inline-start" />
+            ) : (
+              <PowerIcon data-icon="inline-start" aria-hidden="true" />
+            )}
             {isActive ? "Desactivar" : "Activar"}
           </Button>
         </CardAction>
@@ -274,7 +280,13 @@ export function QuizForm({ courseId, savedQuiz }: QuizFormProps) {
 
       <div>
         <Button type="submit" variant="brand" disabled={isSaving}>
-          {isSaving ? <Spinner data-icon="inline-start" /> : null}
+          {isSaving ? (
+            <Spinner data-icon="inline-start" />
+          ) : isCreating ? (
+            <PlusIcon data-icon="inline-start" aria-hidden="true" />
+          ) : (
+            <CheckIcon data-icon="inline-start" aria-hidden="true" />
+          )}
           {isCreating ? "Crear quiz" : "Guardar cambios"}
         </Button>
       </div>
