@@ -211,8 +211,8 @@ export function StepDetail({
             nativeButton={false}
           >
             <ArrowSquareOutIcon data-icon="inline-start" />
-            Ver curso en DevTalles
-            <ArrowRightIcon data-icon="inline-end" />
+            <span className="sm:hidden">Curso en DevTalles</span>
+            <span className="hidden sm:inline">Ver curso en DevTalles</span>
           </Button>
         </DialogFooter>
       </div>
