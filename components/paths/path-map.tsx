@@ -194,7 +194,7 @@ function Mascot({ nodePosition }: { nodePosition: NodePosition }) {
       {/* Decorativa: el globo del próximo nodo ya dice qué es (CLAUDE.md §Marca). */}
       <div className="mascot-flight-motion">
         <Image
-          src="/astronauta.webp"
+          src="/astronauta-vuelo.png"
           alt=""
           width={MASCOT_SIZE}
           height={MASCOT_SIZE}

@@ -1,5 +1,11 @@
 import Image from "next/image";
-import { CheckCircleIcon, FireIcon, XCircleIcon } from "@phosphor-icons/react";
+import {
+  ArrowCounterClockwiseIcon,
+  CheckCircleIcon,
+  FireIcon,
+  XCircleIcon,
+  XIcon,
+} from "@phosphor-icons/react";
 
 import type { AttemptResult } from "@/app/(app)/paths/[id]/actions";
 import { Button } from "@/components/ui/button";
@@ -45,14 +51,20 @@ export function QuizResult({
   onRetry,
   onClose,
 }: QuizResultProps) {
-  const mascotSrc = result.passed ? "/streak/celebration-1.webp" : "/astronauta.webp";
+  const mascotSrc = result.passed ? "/streak/celebration-1.webp" : "/streak/reminder.webp";
   const streakMessage = describeStreak(result);
 
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-col items-center gap-3 text-center">
         {/* Decorativa: el título de abajo ya dice si aprobó (CLAUDE.md §Marca). */}
-        <Image src={mascotSrc} alt="" width={128} height={128} />
+        <Image
+          src={mascotSrc}
+          alt=""
+          width={128}
+          height={128}
+          className="motion-safe:animate-float"
+        />
         <h3 className="font-heading text-2xl font-semibold">
           {result.passed ? "¡Quiz aprobado!" : "Casi, sigue practicando"}
         </h3>
@@ -107,10 +119,12 @@ export function QuizResult({
       <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
         {result.passed ? null : (
           <Button variant="outline" onClick={onRetry}>
+            <ArrowCounterClockwiseIcon data-icon="inline-start" aria-hidden="true" />
             Reintentar quiz
           </Button>
         )}
         <Button variant={result.passed ? "brand" : "default"} onClick={onClose}>
+          <XIcon data-icon="inline-start" aria-hidden="true" />
           Cerrar
         </Button>
       </div>

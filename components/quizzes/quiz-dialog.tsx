@@ -1,8 +1,10 @@
 // Sin "use client" a propósito, mismo criterio que step-status-toggle.tsx: recibe callbacks y solo
 // se importa desde path-steps-view.tsx, que ya es cliente.
 import { useState } from "react";
+import { ArrowRightIcon } from "@phosphor-icons/react";
 
 import type { AttemptResult } from "@/app/(app)/paths/[id]/actions";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -12,10 +14,11 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Progress } from "@/components/ui/progress";
+import { Progress, ProgressLabel } from "@/components/ui/progress";
 import { Spinner } from "@/components/ui/spinner";
 import type { ActionResultWithData } from "@/lib/action-result";
 import { browserTimeZone } from "@/lib/gamification/streak";
+import { cn } from "@/lib/utils";
 import type { CourseQuiz } from "@/lib/quizzes/schema";
 
 import { QuizQuestion } from "./quiz-question";
@@ -46,12 +49,6 @@ type Phase = "answering" | "submitting" | "result" | "error";
 
 // Una action rechaza (en vez de devolver ok: false) cuando se corta la conexión.
 const CONNECTION_ERROR = "Se perdió la conexión. Revisa tu internet e intenta de nuevo.";
-
-function describeQuiz(quiz: CourseQuiz): string {
-  const questionCount = quiz.questions.length;
-  const questionsLabel = questionCount === 1 ? "pregunta" : "preguntas";
-  return `${questionCount} ${questionsLabel} · apruebas con ${quiz.passPercentage} %`;
-}
 
 function emptyAnswers(session: QuizSession | null): (number | undefined)[] {
   const questionCount = session?.quiz.questions.length ?? 0;
@@ -157,11 +154,15 @@ export function QuizDialog({
   return (
     <Dialog open={session !== null} onOpenChange={handleOpenChange}>
       <DialogContent className="max-h-[90dvh] overflow-y-auto sm:max-w-xl">
-        <DialogHeader>
-          <DialogTitle className="text-xl font-semibold text-pretty">
-            Quiz: {courseTitle}
-          </DialogTitle>
-          <DialogDescription>{describeQuiz(quiz)}</DialogDescription>
+        <DialogHeader className="pr-8">
+          <p className="text-xs font-semibold tracking-wider text-primary-bright uppercase">Quiz</p>
+          <DialogTitle className="text-xl font-semibold text-pretty">{courseTitle}</DialogTitle>
+          <DialogDescription className="flex flex-wrap gap-2">
+            <Badge variant="secondary">
+              {questionCount} {questionCount === 1 ? "pregunta" : "preguntas"}
+            </Badge>
+            <Badge variant="outline">Apruebas con {quiz.passPercentage} %</Badge>
+          </DialogDescription>
         </DialogHeader>
 
         {phase === "answering" && currentQuestion ? (
@@ -169,7 +170,11 @@ export function QuizDialog({
             <Progress
               value={progressPercent}
               aria-label={`Pregunta ${questionIndex + 1} de ${questionCount}`}
-            />
+            >
+              <ProgressLabel>
+                Pregunta {questionIndex + 1} de {questionCount}
+              </ProgressLabel>
+            </Progress>
             <QuizQuestion
               // Cada pregunta monta su propio grupo de opciones: el foco no arrastra a la siguiente.
               key={currentQuestion.id}
@@ -177,17 +182,29 @@ export function QuizDialog({
               selectedOption={answers[questionIndex]}
               onSelect={selectOption}
             />
-            <DialogFooter>
+            <DialogFooter
+              className={cn(
+                "flex-col sm:flex-row sm:items-center",
+                hasCurrentAnswer ? "sm:justify-end" : "sm:justify-between",
+              )}
+            >
+              {!hasCurrentAnswer ? (
+                <p className="text-sm text-muted-foreground">
+                  Elige una opción para {isLastQuestion ? "entregar" : "continuar"}.
+                </p>
+              ) : null}
               {isLastQuestion ? (
                 <Button variant="brand" disabled={!hasCurrentAnswer} onClick={submitAttempt}>
                   Entregar
                 </Button>
               ) : (
                 <Button
+                  variant="brand"
                   disabled={!hasCurrentAnswer}
                   onClick={() => setQuestionIndex(questionIndex + 1)}
                 >
                   Siguiente
+                  <ArrowRightIcon data-icon="inline-end" />
                 </Button>
               )}
             </DialogFooter>

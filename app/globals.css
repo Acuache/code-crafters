@@ -422,6 +422,30 @@
 @layer base {
   * {
     @apply border-border outline-ring/50;
+    scrollbar-color: var(--primary-bright) transparent;
+    scrollbar-width: thin;
+  }
+  ::-webkit-scrollbar {
+    width: 0.75rem;
+    height: 0.75rem;
+  }
+  ::-webkit-scrollbar-track,
+  ::-webkit-scrollbar-corner {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    border: 2px solid transparent;
+    border-radius: 9999px;
+    background-color: var(--primary-bright);
+    background-clip: content-box;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    ::-webkit-scrollbar-thumb {
+      transition: filter 160ms ease-out;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      filter: brightness(1.12);
+    }
   }
   body {
     @apply bg-background text-foreground;

@@ -48,7 +48,7 @@ export function QuizQuestion({ question, selectedOption, onSelect }: QuizQuestio
   const isAnswered = selectedOption !== undefined;
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-4 motion-safe:animate-in motion-safe:duration-200 motion-safe:fill-mode-both motion-safe:fade-in motion-safe:slide-in-from-right-2">
       <h3 className="font-heading text-lg font-semibold text-pretty">{question.prompt}</h3>
       <div className="flex flex-col gap-2" role="radiogroup" aria-label="Opciones">
         {question.options.map((option, optionIndex) => {
@@ -64,11 +64,23 @@ export function QuizQuestion({ question, selectedOption, onSelect }: QuizQuestio
               disabled={isAnswered}
               focusableWhenDisabled
               className={cn(
-                "h-auto justify-start gap-3 py-3 text-left whitespace-normal",
+                "h-auto min-h-12 justify-start gap-3 py-3 text-left whitespace-normal focus-visible:ring-4 focus-visible:ring-ring/80 motion-safe:hover:-translate-y-0.5",
                 OPTION_STATE_CLASS[state],
               )}
               onClick={() => onSelect(optionIndex)}
             >
+              <span
+                aria-hidden="true"
+                className={cn(
+                  "flex size-7 shrink-0 items-center justify-center rounded-md border border-border bg-muted text-xs font-semibold text-muted-foreground",
+                  state === "correct" &&
+                    "border-primary-bright/40 bg-primary-bright/10 text-primary-bright",
+                  state === "incorrect" &&
+                    "border-destructive/40 bg-destructive/10 text-destructive",
+                )}
+              >
+                {String.fromCharCode(65 + optionIndex)}
+              </span>
               <span className="flex-1">{option}</span>
               {state === "correct" ? (
                 <CheckCircleIcon weight="fill" className="text-primary-bright" aria-hidden="true" />
