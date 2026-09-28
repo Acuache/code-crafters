@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, useTransition } from "react";
 import {
   CheckIcon,
   CopyIcon,
+  LinkBreakIcon,
   LinkSimpleIcon,
   ShareNetworkIcon,
   WarningIcon,
@@ -11,6 +12,7 @@ import {
 
 import { setPathSharing } from "@/app/(app)/paths/[id]/share-actions";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -22,6 +24,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { Separator } from "@/components/ui/separator";
 import { Spinner } from "@/components/ui/spinner";
 
 const COPIED_FEEDBACK_MS = 2000;
@@ -100,27 +103,43 @@ export function SharePathDialog({ pathId, shareSlug, isPublic }: SharePathDialog
         <ShareNetworkIcon data-icon="inline-start" />
         Compartir
       </DialogTrigger>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Compartir tu ruta</DialogTitle>
+      <DialogContent className="gap-5 sm:max-w-lg">
+        <DialogHeader className="pr-8">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <DialogTitle className="text-lg">Compartir tu ruta</DialogTitle>
+            <Badge variant={isPublic ? "secondary" : "outline"}>
+              {isPublic ? <LinkSimpleIcon data-icon="inline-start" /> : null}
+              {isPublic ? "Enlace activo" : "Solo tú"}
+            </Badge>
+          </div>
           <DialogDescription>
             {isPublic
-              ? "Cualquiera con este enlace puede ver tu ruta y hacerla desde su cuenta. Tu avance no se muestra."
-              : "Se verán el título, el resumen y los cursos de tu ruta tal como los ves, con tu nombre y tu avatar de Discord. Tu avance no se muestra."}
+              ? "Quien tenga el enlace puede ver tu ruta y copiarla a su cuenta. Tu avance permanece privado."
+              : "Al crear el enlace, cualquiera podrá ver el título, el resumen, los cursos, tu nombre y tu avatar de Discord. Tu progreso permanecerá privado."}
           </DialogDescription>
         </DialogHeader>
 
         {isPublic ? (
           <div className="flex flex-col gap-2">
+            <label htmlFor="share-url" className="text-sm font-medium">
+              Enlace público
+            </label>
             <div className="flex flex-col gap-2 sm:flex-row">
               <Input
+                id="share-url"
                 ref={linkInputRef}
                 readOnly
                 value={shareUrl}
-                aria-label="Enlace público de tu ruta"
-                onFocus={(event) => event.currentTarget.select()}
+                className="h-11 min-w-0 font-mono text-xs"
+                title={shareUrl}
+                onClick={(event) => event.currentTarget.select()}
               />
-              <Button variant="outline" onClick={copyLink} disabled={isSaving}>
+              <Button
+                variant="brand"
+                className="h-11 sm:shrink-0"
+                onClick={copyLink}
+                disabled={isSaving}
+              >
                 {isCopied ? (
                   <CheckIcon data-icon="inline-start" />
                 ) : (
@@ -129,9 +148,11 @@ export function SharePathDialog({ pathId, shareSlug, isPublic }: SharePathDialog
                 {isCopied ? "Copiado" : "Copiar enlace"}
               </Button>
             </div>
-            {copyStatus === "manual" ? (
-              <p role="status" className="text-sm text-muted-foreground">
-                Copia el enlace a mano
+            {copyStatus !== "idle" ? (
+              <p role="status" aria-atomic="true" className="text-sm text-muted-foreground">
+                {isCopied
+                  ? "Enlace copiado al portapapeles."
+                  : "El enlace quedó seleccionado. Cópialo con el atajo de tu dispositivo."}
               </p>
             ) : null}
           </div>
@@ -144,10 +165,21 @@ export function SharePathDialog({ pathId, shareSlug, isPublic }: SharePathDialog
           </Alert>
         ) : null}
 
-        <DialogFooter>
+        {isPublic ? <Separator /> : null}
+
+        <DialogFooter className={isPublic ? "sm:justify-start" : undefined}>
           {isPublic ? (
-            <Button variant="ghost" onClick={() => changeSharing(false)} disabled={isSaving}>
-              {isSaving ? <Spinner data-icon="inline-start" /> : null}
+            <Button
+              variant="destructive"
+              className="h-11"
+              onClick={() => changeSharing(false)}
+              disabled={isSaving}
+            >
+              {isSaving ? (
+                <Spinner data-icon="inline-start" />
+              ) : (
+                <LinkBreakIcon data-icon="inline-start" />
+              )}
               Dejar de compartir
             </Button>
           ) : (
