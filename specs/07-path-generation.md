@@ -202,7 +202,7 @@ Pasos internos de `generatePath`:
    `buildPath()` ni insertar nada. Sin este guard, un Supabase sin el seed aplicado (las migraciones
    `..._seed_courses.sql`/`..._seed_programs.sql` del spec 02 no corridas) produce una ruta de **0
    pasos** que igual se guarda y redirige sin error — exactamente la forma de "no funciona al
-   clonarlo" que `docs/ENUNCIADO.md` descalifica.
+   clonarlo" que el producto no puede permitirse.
 7. `const built = buildPath(profile, catalog, programs)`.
 8. `insert` en `learning_paths` (`user_id`, `assessment_id`, `title`, `goal`, `summary`,
    `budget_hours`) `.select("id").single()`.
@@ -367,7 +367,7 @@ para el "X h de Y h", y el spec 08 lo reusa para mostrar `fitsInBudget`.
   **No:** confiar en que el seed del spec 02 siempre está aplicado. `buildPath()` no lanza en ese caso
   (`resolvePrograms` devuelve `[]`, todo da `0`, `fitsInBudget: true`): sin el guard, un Supabase sin
   seed generaría rutas de 0 pasos en silencio — exactamente la forma que toma "no funciona al
-  clonarlo", que `docs/ENUNCIADO.md` descalifica de inmediato.
+  clonarlo", lo primero que el producto no puede permitirse.
 - **Sí:** el placeholder de `/paths/[id]` filtra `status <> 'discarded'` al listar pasos y al sumar
   horas. **No:** listar `path_steps` tal cual. Sin el filtro, un curso que el motor sacó por "ya lo
   dominás" o por recorte de presupuesto aparece igual en la ruta que se le muestra al usuario — el
@@ -406,7 +406,7 @@ para el "X h de Y h", y el spec 08 lo reusa para mostrar `fitsInBudget`.
   versión con tabla completa y badges por procedencia. Esa es ~60-70% de la vista que el spec 08 va a
   escribir y a reemplazar por completo; construirla dos veces (una angosta acá, otra completa después)
   es trabajo que el 08 descarta entero. La versión mínima sigue verificando lo mismo que necesita este
-  spec: que el redirect llega a datos reales, navegando la app — como evalúa el concurso.
+  spec: que el redirect llega a datos reales, navegando la app — que es como se la juzga.
 - **Sí:** el placeholder existe (propiedad transitoria de este spec). **No:** dejar `/paths/[id]` sin
   ninguna página hasta que el 08 aterrice. Mismo precedente que `app/dashboard/page.tsx` del spec 03,
   resuelto por el spec 09: sin esto, el criterio "completar el cuestionario redirige a una ruta real"

@@ -6,17 +6,17 @@
 
 **Sí, pero no como motor de la ruta.** La IA vale la pena como capa de personalización encima de un motor por reglas basado en las rutas oficiales de DevTalles, y como herramienta *offline* para enriquecer el catálogo.
 
-Esto corrige lo que decidimos en `ROADMAP.md` ("la IA arma la ruta"). Esa decisión se tomó antes de extraer los datos, y los datos cambian el panorama (ver abajo).
+Esto corrige lo que decidimos en el roadmap original ("la IA arma la ruta"). Esa decisión se tomó antes de extraer los datos, y los datos cambian el panorama (ver abajo).
 
 ---
 
-## 1. Lo que dice el enunciado (y lo que no dice)
+## 1. Lo que piden los requisitos (y lo que no piden)
 
-- **La IA no es requisito ni criterio de evaluación.** Ningún punto del enunciado la menciona. Suma solo si mejora la **Idea**, la **UI** o la experiencia; no suma por existir.
-- **"Al clonar el proyecto este debe funcionar siguiendo las instrucciones".** El evaluador clona el repo. Si la ruta depende de una API key que no tiene, la función principal de la app no funciona en su máquina.
-- **"Las soluciones parciales o que no funcionen serán descartadas de inmediato".** Una llamada a OpenAI que falla, tarda 20 s o devuelve algo raro durante la evaluación puede costarnos el concurso entero, no solo puntos.
+- **La IA no es un requisito.** Ninguno de los requisitos la menciona. Suma solo si mejora la **idea**, la **UI** o la experiencia; no suma por existir.
+- **"Al clonar el proyecto este debe funcionar siguiendo las instrucciones".** Quien prueba la app clona el repo. Si la ruta depende de una API key que no tiene, la función principal de la app no funciona en su máquina.
+- **Una solución parcial no sirve.** Una llamada a OpenAI que falla, tarda 20 s o devuelve algo raro justo cuando alguien la está probando deja a la app sin su función principal.
 - **"Adaptarse a las necesidades cambiantes… adición de nuevas características".** Aquí la IA sí ayuda: cuando DevTalles publique un curso nuevo, se re-extrae y se re-enriquece sin reescribir reglas a mano.
-- **Evaluadores = gente de DevTalles.** Conocen sus propias rutas. Una ruta inventada por IA que contradiga la ruta oficial del instructor se ve mal; una que la **respeta y la personaliza** se ve muy bien.
+- **Quien la prueba puede ser gente de DevTalles.** Conocen sus propias rutas. Una ruta inventada por IA que contradiga la ruta oficial del instructor se ve mal; una que la **respeta y la personaliza** se ve muy bien.
 
 ## 2. Lo que dicen los datos que ya extrajimos
 
@@ -42,21 +42,21 @@ Esto corrige lo que decidimos en `ROADMAP.md` ("la IA arma la ruta"). Esa decisi
 
 ## 4. Riesgos reales (ordenados por gravedad)
 
-1. **La app no funciona al clonar o en la fecha de evaluación.** Sin key, key revocada, créditos agotados o vencidos (revisar si los $10 tienen fecha de expiración). Es el riesgo que puede **descalificar**.
+1. **La app no funciona al clonar o el día de la demo.** Sin key, key revocada, créditos agotados o vencidos (revisar si los $10 tienen fecha de expiración). Es el riesgo más grave: la app deja de servir.
 2. **Rutas incoherentes.** Aunque `z.enum` evita cursos inventados, no evita el orden malo (NestJS antes que Node), quitar un curso requerido o meter 30 cursos. Validar esto bien cuesta casi lo mismo que escribir el motor por reglas.
 3. **Dos motores que mantener.** El roadmap actual pide "IA arma la ruta" **y** "plan B por reglas". Son dos implementaciones de lo mismo en la semana 1, a cargo de una sola persona (P2). Y el plan B es obligatorio igual, por el punto 1.
-4. **Latencia.** Generar una ruta completa puede tardar 5–20 s. En el video se nota y en la evaluación se siente como app lenta.
+4. **Latencia.** Generar una ruta completa puede tardar 5–20 s. En el video se nota y al probarla se siente como app lenta.
 5. **No determinismo.** Mismas respuestas, ruta distinta. Complica probar, depurar y grabar el video.
 6. **Abuso del deploy público.** Si alguien encuentra el endpoint, quema los créditos. Se mitiga, pero hay que hacerlo.
-7. **Parecer "otro wrapper de ChatGPT".** Con 18 equipos y un reto de "generador de rutas", es probable que varios usen IA para lo mismo. La IA sola **no diferencia**; diferencia cómo se integra.
+7. **Parecer "otro wrapper de ChatGPT".** En un "generador de rutas", lo obvio es usar IA para todo. La IA sola **no diferencia**; diferencia cómo se integra.
 
-> **Lo que NO es un riesgo:** el costo. Con un modelo "mini" y prompts de pocos miles de tokens, $10 alcanza para miles de generaciones. El problema con el dinero no es gastarlo con uso normal, es el abuso o quedarse sin crédito justo cuando evalúan.
+> **Lo que NO es un riesgo:** el costo. Con un modelo "mini" y prompts de pocos miles de tokens, $10 alcanza para miles de generaciones. El problema con el dinero no es gastarlo con uso normal, es el abuso o quedarse sin crédito justo en una demo.
 
 ---
 
 ## 5. Los tres caminos
 
-### A. La IA arma la ruta (lo que dice el roadmap hoy)
+### A. La IA arma la ruta (lo que decía el roadmap original)
 El modelo recibe el catálogo completo y el perfil, y decide cursos, orden y etapas. Reglas solo como plan B.
 
 ### B. Sin IA
@@ -65,7 +65,7 @@ Cuestionario → reglas → rutas oficiales filtradas. Razones con plantillas.
 ### C. Híbrido: las reglas deciden, la IA personaliza ⭐ recomendado
 Motor por reglas sobre las rutas oficiales (siempre funciona) + IA que explica, ajusta dentro de límites y entiende la meta en texto libre. Si la IA falla, el usuario igual tiene su ruta.
 
-### Comparación con los criterios del concurso
+### Comparación
 
 | Criterio | A. IA arma | B. Sin IA | C. Híbrido |
 |---|---|---|---|
@@ -75,7 +75,7 @@ Motor por reglas sobre las rutas oficiales (siempre funciona) + IA que explica, 
 | Impacto en el video | Alto si sale bien, variable | Medio | **Alto y predecible** |
 | Código limpio | Lógica duplicada (IA + fallback) | Simple | **Un motor + una capa** |
 | Esfuerzo semana 1 | Alto | Bajo | Medio |
-| Riesgo de descalificación | Medio-alto | Muy bajo | **Muy bajo** |
+| Riesgo de que no funcione al clonar | Medio-alto | Muy bajo | **Muy bajo** |
 
 **Por qué C y no B:** B es seguro pero se parece a lo que hará cualquiera, y pierde justo lo que más luce en la demo (razones personalizadas y meta en texto libre).
 **Por qué C y no A:** A exige el mismo motor por reglas (por el plan B) más una validación compleja, con más riesgo y peor coherencia con las rutas oficiales. C es, en la práctica, **menos trabajo** que A.
@@ -96,8 +96,8 @@ Script `scripts/enrich-courses.ts`, corre en local y guarda `data/courses.enrich
 | `prerequisite_slugs` | texto de `prerequisites` + catálogo de slugs | Ordenar por dependencias (orden topológico) |
 | `outcome` (1 frase) | outcomes o, si falta, chapters | Tarjetas de la UI y razones por plantilla |
 
-- **Revisión humana obligatoria:** 74 filas, ~1 hora repartida entre los 3. Así lo que ve el evaluador está controlado.
-- El evaluador **no necesita key**: el JSON enriquecido ya viene en el repo y va al seed.
+- **Revisión humana obligatoria:** 74 filas, ~1 hora repartida entre los 3. Así lo que ve el usuario está controlado.
+- Quien clona el repo **no necesita key**: el JSON enriquecido ya viene en el repo y va al seed.
 
 ### Capa 1: Motor por reglas (el que genera la ruta, siempre)
 `lib/paths/build-path.ts`, función pura y testeable:
@@ -148,7 +148,7 @@ Reglas de seguridad (en nuestro código, no en el prompt):
 | Decidir cursos y orden desde cero | Medio | Alto | **No** |
 | Preguntas del cuestionario generadas por IA | Bajo | Medio | **No**: cuestionario fijo, más claro y testeable |
 | Mini-quiz de re-evaluación generado en vivo | Medio | **Alto** | **No**. Preguntas hechas desde títulos de capítulos salen genéricas o incorrectas, y los instructores lo notan |
-| Chat mentor / asistente | Bajo para el concurso | Alto (tiempo) | **No** (ya estaba en WON'T) |
+| Chat mentor / asistente | Bajo | Alto (tiempo) | **No** (ya estaba en WON'T) |
 | RAG, embeddings, pgvector | Nulo con 74 cursos | Complejidad | **No** |
 
 **Alternativa a la re-evaluación adaptativa:** botón "Recalcular mi ruta". El usuario actualiza lo que ya domina, la Capa 1 regenera, se conserva el progreso y (si hay key) la Capa 2 re-explica. Reutiliza el mismo motor, es adaptativo de verdad y cuesta un día en vez de tres.
@@ -180,14 +180,14 @@ Lo que más impresiona no es "la IA generó algo", sino que la ruta **se nota he
 
 ---
 
-## 10. Qué cambiaría en `ROADMAP.md` si elegimos C
+## 10. Qué cambiaría en el roadmap original si elegimos C
 
 - **Decisiones ya tomadas:** "La IA arma la ruta" → "Motor por reglas sobre rutas oficiales + personalización con IA".
 - **Día 2 (P2):** enriquecimiento offline + revisión humana (se mantiene, sube de prioridad).
 - **Días 3–4 (P2):** primero `build-path.ts` (Capa 1) con tests de 5 perfiles; después la Capa 2. Desaparece el "plan B" como tarea separada: **el motor por reglas es el plan A**.
 - **Hito 1:** se cumple solo con la Capa 1. La Capa 2 puede entrar al final de la semana 1 o al inicio de la 2 sin bloquear nada.
 - **COULD:** reemplazar "mini-quiz generado por IA" por "Recalcular mi ruta".
-- **Riesgos:** agregar "créditos vencidos o agotados en la fecha de evaluación" y "límite de gasto duro".
+- **Riesgos:** agregar "créditos vencidos o agotados el día de la demo" y "límite de gasto duro".
 
 ---
 
@@ -204,4 +204,4 @@ Lo que más impresiona no es "la IA generó algo", sino que la ruta **se nota he
 - [ ] ¿Límite diario de personalizaciones por usuario? (sugerido: 5)
 - [ ] ¿Re-evaluación con mini-quiz o "Recalcular mi ruta"? (recomendación: recalcular)
 - [ ] ¿Los $10 tienen fecha de vencimiento? ¿Quién es dueño de la key?
-- [ ] Confirmar con la organización si los créditos o la key deben quedar activos durante la evaluación.
+- [ ] Confirmar que los créditos y la key queden activos para las demos.

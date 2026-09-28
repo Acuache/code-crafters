@@ -21,7 +21,7 @@ página del cuestionario (el mapa sólo le asigna `components/quiz/*`), qué val
 enviar, dado que el 07 —quien genera y redirige— todavía no existe.
 
 Es el primer spec que escribe un formulario en el repo: instala `react-hook-form`, `zod` y
-`@hookform/resolvers`, que el `ROADMAP.md` §stack ya había elegido y que los specs 07, 11 y 16 van a
+`@hookform/resolvers`, que el stack del roadmap original ya había elegido y que los specs 07, 11 y 16 van a
 reusar.
 
 **Dependencias, una por motivo distinto:**
@@ -298,7 +298,7 @@ action desde `requireUser()`, nunca el cliente.
   (área que no corresponde a la meta), exactamente lo que el spec 04 evitó al descartar `META_STACKS`.
 - **Sí:** `react-hook-form` + `zod` + `@hookform/resolvers`, con `Controller` sobre los componentes
   de `components/ui/*`. **No:** estado propio con `useState` y `safeParse` a mano. Es el stack que ya
-  eligió `ROADMAP.md` y el patrón que documenta shadcn hoy para el `Field` que ya está en el repo
+  eligió el roadmap original y el patrón que documenta shadcn hoy para el `Field` que ya está en el repo
   (verificado en Context7); además `form.trigger(campos)` resuelve la validación por paso de un
   wizard sin escribir el estado de "tocado" campo por campo.
 - **Sí:** el plazo es una lista cerrada de 3, 6, 9 y 12 meses (`z.union` de literales). **No:** un
@@ -318,7 +318,7 @@ action desde `requireUser()`, nunca el cliente.
   en silencio la primera vez que el spec 04 agregue una meta, y el `z.enum` derivado garantiza que la
   UI y la validación nunca discrepen.
 - **Sí:** `app/(app)/quiz/page.tsx`, creando la carpeta del route group pero sin `layout.tsx` propio.
-  **No:** `app/quiz/page.tsx` plano. Es la ubicación que ya describe `ROADMAP.md`, el 08 tiene
+  **No:** `app/quiz/page.tsx` plano. Es la ubicación que ya describía el roadmap original, el 08 tiene
   asignado `app/(app)/paths/[id]/*` en la misma carpeta, y un route group sin layout no invade la
   decisión de layout que le toca al spec 09 — mientras que un archivo plano más sería un segundo
   placeholder que el 09 debería mover.
@@ -329,7 +329,7 @@ action desde `requireUser()`, nunca el cliente.
 - **Sí:** este spec agrega el botón "Crear mi ruta" en `app/dashboard/page.tsx`, que es del spec 03.
   **No:** dejar `/quiz` accesible sólo tecleando la URL. Es una excepción consciente a la regla 5 del
   mapa, barata porque el spec 09 reescribe ese archivo entero de todos modos, y sin ella no hay forma
-  de verificar el flujo navegando la app — que es como el concurso la evalúa.
+  de verificar el flujo navegando la app — que es como se la juzga.
 - **Sí:** cada paso es su propio archivo en `components/quiz/steps/`. **No:** un único archivo con
   los seis, ni un componente genérico parametrizado por tipo de pregunta. Cada paso tiene su propio
   control (dos selects, toggle simple, chips múltiples, número + select, textarea): un componente
@@ -362,8 +362,8 @@ action desde `requireUser()`, nunca el cliente.
   requerido de casi cualquier meta). Sin estos defaults, react-hook-form arranca los arrays en
   `undefined` y el número de horas en `NaN`, lo que hace literalmente incumplibles dos criterios de
   aceptación de este mismo spec ("avanza con cero chips marcados", "el texto libre acepta quedar
-  vacío"); y sin preseleccionar el caso de referencia, la primera ruta que ve un evaluador que no
-  toca los valores por defecto cae en `fitsInBudget: false` por diseño del propio formulario, no del
+  vacío"); y sin preseleccionar el caso de referencia, la primera ruta que ve quien prueba la app sin
+  tocar los valores por defecto cae en `fitsInBudget: false` por diseño del propio formulario, no del
   motor.
 - **Sí:** el paso 1 del plan verifica compilando un archivo real que ejercita `zodResolver` y
   `z.enum(Object.keys(...))`. **No:** verificar sólo con un `npm run build` sin ningún import nuevo.

@@ -44,8 +44,8 @@ y "Dart Web").
 - `lib/supabase/database.types.ts` generado con `generate_typescript_types`, y los dos clientes
   existentes (`lib/supabase/{client,server}.ts`) tipados con `Database`.
 - Corregir `docs/SPECS-MAP.md` §4 (decisiones cerradas) y §7 (la ficha del 02 hoy dice que crea
-  `achievements`/`user_achievements`, al revés de su propia regla 6) y el modelo de datos de
-  `docs/ROADMAP.md`.
+  `achievements`/`user_achievements`, al revés de su propia regla 6) y el modelo de datos del
+  roadmap original.
 
 **Qué NO entra (queda para otros specs):**
 
@@ -271,8 +271,8 @@ admin real recibe _permission denied for function_ al intentar escribir el catá
    `createServerClient<Database>` en `lib/supabase/server.ts`. Verificación: `npm run build` sin
    errores de tipos.
 8. Corregir `docs/SPECS-MAP.md` (§4: marcar las tres decisiones como cerradas por el 02; §7: quitar
-   `achievements`/`user_achievements` de la ficha del 02) y el modelo de datos de
-   `docs/ROADMAP.md` (reflejar `role`, `programs`/`program_courses` y las 15 rutas). Verificación:
+   `achievements`/`user_achievements` de la ficha del 02) y el modelo de datos del
+   roadmap original (reflejar `role`, `programs`/`program_courses` y las 15 rutas). Verificación:
    ninguna mención residual a que el 02 crea tablas de gamificación.
 
 **Paso 9 (post-review):** `/review` con `craft-reviewer` sobre las migraciones y los dos clientes
@@ -310,15 +310,15 @@ completo de promoción a admin repetido con éxito, y `get_advisors(security)` e
       primer login real del spec 03 si la simulación manual en `auth.users` resulta frágil).
 - [x] `npm run build` compila con `lib/supabase/database.types.ts` generado y los dos clientes
       tipados.
-- [x] `docs/SPECS-MAP.md` y `docs/ROADMAP.md` ya no contradicen el esquema que este spec deja.
+- [x] `docs/SPECS-MAP.md` y el roadmap original ya no contradicen el esquema que este spec deja.
 
 ## Decisiones
 
 - **Sí:** el primer admin se promueve a mano desde el panel de Supabase (`update profiles set
 role = 'admin' where id = '...'`) después del primer login. **No:** ni credenciales de
   email/contraseña sembradas, ni un Discord ID fijo en el repo, ni una lista de correos admin en
-  configuración. El repo es público (requisito del concurso): cualquier secreto ahí es un secreto
-  de los otros 17 equipos también, y el login es solo OAuth, así que no hay "primer registro
+  configuración. El repo es público: cualquier secreto ahí es un secreto de cualquiera que lo lea,
+  y el login es solo OAuth, así que no hay "primer registro
   garantizado" en el que confiar sin riesgo.
 - **Sí:** `programs` tiene 15 filas, una por ruta oficial (`react` y `react-native` separados,
   igual `dart-movil`/`dart-web`). **No:** 13 filas con la ruta como columna extra de
@@ -376,8 +376,8 @@ role = 'admin' where id = '...'`) después del primer login. **No:** ni credenci
 | Riesgo                                                                                                                                                                       | Mitigación                                                                                                                                                                                  |
 | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | El trigger falla en producción y bloquea el registro (el patrón oficial de Supabase lo advierte explícitamente)                                                              | Probar el trigger con un insert manual en `auth.users` antes de mergear, y como segunda verificación en el primer login real del spec 03                                                    |
-| Cambiar el rol a mano se olvida u ocurre sobre el usuario equivocado                                                                                                         | El criterio de aceptación lo deja como paso explícito del README; no bloquea ningún requisito del `ENUNCIADO.md`, que no exige panel admin en el Hito 1                                     |
-| El JSON de `courses.json` (170 KB) embebido en una migración hace pesado el diff y el historial de `supabase/migrations/`                                                    | Aceptado: es una sola vez por catálogo congelado (spec 01), y la alternativa (script aparte) suma una dependencia y un paso manual que el evaluador puede saltarse                          |
+| Cambiar el rol a mano se olvida u ocurre sobre el usuario equivocado                                                                                                         | El criterio de aceptación lo deja como paso explícito del README; no bloquea ningún requisito del producto, que no exige panel admin en el Hito 1                                            |
+| El JSON de `courses.json` (170 KB) embebido en una migración hace pesado el diff y el historial de `supabase/migrations/`                                                    | Aceptado: es una sola vez por catálogo congelado (spec 01), y la alternativa (script aparte) suma una dependencia y un paso manual que quien clona el repo puede saltarse                   |
 | Un curso nuevo del panel del spec 10 no puede unirse a ningún programa porque `program_courses.course_id` es `on delete restrict` pero no impide un curso sin ningún vínculo | Aceptado como limitación conocida, igual que hoy `qwik-introduccion` y `go-microservicios`: un curso sin programa nunca aparece en una ruta generada, y el spec 10 debe advertirlo en su UI |
 | `programs.slug` no coincide con ningún vocabulario todavía escrito (el spec 04 define `meta → programas` sobre estos 15 slugs)                                               | El spec 04 depende del 02 solo por este vocabulario; queda documentado aquí para que el 04 lo consuma sin inventarlo de nuevo                                                               |
 

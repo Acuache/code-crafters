@@ -10,11 +10,10 @@
 
 ## Por qué existe este spec
 
-`docs/ROADMAP.md` lo pone en SHOULD ("XP por curso según horas, niveles, 5 o 6 insignias, racha y
+El roadmap original lo pone en SHOULD ("XP por curso según horas, niveles, 5 o 6 insignias, racha y
 confetti") y el guion del video lo usa en el segundo 45: "marcar un curso, XP e insignia". Una ruta
 de 100 horas se recorre en semanas, y sin un premio intermedio marcar un paso como hecho no
-cambia nada visible fuera de una barra. El concurso se evalúa navegando la app (`ENUNCIADO.md`,
-criterio 4), y el patrón de Duolingo (XP + racha) es el que ya inspira el mapa del spec 12.
+cambia nada visible fuera de una barra. La app se juzga navegándola, y el patrón de Duolingo (XP + racha) es el que ya inspira el mapa del spec 12.
 
 **Dependencias, una por motivo distinto:**
 
@@ -99,7 +98,7 @@ criterio 4), y el patrón de Duolingo (XP + racha) es el que ya inspira el mapa 
   la carga antes de que `requireUser()` lo mande a `/login`.
 - Actualizar `docs/SPECS-MAP.md` (fila 14, §7 "14 · gamification", regla 5 con la propiedad y las
   cinco excepciones de arriba, regla 6 con la migración del 14, regla 9 y §6),
-  `docs/decisiones/README.md` (fila de la 0007) y `docs/ROADMAP.md`
+  `docs/decisiones/README.md` (fila de la 0007) y el roadmap original
   (el modelo de datos ya no tiene `profiles.xp/level/streak/last_activity_at` ni las tablas
   `achievements`/`user_achievements`; no hay "XP extra" por puntaje; las insignias van en
   `/profile`, no en el dashboard).
@@ -460,7 +459,7 @@ quiz.
 11. **Pulido visual y accesibilidad.** Revisión con la skill `ui-ux-pro-max`: contraste de las
     insignias bloqueadas y de los colores del confetti en tema claro y oscuro, foco del modal, 360 px
     de ancho, y "reducir movimiento" emulado (sin confetti, el modal igual aparece).
-12. **Cierre.** Actualizar `docs/SPECS-MAP.md` y `docs/ROADMAP.md` (ver Alcance). Verificación:
+12. **Cierre.** Actualizar `docs/SPECS-MAP.md` y el roadmap original (ver Alcance). Verificación:
     `npm run test`, `npm run typecheck`, `npm run lint` y `npm run build` pasan.
 
 ## Criterios de aceptación
@@ -515,7 +514,7 @@ quiz.
 ## Decisiones
 
 - **XP, nivel e insignias derivados al leer, no guardados** (cambia lo que decían `SPECS-MAP.md` y
-  `ROADMAP.md`). El XP sale de los pasos `done` que existen hoy: no se puede desincronizar, no hay
+  el roadmap original). El XP sale de los pasos `done` que existen hoy: no se puede desincronizar, no hay
   forma de farmearlo marcando y desmarcando, y no obliga a abrir escritura sobre `profiles`, que
   no tiene política de update a propósito (spec 02: si no, cualquiera se pone `role = 'admin'`).
   Descartado: columnas en `profiles` actualizadas por trigger (se desincronizan y necesitan

@@ -11,15 +11,14 @@ abría, y el resultado se compartía entre todos los usuarios. Al probarlo apare
 problemas:
 
 - **Tardaba.** El primer usuario de cada curso esperaba entre 15 y 45 s ("Preparando tu quiz…"). En
-  la demo del concurso, ese primero es el jurado.
+  una demo, ese primero es quien está probando la app.
 - **La IA no conocía el curso.** Solo veía el título, el resumen, los temas y los *títulos* de los
   capítulos de `data/courses.json`: preguntaba cosas genéricas, podía inventar y nadie revisaba lo
   que se publicaba.
 - **La práctica por capítulo sobraba.** DevTalles ya evalúa varias secciones, y con solo el título
   de un capítulo las preguntas eran casi adivinanzas.
 - **Pedía una variable de entorno más.** Guardar el quiz compartido necesitaba `SUPABASE_SECRET_KEY`,
-  porque `quizzes` no tenía políticas para usuarios. `ENUNCIADO.md` descalifica un proyecto que no
-  funcione al clonarlo.
+  porque `quizzes` no tenía políticas para usuarios, y la app tiene que funcionar al clonarla.
 
 ## Opciones consideradas
 
@@ -28,8 +27,8 @@ problemas:
 2. **Que la IA sugiera preguntas desde el panel y el admin las revise** — contenido revisado, pero
    suma una pantalla y un flujo con IA que no hacen falta para tener quizzes; queda para otro spec.
 3. **El admin escribe un quiz por curso desde `/admin`, con un seed inicial** — contenido revisado y
-   editable, sin IA ni secret key. El seed trae 3 preguntas básicas por curso para que el jurado vea
-   quizzes en los 74 cursos apenas clona.
+   editable, sin IA ni secret key. El seed trae 3 preguntas básicas por curso para que quien clona el
+   repo vea quizzes en los 74 cursos desde el primer momento.
 
 ## Qué dijo el abogado del diablo
 

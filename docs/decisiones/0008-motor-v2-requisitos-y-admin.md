@@ -28,7 +28,7 @@ La causa raíz: el motor no sabe qué curso necesita a cuál. Solo conoce la eta
 programa oficial. El ADR 0001 había descartado a propósito un `prerequisite_slugs` por curso ("dentro
 de un programa manda el `stage` oficial"), y eso es justo lo que falló.
 
-Además, el usuario pidió que el admin controle el motor, para que sea escalable. `ENUNCIADO.md` pide
+Además, el usuario pidió que el admin controle el motor, para que sea escalable: la app tiene que
 "adaptarse a las necesidades cambiantes de la comunidad".
 
 ## Opciones consideradas

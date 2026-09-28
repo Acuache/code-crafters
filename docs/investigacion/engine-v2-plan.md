@@ -7,9 +7,9 @@
 > - un curso de principiante que la ruta oficial pone tarde se queda en su etapa oficial;
 > - los tramos no retroceden.
 >
-> El prototipo de `engine-v2-prototype/` queda como registro y ya no corre: comparaba contra el motor
-> del spec 04, que el 17 reemplazó. Sus muestras (`engine-v2-samples/`, sin commitear) coinciden con
-> el motor real, y los casos de React y Java pasaron a `lib/paths/build-path.test.ts`.
+> El prototipo con el que se validó este plan ya no está en el repo: comparaba contra el motor del
+> spec 04, que el 17 reemplazó. Sus muestras coincidían con el motor real, y los casos de React y Java
+> pasaron a `lib/paths/build-path.test.ts`.
 
 ## Contexto
 
@@ -39,8 +39,8 @@ oficial. Se prototipó el motor v2 en memoria (6 rondas de prueba y corrección,
 independiente sobre 19 perfiles) y resuelve todos los casos anteriores en **0.1–1.2 ms por ruta**:
 generar no tarda más que hoy.
 
-Además, el usuario pidió que **el admin controle el motor** para que sea escalable (y
-`ENUNCIADO.md` pide "adaptarse a las necesidades cambiantes de la comunidad").
+Además, el usuario pidió que **el admin controle el motor** para que sea escalable (y la app tiene
+que "adaptarse a las necesidades cambiantes de la comunidad").
 
 ## Decisiones tomadas con el usuario
 

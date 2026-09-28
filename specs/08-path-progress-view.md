@@ -15,8 +15,8 @@ el ADR 0001 y el ADR 0004 prometen como respuesta a "esto ya está hecho, es rei
 procedencia **y el descarte** visibles — está guardada en `path_steps` (`origin`, `reason`,
 `status = 'discarded'` + `discard_reason`) sin que ninguna pantalla la muestre.
 
-Este spec cierra ese hueco y cumple la mitad de "guardar varias rutas y **marcar progreso**" del
-`docs/ENUNCIADO.md` (la otra mitad, ver todas las rutas, es el spec 09). Es la base sobre la que
+Este spec cierra ese hueco y cumple la mitad del requisito "guardar varias rutas y **marcar
+progreso**" (la otra mitad, ver todas las rutas, es el spec 09). Es la base sobre la que
 cuelgan 09 (reusa el cálculo de progreso), 12 (reusa el control de estado), 14 (reusa
 `completed_at`), 15 y 16.
 

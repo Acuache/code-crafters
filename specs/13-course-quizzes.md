@@ -12,8 +12,8 @@
 El ADR 0005 integró los quizzes de Ariel: se generan con OpenAI la primera vez que alguien abre el
 quiz de un curso o de un capítulo. Al probarlo aparecieron tres problemas:
 
-- **Tarda.** El primer usuario de cada curso espera entre 15 y 45 s ("Preparando tu quiz…"). En la
-  demo del concurso, ese primero es el jurado.
+- **Tarda.** El primer usuario de cada curso espera entre 15 y 45 s ("Preparando tu quiz…"). En una
+  demo, ese primero es quien está probando la app.
 - **La IA no conoce el curso.** Solo ve lo que hay en `data/courses.json`: título, resumen, temas y
   los *títulos* de los capítulos. Pregunta cosas genéricas del tema, puede inventar, y nadie revisa
   lo que se publica.
@@ -21,7 +21,7 @@ quiz de un curso o de un capítulo. Al probarlo aparecieron tres problemas:
   solo el título de un capítulo las preguntas son casi adivinanzas.
 
 Además, generar los quizzes obliga a tener `SUPABASE_SECRET_KEY`: una variable de entorno más para
-quien clone el repo, y `ENUNCIADO.md` descalifica un proyecto que no funcione al clonarlo.
+quien clone el repo, y la app tiene que funcionar al clonarla.
 
 La idea de Ariel se conserva: un quiz por curso, aprobarlo marca el paso como "Hecho", los intentos
 se guardan y suman a la racha. Cambia de dónde salen las preguntas: las escribe el admin, igual que
@@ -279,7 +279,7 @@ defecto en el seed.
 - **RLS en vez de secret key.** El admin escribe con `private.is_admin()` (mismo patrón que el
   catálogo) y el usuario lee con su sesión: sale `lib/supabase/admin.ts` y una variable de entorno.
 - **3 preguntas sencillas por curso en el seed, redactadas por el agente y revisadas por el
-  equipo.** Así el jurado ve quizzes en todos los cursos apenas clona. Son conceptos del propio
+  equipo.** Así quien clona el repo ve quizzes en todos los cursos desde el primer momento. Son conceptos del propio
   resumen del curso. El seed es un JSON embebido y generado una sola vez, igual que el de cursos
   del spec 02; lo que cambie después va por el panel, no reescribiendo la migración.
 - **60 % por defecto (2 de 3), editable por quiz.**
