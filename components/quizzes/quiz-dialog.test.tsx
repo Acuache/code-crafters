@@ -80,7 +80,8 @@ describe("QuizDialog", () => {
     renderDialog();
 
     expect(screen.getByText("Pregunta 1")).toBeTruthy();
-    expect(screen.getByText("3 preguntas · apruebas con 60 %")).toBeTruthy();
+    expect(screen.getByText("3 preguntas")).toBeTruthy();
+    expect(screen.getByText("Apruebas con 60 %")).toBeTruthy();
     expect(screen.queryByText(/Preparando/)).toBeNull();
     expect((screen.getByRole("button", { name: "Siguiente" }) as HTMLButtonElement).disabled).toBe(
       true,
