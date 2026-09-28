@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import type { LandingLink } from "@/lib/landing/cta";
 
 const SECTION_LINKS = [
+  // { href: "#ruta-ejemplo", label: "Ruta de ejemplo" },
   { href: "#como-funciona", label: "Cómo funciona" },
   { href: "#preguntas", label: "Preguntas" },
 ];
@@ -17,7 +18,7 @@ export function LandingHeader({ cta }: { cta: LandingLink }) {
       <div className="mx-auto flex h-16 max-w-6xl items-center gap-4 px-4 sm:px-6">
         <Link
           href="/"
-          className="shrink-0 rounded-xl bg-logo-backdrop px-2.5 py-1 outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
+          className="shrink-0 rounded-xl bg-logo-backdrop px-2.5 py-1 outline-none focus-visible:ring-3 focus-visible:ring-ring/50 dark:bg-transparent"
         >
           {/* 144 × 55 respeta la proporción del archivo (720 × 275); el CSS lo lleva a 120 px. */}
           <Image
@@ -30,7 +31,7 @@ export function LandingHeader({ cta }: { cta: LandingLink }) {
           />
         </Link>
 
-        <nav aria-label="Principal" className="ml-auto hidden sm:block">
+        <nav aria-label="Principal" className="ml-auto hidden md:block">
           <ul className="flex items-center gap-1">
             {SECTION_LINKS.map((link) => (
               <li key={link.href}>

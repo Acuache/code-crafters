@@ -28,8 +28,7 @@ export const EXAMPLE_ANSWERS: readonly string[] = [
   "Plazo: 6 meses",
 ];
 
-export const EXAMPLE_FREE_TEXT =
-  "Quiero conseguir mi primer trabajo como frontend y ya sé algo de JavaScript.";
+export const EXAMPLE_FREE_TEXT = "Quiero enfocarme en frontend y ya manejo JavaScript.";
 
 // El curso de la meta: el que retoma el mockup de la IA.
 export const EXAMPLE_MAIN_COURSE: ExampleCourse = {
@@ -69,7 +68,7 @@ export const EXAMPLE_DISCARDED: readonly ExampleDiscardedCourse[] = [
 
 // Retoma el texto libre, como exige el spec 11: el valor de la IA tiene que verse en lo que escribió.
 export const EXAMPLE_AI = {
-  title: "Tu camino a tu primer empleo frontend con React",
+  title: "Tu ruta frontend con React",
   mainCourseReason:
-    "Es la base que piden las ofertas junior de frontend: con él armas tus primeros proyectos de portafolio.",
+    "Como ya manejas JavaScript y buscas frontend, React se alinea con la meta que elegiste.",
 };

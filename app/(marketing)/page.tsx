@@ -10,9 +10,9 @@ import { TechStrip } from "@/components/landing/tech-strip";
 import { landingCtas } from "@/lib/landing/cta";
 import { createClient } from "@/lib/supabase/server";
 
-const TITLE = "DevPathlles · Tu ruta de aprendizaje en DevTalles";
+const TITLE = "DevPathlles · Una ruta de DevTalles a tu ritmo";
 const DESCRIPTION =
-  "Cuéntanos tu meta, tu nivel y cuánto tiempo tienes: DevPathlles arma una ruta con cursos reales de DevTalles y te acompaña hasta terminarla.";
+  "Responde seis preguntas y recibe una ruta de cursos reales de DevTalles, ajustada a tu meta, a lo que ya dominas y al tiempo que tienes.";
 
 export const metadata: Metadata = {
   title: TITLE,

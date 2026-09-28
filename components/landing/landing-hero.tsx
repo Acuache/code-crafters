@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import type { LandingLink } from "@/lib/landing/cta";
 
 import { HeroMascot } from "./hero-mascot";
+import { RoutePreview } from "./route-preview";
 
 type LandingHeroProps = {
   primaryCta: LandingLink;
@@ -19,14 +20,15 @@ export function LandingHero({ primaryCta, isSignedIn }: LandingHeroProps) {
         <div className="flex flex-col items-start gap-6">
           <Eyebrow>Rutas de aprendizaje · Cursos de DevTalles</Eyebrow>
           <h1 className="text-display text-balance">
-            Tu ruta de aprendizaje en DevTalles,{" "}
+            Una ruta de DevTalles que{" "}
             <span className="text-reflection bg-clip-text text-transparent">
-              trazada para ti
+              sí cabe en tu tiempo
             </span>
           </h1>
           <p className="max-w-xl text-lg text-pretty text-muted-foreground">
-            Cuéntanos tu meta, tu nivel y cuánto tiempo tienes. DevPathlles arma una ruta con cursos
-            reales de DevTalles, te explica por qué va cada uno y te acompaña hasta terminarla.
+            Responde seis preguntas. DevPathlles combina cursos reales de DevTalles según tu meta y
+            nivel, deja fuera lo que ya dominas y ajusta la ruta a tus horas y plazo. Cada curso
+            explica por qué aparece.
           </p>
 
           <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
@@ -46,24 +48,29 @@ export function LandingHero({ primaryCta, isSignedIn }: LandingHeroProps) {
               variant="outline"
               size="lg"
               className="h-11 px-5 text-base"
-              render={<a href="#como-funciona" />}
+              render={<a href="#ruta-ejemplo" />}
               nativeButton={false}
             >
               <span className="inline-flex items-center justify-center gap-2">
-                Mira cómo funciona
+                Ver una ruta de ejemplo
                 <ArrowDownIcon aria-hidden="true" />
               </span>
             </Button>
           </div>
 
-          {isSignedIn ? null : (
-            <p className="text-sm text-muted-foreground">
-              Gratis · Entra con Discord, Google o GitHub
+          <div className="flex items-center gap-3">
+            <HeroMascot compact />
+            <p className="max-w-sm text-sm text-pretty text-muted-foreground">
+              DevPathlles es gratis.{" "}
+              {isSignedIn
+                ? null
+                : "Inicia sesión con Discord, Google o GitHub para crear y guardar tu ruta. "}
+              Los cursos están en DevTalles y pueden tener costo.
             </p>
-          )}
+          </div>
         </div>
 
-        <HeroMascot />
+        <RoutePreview />
       </div>
     </section>
   );

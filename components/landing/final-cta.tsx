@@ -27,7 +27,8 @@ export function FinalCta({ primaryCta }: { primaryCta: LandingLink }) {
           <div className="flex flex-col items-center gap-4 sm:items-start">
             <h2 className="text-title text-balance">Tu próxima meta empieza hoy</h2>
             <p className="text-lg text-pretty text-muted-foreground">
-              Seis preguntas y tienes tu ruta con cursos reales de DevTalles.
+              Seis respuestas para empezar una ruta de cursos reales de DevTalles, ajustada a tu
+              meta y a tu tiempo.
             </p>
             <Button
               variant="brand"

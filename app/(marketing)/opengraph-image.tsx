@@ -2,7 +2,7 @@ import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { ImageResponse } from "next/og";
 
-export const alt = "DevPathlles: rutas de aprendizaje sobre los cursos de DevTalles";
+export const alt = "DevPathlles: una ruta de cursos de DevTalles ajustada a tu tiempo";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -50,10 +50,10 @@ export default function OpenGraphImage() {
 
       <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
         <div style={{ display: "flex", fontSize: 68, lineHeight: 1.1 }}>
-          Tu ruta de aprendizaje en DevTalles, trazada para ti
+          Una ruta de DevTalles que sí cabe en tu tiempo
         </div>
         <div style={{ display: "flex", fontSize: 32, color: MUTED_TEXT_COLOR }}>
-          Cuestionario · Motor de reglas · IA · Progreso
+          Seis preguntas · Cursos reales · A tu ritmo
         </div>
       </div>
     </div>,

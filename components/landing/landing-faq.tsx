@@ -13,7 +13,7 @@ const QUESTIONS = [
   {
     question: "¿DevPathlles es gratis?",
     answer:
-      "Sí. Solo necesitas entrar con Discord, Google o GitHub para guardar tus rutas. Los cursos se toman en cursos.devtalles.com, con sus propias condiciones.",
+      "DevPathlles no cobra por crear ni guardar rutas; necesitas iniciar sesión. Los cursos se cursan en cursos.devtalles.com y pueden tener costo según sus propias condiciones.",
   },
   {
     question: "¿De dónde salen los cursos?",
@@ -23,7 +23,7 @@ const QUESTIONS = [
   {
     question: "¿Qué hace la IA y qué pasa si no está disponible?",
     answer:
-      "Lee lo que escribiste en la última pregunta, ajusta tu ruta a eso y la explica con tus palabras. Si no está disponible, la ruta se arma igual con el motor.",
+      "Interpreta el texto libre para ajustar tu perfil y personaliza el título y las razones. El motor de reglas elige los cursos. Si la IA no está disponible, la ruta se genera con tus respuestas cerradas.",
   },
   {
     question: "¿Puedo tener más de una ruta?",

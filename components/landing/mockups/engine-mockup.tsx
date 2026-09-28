@@ -18,7 +18,7 @@ export function EngineMockup() {
   return (
     <Card size="sm">
       <CardHeader>
-        <CardTitle>Los primeros pasos de una ruta de ejemplo</CardTitle>
+        <CardTitle>Cursos incluidos y por qué</CardTitle>
       </CardHeader>
       <CardContent>
         <ul className="flex flex-col divide-y">
@@ -33,6 +33,7 @@ export function EngineMockup() {
                 <StepOriginBadge origin={course.origin} />
                 <CourseDuration hours={course.hours} />
               </span>
+              <span className="text-xs text-muted-foreground">{course.engineReason}</span>
             </li>
           ))}
           {EXAMPLE_DISCARDED.map((course) => (

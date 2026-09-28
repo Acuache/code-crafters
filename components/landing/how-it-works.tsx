@@ -1,19 +1,11 @@
-import {
-  ChatCircleTextIcon,
-  PathIcon,
-  ShareNetworkIcon,
-  SparkleIcon,
-  TrophyIcon,
-} from "@phosphor-icons/react/ssr";
+import { ChatCircleTextIcon, PathIcon, TrophyIcon } from "@phosphor-icons/react/ssr";
 
 import { Eyebrow } from "@/components/brand/eyebrow";
 
 import { Journey, type JourneyStation } from "./journey";
 import { AiMockup } from "./mockups/ai-mockup";
-import { EngineMockup } from "./mockups/engine-mockup";
 import { ProgressMockup } from "./mockups/progress-mockup";
 import { QuizMockup } from "./mockups/quiz-mockup";
-import { ShareMockup } from "./mockups/share-mockup";
 
 const STATIONS: JourneyStation[] = [
   {
@@ -27,39 +19,21 @@ const STATIONS: JourneyStation[] = [
   },
   {
     id: "engine",
-    title: "El motor arma tu ruta",
+    title: "El motor organiza tus cursos",
     description:
-      "Parte de las rutas oficiales de DevTalles: quita lo que ya dominas, suma tus intereses y recorta hasta que quepa en tu tiempo. Cada curso dice por qué entró, y los que salieron, por qué salieron.",
+      "El motor usa las rutas oficiales, tu nivel, tus intereses y tu tiempo para incluir u omitir cursos. La IA interpreta el texto libre y ajusta tu perfil; si no está disponible, la ruta igual se genera con tus respuestas cerradas.",
     icon: <PathIcon weight="bold" />,
     pose: "torch",
-    mockup: <EngineMockup />,
-  },
-  {
-    id: "ai",
-    title: "La IA la hace tuya",
-    description:
-      "Si escribes qué buscas, la IA ajusta tu ruta a eso y te la explica con tus palabras. ¿Sin IA? Tu ruta se arma igual: la IA suma, nunca decide sola.",
-    icon: <SparkleIcon weight="bold" />,
-    pose: "orb",
     mockup: <AiMockup />,
   },
   {
     id: "progress",
-    title: "Avanza curso a curso",
+    title: "Avanza y comparte tu ruta",
     description:
-      "Tu ruta es un mapa: marca tu avance, aprueba el quiz de cada curso, gana XP, sube de nivel, desbloquea insignias y cuida tu racha.",
+      "Marca cursos como pendientes, en curso o hechos, aprueba sus quizzes y gana XP. También puedes compartir un enlace público: muestra la ruta, no tu progreso.",
     icon: <TrophyIcon weight="bold" />,
     pose: "flame",
     mockup: <ProgressMockup />,
-  },
-  {
-    id: "share",
-    title: "Compártela en Discord",
-    description:
-      "Publica tu ruta con un link. En Discord se ve con su tarjeta, y quien la abra puede copiarla a su cuenta y empezarla desde cero.",
-    icon: <ShareNetworkIcon weight="bold" />,
-    pose: "orbit",
-    mockup: <ShareMockup />,
   },
 ];
 
