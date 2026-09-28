@@ -370,12 +370,9 @@ function JourneyMascot({
         transitionDuration: `${TRAVEL_DURATION_MS}ms`,
       }}
     >
-      <div
-        key={movementKey}
-        className={movementKey > 0 ? "mascot-scroll-motion" : undefined}
-      >
+      <div key={movementKey} className={movementKey > 0 ? "mascot-scroll-motion" : undefined}>
         <Image
-          src="/astronauta-vuelo.png"
+          src="/astronauta-vuelo.webp"
           alt=""
           width={size}
           height={size}

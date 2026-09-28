@@ -16,7 +16,7 @@ export function GeneratingPath() {
       <EmptyHeader>
         <EmptyMedia>
           <Image
-            src="/astronauta-vuelo.png"
+            src="/astronauta-vuelo.webp"
             alt=""
             width={160}
             height={160}

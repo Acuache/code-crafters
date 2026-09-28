@@ -1,12 +1,10 @@
 import Link from "next/link";
 import { ArrowDownIcon, PathIcon } from "@phosphor-icons/react/ssr";
 
-import { Eyebrow } from "@/components/brand/eyebrow";
 import { Button } from "@/components/ui/button";
 import type { LandingLink } from "@/lib/landing/cta";
 
-import { HeroMascot } from "./hero-mascot";
-import { RoutePreview } from "./route-preview";
+import { HeroScene } from "./hero-scene";
 
 type LandingHeroProps = {
   primaryCta: LandingLink;
@@ -16,61 +14,54 @@ type LandingHeroProps = {
 export function LandingHero({ primaryCta, isSignedIn }: LandingHeroProps) {
   return (
     <section className="relative overflow-hidden">
-      <div className="relative mx-auto grid max-w-6xl items-center gap-8 px-4 py-16 sm:px-6 lg:grid-cols-2 lg:gap-12 lg:py-24">
-        <div className="flex flex-col items-start gap-6">
-          <Eyebrow>Rutas de aprendizaje · Cursos de DevTalles</Eyebrow>
-          <h1 className="text-display text-balance">
-            Una ruta de DevTalles que{" "}
-            <span className="text-reflection bg-clip-text text-transparent">
-              sí cabe en tu tiempo
+      <div className="mx-auto grid w-full max-w-6xl items-center gap-8 px-4 pt-10 pb-16 sm:px-6 lg:min-h-[calc(100svh-4rem)] lg:grid-cols-[1.05fr_1fr] lg:gap-6 lg:py-12">
+        <div className="flex flex-col items-center gap-6 text-center lg:items-start lg:text-left">
+          <h1 className="text-hero text-balance">
+            Deja de adivinar{" "}
+            <span className="block bg-linear-to-r from-primary-bright to-chart-2 bg-clip-text text-transparent">
+              qué curso sigue
             </span>
           </h1>
-          <p className="max-w-xl text-lg text-pretty text-muted-foreground">
-            Responde seis preguntas. DevPathlles combina cursos reales de DevTalles según tu meta y
-            nivel, deja fuera lo que ya dominas y ajusta la ruta a tus horas y plazo. Cada curso
-            explica por qué aparece.
+          <p className="max-w-lg text-lg text-pretty text-muted-foreground sm:text-xl">
+            Dinos tu meta y cuánto tiempo tienes. DevPathlles ordena los cursos de DevTalles, salta
+            lo que ya dominas y te marca el siguiente paso.
           </p>
 
-          <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
+          <div className="flex w-full flex-col items-center gap-2 sm:w-auto sm:flex-row sm:gap-3">
             <Button
               variant="brand"
               size="lg"
-              className="h-11 px-6 text-base"
+              className="h-14 w-full px-8 text-lg sm:w-auto"
               render={<Link href={primaryCta.href} />}
               nativeButton={false}
             >
               <span className="inline-flex items-center justify-center gap-2">
-                <PathIcon aria-hidden="true" />
+                <PathIcon aria-hidden="true" className="size-5" />
                 {primaryCta.label}
               </span>
             </Button>
             <Button
-              variant="outline"
+              variant="ghost"
               size="lg"
-              className="h-11 px-5 text-base"
-              render={<a href="#ruta-ejemplo" />}
+              className="h-14 px-5 text-base text-muted-foreground"
+              render={<a href="#como-funciona" />}
               nativeButton={false}
             >
               <span className="inline-flex items-center justify-center gap-2">
-                Ver una ruta de ejemplo
+                Mira cómo funciona
                 <ArrowDownIcon aria-hidden="true" />
               </span>
             </Button>
           </div>
 
-          <div className="flex items-center gap-3">
-            <HeroMascot compact />
-            <p className="max-w-sm text-sm text-pretty text-muted-foreground">
-              DevPathlles es gratis.{" "}
-              {isSignedIn
-                ? null
-                : "Inicia sesión con Discord, Google o GitHub para crear y guardar tu ruta. "}
-              Los cursos están en DevTalles y pueden tener costo.
+          {isSignedIn ? null : (
+            <p className="text-sm text-balance text-muted-foreground">
+              Gratis · Seis preguntas · Entra con Discord, Google o GitHub
             </p>
-          </div>
+          )}
         </div>
 
-        <RoutePreview />
+        <HeroScene />
       </div>
     </section>
   );

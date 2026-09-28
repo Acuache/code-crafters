@@ -4,6 +4,8 @@ import fs from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
 
+import { EXAMPLE_COURSES, EXAMPLE_DISCARDED } from "@/lib/landing/example-path";
+
 import { buildPath } from "./build-path";
 import { DISCARD_REASONS } from "./discard-reasons";
 import { GOALS } from "./goals";
@@ -212,6 +214,29 @@ describe("buildPath — rutas de las muestras revisadas (Anexo D del plan)", () 
     expect(discardOf(built, "git-github-control-versiones-desde-cero")?.discardReason).toBe(
       DISCARD_REASONS.budget,
     );
+  });
+
+  // Las respuestas de EXAMPLE_ANSWERS: la landing no puede mostrar una ruta que el motor no da.
+  it("la ruta de ejemplo de la landing es la que arma el motor", () => {
+    const built = build(
+      makeProfile({
+        goal: "react",
+        level: "tengo_bases",
+        masteredTechnologies: ["javascript"],
+        hoursPerWeek: 4,
+        deadlineMonths: 6,
+      }),
+    );
+
+    expect(slugsOf(built)).toEqual(EXAMPLE_COURSES.map((course) => course.slug));
+    expect(built.steps.map((step) => step.reason)).toEqual(
+      EXAMPLE_COURSES.map((course) => course.engineReason),
+    );
+    for (const discardedCourse of EXAMPLE_DISCARDED) {
+      expect(discardOf(built, discardedCourse.slug)?.discardReason).toBe(
+        discardedCourse.discardReason,
+      );
+    }
   });
 
   it("React Native incluye React, aunque el programa oficial no lo nombre", () => {

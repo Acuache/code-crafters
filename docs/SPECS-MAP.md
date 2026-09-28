@@ -213,9 +213,13 @@ los anteriores (no depende de nada); y 11 y 12 entre sí una vez cerrado el 08 (
    `app/globals.css`, los tokens `--animate-float`, `--animate-marquee` y `--animate-twinkle`, la
    utilidad `starfield` y, en el tema claro, `--level-required`, `--level-recommended` y `--ai` más
    oscuros: los badges pintan el texto sobre el mismo token al 15 % y quedaban en 3.9–4.0:1 (ahora
-   4.6:1, en toda la app). Del 03: el rediseño solo visual de `app/login/{page,provider-button}.tsx`
-   (panel de marca en desktop, Discord como botón principal, "Volver al inicio"), sin tocar el OAuth,
-   `next` ni los errores. Todo lo demás de otros specs (`step-meta`, `step-node-style`, `XpBar`,
+   4.6:1, en toda la app); con el rediseño del hero, `--text-hero` y `.hero-trail-draw`. Del 03: el
+   rediseño solo visual de `app/login/{page,provider-button}.tsx` (panel de marca en desktop, Discord
+   como botón principal, "Volver al inicio"), sin tocar el OAuth, `next` ni los errores. Del 04/17: un
+   test en `lib/paths/build-path.test.ts` que compara la ruta de ejemplo de la landing con
+   `buildPath()`. Del 07 y el 12: solo la ruta del asset (`astronauta-vuelo.png` → `.webp`) en
+   `components/paths/{generating-path,path-map}.tsx`. Todo lo demás de otros specs (`step-meta`,
+   `step-node-style`, `XpBar`,
    `AchievementMedal`, `StreakIndicator`, `launchConfetti`, `lib/path-map/motion.ts`,
    `lib/gamification/xp.ts`, `TECHNOLOGIES`) se importa sin cambios.
    **Excepciones explícitas del spec 17 (motor v2):** es dueño de `lib/paths/discard-reasons.ts`,

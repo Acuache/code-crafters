@@ -11,20 +11,3 @@ export const MASCOT_POSES: Record<MascotPoseId, MascotPose> = {
   orbit: { src: "/streak/celebration-4.webp", width: 512, height: 481 },
   flame: { src: "/streak/reminder.webp", width: 512, height: 637 },
 };
-
-// El orden en que cambia la mascota del hero al tocarla.
-export const HERO_POSE_CYCLE: readonly MascotPoseId[] = [
-  "rocket",
-  "wave",
-  "orb",
-  "torch",
-  "orbit",
-  "flame",
-];
-
-export function nextHeroPose(current: MascotPoseId): MascotPoseId {
-  const currentIndex = HERO_POSE_CYCLE.indexOf(current);
-  const nextIndex = (currentIndex + 1) % HERO_POSE_CYCLE.length;
-
-  return HERO_POSE_CYCLE[nextIndex];
-}

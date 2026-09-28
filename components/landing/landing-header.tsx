@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 import type { LandingLink } from "@/lib/landing/cta";
 
 const SECTION_LINKS = [
-  // { href: "#ruta-ejemplo", label: "Ruta de ejemplo" },
   { href: "#como-funciona", label: "Cómo funciona" },
   { href: "#preguntas", label: "Preguntas" },
 ];

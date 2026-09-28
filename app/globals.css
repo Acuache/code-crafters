@@ -73,6 +73,11 @@
   --text-display--line-height: 1.05;
   --text-display--letter-spacing: -0.02em;
   --text-display--font-weight: 700;
+  /* Solo el título del hero de la landing: la primera pantalla necesita más peso que text-display. */
+  --text-hero: clamp(2.5rem, 1rem + 4.2vw, 4.25rem);
+  --text-hero--line-height: 1;
+  --text-hero--letter-spacing: -0.03em;
+  --text-hero--font-weight: 700;
   /* Spec 12: rebote corto del nodo del mapa al marcar un paso como hecho. */
   --animate-step-pop: step-pop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
 
@@ -284,45 +289,6 @@
   background-size: 320px 224px;
 }
 
-.text-reflection {
-  background-image:
-    linear-gradient(to right, var(--primary-bright), var(--chart-2)),
-    linear-gradient(
-      110deg,
-      transparent 43%,
-      rgb(226 220 255 / 60%) 48%,
-      rgb(255 255 255 / 98%) 50%,
-      rgb(226 220 255 / 60%) 52%,
-      transparent 57%
-    );
-  background-size:
-    100% 100%,
-    240% 100%;
-  background-position:
-    0 0,
-    100% 0;
-  background-repeat: no-repeat;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .text-reflection {
-    animation: text-reflection 5s ease-in-out infinite;
-  }
-}
-
-@keyframes text-reflection {
-  from {
-    background-position:
-      0 0,
-      100% 0;
-  }
-  to {
-    background-position:
-      0 0,
-      0 0;
-  }
-}
-
 @media (prefers-reduced-motion: no-preference) {
   .starfield-drifting {
     animation:
@@ -391,6 +357,22 @@
   }
   50% {
     transform: translate3d(6px, -8px, 0) rotate(3deg);
+  }
+}
+
+/* Hero de la landing: la estela del astronauta se dibuja una vez al cargar (pathLength=1). */
+@media (prefers-reduced-motion: no-preference) {
+  .hero-trail-draw {
+    animation: hero-trail-draw 1.6s cubic-bezier(0.65, 0, 0.35, 1) 0.2s both;
+  }
+}
+
+@keyframes hero-trail-draw {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
   }
 }
 

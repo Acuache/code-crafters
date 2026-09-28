@@ -2,7 +2,7 @@ import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { ImageResponse } from "next/og";
 
-export const alt = "DevPathlles: una ruta de cursos de DevTalles ajustada a tu tiempo";
+export const alt = "DevPathlles: deja de adivinar qué curso de DevTalles sigue";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -16,6 +16,7 @@ const logoSrc = `data:image/png;base64,${logoData}`;
 const BRAND_GRADIENT = "linear-gradient(135deg, #3a14c4 0%, #5a16c1 100%)"; // --primary → --primary-end
 const LOGO_BACKDROP = "#171027"; // --logo-backdrop
 const TEXT_COLOR = "#f0eeff"; // --foreground del tema oscuro
+const HIGHLIGHT_COLOR = "#c0b9fc"; // --chart-2 del tema oscuro, el lavanda del título del hero
 const MUTED_TEXT_COLOR = "rgba(240, 238, 255, 0.8)";
 
 // La tarjeta que muestra Discord al pegar el link de la landing. Solo aplica a `/`: vive en el
@@ -49,11 +50,13 @@ export default function OpenGraphImage() {
       </div>
 
       <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
-        <div style={{ display: "flex", fontSize: 68, lineHeight: 1.1 }}>
-          Una ruta de DevTalles que sí cabe en tu tiempo
+        {/* El mismo título que el hero de la landing: el link y la página cuentan lo mismo. */}
+        <div style={{ display: "flex", flexDirection: "column", fontSize: 76, lineHeight: 1.05 }}>
+          <span>Deja de adivinar</span>
+          <span style={{ color: HIGHLIGHT_COLOR }}>qué curso sigue</span>
         </div>
         <div style={{ display: "flex", fontSize: 32, color: MUTED_TEXT_COLOR }}>
-          Seis preguntas · Cursos reales · A tu ritmo
+          Seis preguntas · Cursos reales de DevTalles · A tu ritmo
         </div>
       </div>
     </div>,

@@ -132,12 +132,12 @@ Los assets de marca de DevPathlles viven en `public/` (y `app/` para los iconos)
 | `public/logo.webp` | Lockup completo: mascota + wordmark "DevPathlles" | Cabeceras (incluida la de la landing, spec 05 `landing`), cabecera de `/shared/[slug]` (spec 15 `path-sharing`) |
 | `public/og-logo.png` | El mismo lockup en PNG, 360 × 128 | Solo las tarjetas OG de `/` (spec 05) y de `/shared/[slug]` (spec 15): `ImageResponse` no decodifica WebP |
 | `public/astronauta.webp` | La mascota sola, recorte cuadrado | README, avatares, estados vacíos, páginas de error y 404, ilustraciones pequeñas, la pose que saluda de la landing y la estación "Cuestionario" (spec 05) |
-| `public/astronauta-vuelo.png` | La mascota volando | Pantalla de "generando ruta" (spec 07 `path-generation`), el mapa de la ruta y el astronauta que viaja por el recorrido de la landing |
+| `public/astronauta-vuelo.webp` | La mascota volando | El hero de la landing (spec 05), la pantalla de "generando ruta" (spec 07 `path-generation`), el mapa de la ruta y el astronauta que viaja por el recorrido de la landing |
 | `public/astronauta-primera-ruta.png` | La mascota invitando a crear la primera ruta | Estado vacío de `/dashboard` |
 | `public/astronauta-eliminar-ruta.png` | La mascota con una papelera | Diálogo de confirmación al borrar una ruta (`components/dashboard/delete-path-button.tsx`) |
 | `public/languages-icons/*.svg` | Logos de tecnologías e iconos de áreas e intereses | Pasos Meta, Ya dominas y Te interesa del cuestionario (`components/quiz/steps/`) y la franja de tecnologías de la landing (`components/landing/tech-strip.tsx`) |
 | `app/icon.png`, `app/apple-icon.png` | Icono de la app | Los engancha Next por convención de archivo — no se referencian a mano ni van en `metadata.icons` |
-| `public/streak/celebration-{1,2,3,4}.webp` | Cuatro poses de celebración de la mascota | Spec 14 `gamification`: paso completado, ruta completada, subida de nivel, insignia nueva. Spec 05: el cohete (`-1`) en el hero y el CTA final; el orbe (`-2`), la antorcha (`-3`) y la órbita (`-4`) en las estaciones IA, Motor y Compartir |
+| `public/streak/celebration-{1,2,3,4}.webp` | Cuatro poses de celebración de la mascota | Spec 14 `gamification`: paso completado, ruta completada, subida de nivel, insignia nueva. Spec 05: el cohete (`-1`) en el CTA final; el orbe (`-2`), la antorcha (`-3`) y la órbita (`-4`) en las estaciones IA, Motor y Compartir |
 | `public/streak/reminder.webp` | La mascota con la llama de la racha | Spec 14 `gamification`: racha activa / recordatorio de volver. Spec 05: la estación "Progreso" |
 | `public/code-quest.webp` | Logo externo, 288 × 124, texto blanco | Solo el footer de la landing (spec 05), dentro de `bg-logo-backdrop` como el wordmark |
 
@@ -145,5 +145,5 @@ Reglas:
 
 - El wordmark de `logo.webp` es blanco y se pierde sobre fondo claro: siempre va envuelto en un contenedor con la clase `bg-logo-backdrop` (token definido en `app/globals.css`, fijo en los dos temas — no usar `dark:` para esto). Por eso el README usa `astronauta.webp`: GitHub no tiene ese fondo.
 - Todo `<Image>` lleva `alt` descriptivo, salvo cuando la imagen es puramente decorativa y el texto equivalente ya está al lado (`alt=""`).
-- No se vuelve a meter un PNG sin optimizar en `public/`: mismo patrón que se usó para estos (`sharp`, `trim` del margen transparente, redimensionar al tamaño real de uso, `webp` calidad ~82 salvo iconos que van en PNG con paleta). Pendiente: los tres `astronauta-*.png` (0,8–1 MB cada uno) todavía no pasaron por ese proceso.
+- No se vuelve a meter un PNG sin optimizar en `public/`: mismo patrón que se usó para estos (`sharp`, `trim` del margen transparente, redimensionar al tamaño real de uso, `webp` calidad ~82 salvo iconos que van en PNG con paleta). `astronauta-vuelo.webp` es la excepción al `trim`: conserva su margen porque cuatro componentes lo dibujan cuadrado. Pendiente: `astronauta-primera-ruta.png` y `astronauta-eliminar-ruta.png` (0,8–1 MB cada uno) todavía no pasaron por ese proceso.
 - `isotipo.png` y `logotipo.png` (la marca del equipo Code Crafters, no la del producto) ya no están en el repo — no se reintroducen en la app.

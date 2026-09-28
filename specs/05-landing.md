@@ -23,8 +23,9 @@ mascota del 14, los tiempos y los estilos de nodo del mapa del 12, la `XpBar` y 
 el `next` del login del 15. Por eso lista esas dependencias, aunque solo reusa piezas.
 
 La interacción es a propósito **pasiva**: el scroll dispara las animaciones y el usuario no tiene que
-manipular nada para entender (pedido explícito durante la definición). La única interacción manual es
-un easter egg con la mascota del hero.
+manipular nada para entender (pedido explícito durante la definición). Las únicas interacciones
+manuales están en el hero: el impulso del astronauta (easter egg) y el detalle de cada curso al pasar
+el puntero por la escena.
 
 ## Alcance
 
@@ -36,7 +37,8 @@ un easter egg con la mascota del hero.
 - **Cabecera fija** con el logo, anclas a "Cómo funciona" y "Preguntas", `ThemeToggle` y un CTA que
   cambia según haya sesión o no.
 - **Hero** con fondo espacial (estrellas en CSS sobre `brand-gradient-soft`), título, bajada, dos CTAs y
-  la mascota flotando. Tocarla (clic, Enter o Espacio) cambia de pose y lanza confetti.
+  una escena: el astronauta en vuelo a la cabeza de una estela que pasa por los cursos de la ruta de
+  ejemplo. Tocarlo le da un impulso. _Rediseñado después de implementar; ver la sección Hero._
 - **Franja de tecnologías** bajo el hero: las 15 de `TECHNOLOGIES` (`lib/paths/interests.ts`, spec 04),
   en un marquee lento que se detiene al pasar el puntero.
 - **Recorrido "Cómo funciona"**: un riel vertical con 5 estaciones (Cuestionario → Motor → IA →
@@ -53,7 +55,9 @@ un easter egg con la mascota del hero.
 - **Excepción en `app/globals.css`:** los tokens `--animate-float`, `--animate-marquee` y
   `--animate-twinkle` (con sus `@keyframes` dentro de `@theme`) y la utilidad `@utility starfield`.
   Agregado en el paso 9: en el tema claro, `--level-required`, `--level-recommended` y `--ai` más
-  oscuros (ver Decisiones). Nada más en ese archivo.
+  oscuros (ver Decisiones). Agregado con el rediseño del hero: el token `--text-hero` y la animación
+  `.hero-trail-draw`; se quitó `.text-reflection`, que solo usaba el título anterior. Nada más en ese
+  archivo.
 - **Excepción en `app/login/*` (del spec 03), agregada después del paso 10 a pedido del usuario:**
   rediseño solo visual del login para que siga el lenguaje de la landing, adonde lleva su botón
   principal. En desktop, pantalla dividida: a la izquierda un panel de marca centrado (estrellas, la
@@ -65,7 +69,8 @@ un easter egg con la mascota del hero.
   Suma "Volver al inicio", `ThemeToggle` y una nota de privacidad. `signInWithProvider`, `next`, el
   redirect con sesión y los mensajes de error no cambian.
 - Tests: `lib/landing/cta.test.ts`, `lib/landing/example-path.test.ts`,
-  `lib/landing/journey-state.test.ts` y `components/landing/hero-mascot.test.tsx`.
+  `lib/landing/journey-state.test.ts` y, en `lib/paths/build-path.test.ts`, que la ruta de ejemplo es
+  la que arma el motor. (`components/landing/hero-mascot.test.tsx` se borró con el rediseño del hero.)
 - Actualizar `docs/SPECS-MAP.md` y `CLAUDE.md` (ver el paso 10 del plan).
 
 **Fuera de alcance:**
@@ -95,7 +100,8 @@ el fondo de estrellas, justificada en Decisiones.
 
 | Lugar | Pose | Archivo |
 |---|---|---|
-| Hero (inicial) y CTA final | Cohete despegando | `streak/celebration-1.webp` |
+| Hero | Astronauta en vuelo (el mismo de "generando ruta" y del mapa) | `astronauta-vuelo.webp` |
+| CTA final | Cohete despegando | `streak/celebration-1.webp` |
 | Viajero del riel | Astronauta clásico (el mismo del mapa del 12) | `astronauta.webp` |
 | 1 · Cuestionario | Astronauta grande, saludando | `astronauta.webp` |
 | 2 · Motor | Antorcha sobre un asteroide ("ilumina el camino") | `streak/celebration-3.webp` |
@@ -103,7 +109,8 @@ el fondo de estrellas, justificada en Decisiones.
 | 4 · Progreso | La llama de la racha | `streak/reminder.webp` |
 | 5 · Compartir | Órbita y estrellas | `streak/celebration-4.webp` |
 
-Ciclo del easter egg del hero: cohete → astronauta → orbe → antorcha → órbita → llama → cohete.
+_El ciclo de poses del hero (cohete → astronauta → orbe → antorcha → órbita → llama) se retiró con el
+rediseño: el astronauta en vuelo es parte de la escena y no cambia de pose._
 
 ### Cabecera (`components/landing/landing-header.tsx`)
 
@@ -115,35 +122,43 @@ Ciclo del easter egg del hero: cohete → astronauta → orbe → antorcha → �
 - `ThemeToggle`, y un `Button` con `landingCtas(isSignedIn).header`: "Entrar" → `/login`, o "Ir a mi
   panel" → `/dashboard`.
 
-### Hero (`components/landing/landing-hero.tsx` + `hero-mascot.tsx`)
+### Hero (`components/landing/landing-hero.tsx` + `hero-scene.tsx` + `hero-astronaut.tsx`)
 
-- Fondo: `brand-gradient-soft` + una capa `starfield` (`aria-hidden`) con
-  `motion-safe:animate-twinkle`.
-- `Eyebrow`: "Rutas de aprendizaje · Cursos de DevTalles".
-- `h1` (`text-display`): "Tu ruta de aprendizaje en DevTalles, **trazada para ti**". El resaltado va con
-  un degradado de texto hecho solo con tokens, medido en los dos temas (ver Criterios).
-- Bajada: "Cuéntanos tu meta, tu nivel y cuánto tiempo tienes. DevPathlles arma una ruta con cursos
-  reales de DevTalles, te explica por qué va cada uno y te acompaña hasta terminarla."
-- CTAs:
-  - `Button variant="brand" size="lg"` con `landingCtas(isSignedIn).primary`: "Arma tu ruta" →
-    `/login?next=/quiz`, o "Ir a mi panel" → `/dashboard`.
-  - `Button variant="outline" size="lg"` "Mira cómo funciona" (`ArrowDownIcon`) → `#como-funciona`.
-- Sin sesión, debajo de los CTAs: "Gratis · Entra con Discord, Google o GitHub"
-  (`text-sm text-muted-foreground`).
-- Layout: dos columnas desde `lg` (texto a la izquierda, mascota a la derecha). En móvil, primero el
-  texto y los CTAs y debajo la mascota, para que el CTA principal quede visible sin scroll a 360 × 640.
-- **`HeroMascot`** (`"use client"`):
-  - Un `button` con `aria-label="Cambiar la pose de la mascota"` que envuelve la pose actual
-    (`alt=""`) y tiene `focus-visible:ring`.
-  - El wrapper flota con `motion-safe:animate-float`.
-  - Cada clic avanza con `nextHeroPose`: la imagen nueva entra con `motion-safe:animate-step-pop` (el
-    token del spec 12) y se llama a `launchConfetti()` (spec 14, que ya trae
-    `disableForReducedMotion`).
-  - La pose siguiente queda montada e invisible, para que el cambio no parpadee.
-  - Un globo "¡Tócame!" (`aria-hidden`, solo tokens) junto a la mascota, que desaparece después del
-    primer clic.
-  - La imagen inicial usa `loading="eager"` + `fetchPriority="high"`, porque es el LCP. `priority` está
-    deprecado en Next 16 (`node_modules/next/dist/docs/01-app/03-api-reference/02-components/image.md`).
+_Rediseñado después de implementar (2026-09-28), a pedido del usuario: el hero original mostraba más
+de 25 datos antes del scroll (eyebrow, bajada larga, una tarjeta de ejemplo con 6 chips y 4 cursos, y
+una nota de 3 frases). Esto describe el actual._
+
+- Fondo: el mismo de la página (`brand-gradient-soft` + `starfield`).
+- `h1` (`text-hero`, token nuevo): "Deja de adivinar" y, en otra línea (`block`), "**qué curso sigue**"
+  con el degradado `from-primary-bright to-chart-2`. Sin eyebrow.
+- Bajada: "Dinos tu meta y cuánto tiempo tienes. DevPathlles ordena los cursos de DevTalles, salta lo
+  que ya dominas y te marca el siguiente paso."
+- CTAs: `Button variant="brand"` (`h-14`) con `landingCtas(isSignedIn).primary`, y `Button
+  variant="ghost"` "Mira cómo funciona" (`ArrowDownIcon`) → `#como-funciona`.
+- Sin sesión: "Gratis · Seis preguntas · Entra con Discord, Google o GitHub" (`text-balance`). El aviso
+  de que los cursos pueden tener costo vive en la primera pregunta frecuente.
+- Layout: dos columnas desde `lg` (`1.05fr 1fr`, alto de la ventana menos la cabecera); texto centrado
+  en móvil y a la izquierda en desktop. En móvil, la escena va debajo y más chica (`max-w-76`).
+- **`HeroScene`** (Server Component): un lienzo de 600 × 600 (el SVG escala con el `viewBox`; lo HTML
+  se ubica en %).
+  - Una estela sube desde abajo a la derecha hasta los propulsores del astronauta: punteado de fondo y
+    encima el trazo con degradado y brillo, que se dibuja una vez al cargar (`.hero-trail-draw`, la
+    misma técnica `pathLength=1` + `stroke-dashoffset` del mapa del 12).
+  - Sobre la estela, un planeta por curso de `EXAMPLE_COURSES` (1 TypeScript → 2 React → bandera en
+    Next.js), con etiqueta corta (`shortTitle` + horas). Cada uno es un `TooltipTrigger` con el título
+    completo y `engineReason`, y un `aria-label` con todo eso.
+  - Fuera de la estela, el curso de `EXAMPLE_DISCARDED` ("~~JavaScript~~ · ya lo dominas"), también con
+    tooltip. Se oculta por debajo de `sm`.
+  - Decorativos y tenues: un Saturno con volumen (la mitad trasera del anillo pasa detrás del planeta),
+    una luna y tres planetas chicos.
+  - Una chispa que recorre la estela cada ~6,5 s (`<animateMotion>` de SMIL, que sigue la curva en las
+    coordenadas del `viewBox`), oculta con `motion-reduce:hidden`.
+  - La escena es un `role="group"` con `aria-label="Ruta de ejemplo"`. Sin pie visible ni desvío
+    punteado hacia el curso quitado: se probaron y se quitaron a pedido del usuario.
+- **`HeroAstronaut`** (`"use client"`): `astronauta-vuelo.webp` dentro de un `button` con
+  `aria-label="Darle impulso al astronauta"`. Cada clic repite el impulso (`mascot-scroll-motion`);
+  sin confetti. Entra volando después de la estela y flota con `mascot-flight-motion`. La imagen usa
+  `loading="eager"` + `fetchPriority="high"`.
 
 ### Franja de tecnologías (`components/landing/tech-strip.tsx`)
 
@@ -205,10 +220,10 @@ Ciclo del easter egg del hero: cohete → astronauta → orbe → antorcha → �
 | # | Nodo (Phosphor) | `h3` | Texto | Mockup (se anima al llegar) |
 |---|---|---|---|---|
 | 1 | `ChatCircleTextIcon` | Cuéntanos a dónde vas | "Seis preguntas: tu meta, tu nivel, lo que ya dominas, lo que te interesa, cuánto tiempo tienes y, si quieres, qué buscas con tus palabras." | `quiz-mockup.tsx`: `Card` con los chips de `EXAMPLE_ANSWERS` como `Badge`, que aparecen uno tras otro |
-| 2 | `PathIcon` | El motor arma tu ruta | "Parte de las rutas oficiales de DevTalles: quita lo que ya dominas, suma tus intereses y recorta hasta que quepa en tu tiempo. Cada curso dice por qué entró, y los que salieron, por qué salieron." | `engine-mockup.tsx`: `Card` "Los primeros pasos de una ruta de ejemplo" con los 3 `EXAMPLE_COURSES` (título, `StepOriginBadge` y horas, de `components/paths/step-meta.tsx`) y el curso de `EXAMPLE_DISCARDED`, cuya tachadura se dibuja al llegar y que muestra su motivo ("ya lo dominas") |
+| 2 | `PathIcon` | El motor arma tu ruta | "Parte de las rutas oficiales de DevTalles: quita lo que ya dominas, suma tus intereses y recorta hasta que quepa en tu tiempo. Cada curso dice por qué entró, y los que salieron, por qué salieron." | `engine-mockup.tsx`: `Card` "Los primeros pasos de una ruta de ejemplo" con los 3 `EXAMPLE_COURSES` (título, `StepOriginBadge` y horas, de `components/paths/step-meta.tsx`) y el curso de `EXAMPLE_DISCARDED`, cuya tachadura se dibuja al llegar y que muestra su motivo ("ya lo dominas"). _`engine-mockup.tsx` se borró con el rediseño del hero: ahora lo cuenta la escena del hero_ |
 | 3 | `SparkleIcon` | La IA la hace tuya | "Si escribes qué buscas, la IA ajusta tu ruta a eso y te la explica con tus palabras. ¿Sin IA? Tu ruta se arma igual: la IA suma, nunca decide sola." | `ai-mockup.tsx`: la cita de `EXAMPLE_FREE_TEXT`; debajo, "Motor:" con la razón por plantilla del primer curso (`text-muted-foreground`), y después `AiBadge` con el título y la razón que escribe la IA, que aparecen después de la línea del motor |
 | 4 | `TrophyIcon` | Avanza curso a curso | "Tu ruta es un mapa: marca tu avance, aprueba el quiz de cada curso, gana XP, sube de nivel, desbloquea insignias y cuida tu racha." | `progress-mockup.tsx` (cliente): `XpBar`, que se llena de 0 al XP de ejemplo; `AchievementMedal` de `first-course` ganada con su nombre; "+N XP · «curso»"; y `FireIcon` con "5 días de racha" |
-| 5 | `ShareNetworkIcon` | Compártela en Discord | "Publica tu ruta con un link. En Discord se ve con su tarjeta, y quien la abra puede copiarla a su cuenta y empezarla desde cero." | `share-mockup.tsx`: una tarjeta de link genérica (borde izquierdo `border-primary-bright`, "DevPathlles", el título de la IA de ejemplo y "de tu_nombre"). No imita la interfaz de Discord. _Retirado después: el recorrido actual tiene tres estaciones (cuestionario, IA y progreso) y el motor pasó a `route-preview.tsx`_ |
+| 5 | `ShareNetworkIcon` | Compártela en Discord | "Publica tu ruta con un link. En Discord se ve con su tarjeta, y quien la abra puede copiarla a su cuenta y empezarla desde cero." | `share-mockup.tsx`: una tarjeta de link genérica (borde izquierdo `border-primary-bright`, "DevPathlles", el título de la IA de ejemplo y "de tu_nombre"). No imita la interfaz de Discord. _Retirado después: el recorrido actual tiene tres estaciones (cuestionario, IA y progreso) y el motor pasó a `route-preview.tsx`, que después se borró con el rediseño del hero_ |
 
 ### Preguntas frecuentes (`components/landing/landing-faq.tsx`)
 
@@ -254,8 +269,10 @@ size="lg"` con `landingCtas(isSignedIn).primary`.
 
 - Mismo patrón que la del 15: `public/og-logo.png` en base64 sobre el color literal de
   `bg-logo-backdrop` y fondo con el degradado de marca en hex.
-- El título del hero y "Cuestionario · Motor de reglas · IA · Progreso".
-- `alt`: "DevPathlles: rutas de aprendizaje sobre los cursos de DevTalles".
+- El título del hero ("Deja de adivinar" y, en lavanda, "qué curso sigue") y "Seis preguntas · Cursos
+  reales de DevTalles · A tu ritmo". Se actualiza junto con el hero: el link y la página cuentan lo
+  mismo.
+- `alt`: "DevPathlles: deja de adivinar qué curso de DevTalles sigue".
 - Vive en el route group, así que solo aplica a `/` (`/login` y `/sistema-diseno` no la heredan).
 
 ## Casos borde
@@ -263,16 +280,16 @@ size="lg"` con `landingCtas(isSignedIn).primary`.
 | Caso | Qué pasa |
 |---|---|
 | Sin sesión | Cabecera: "Entrar" → `/login`. Hero y CTA final: "Arma tu ruta" → `/login?next=/quiz`. Después del OAuth, la persona llega a `/quiz` |
-| Con sesión | Los tres CTAs dicen "Ir a mi panel" → `/dashboard`, y la línea "Gratis · Entra con…" no aparece. No hay redirect |
+| Con sesión | Los tres CTAs dicen "Ir a mi panel" → `/dashboard`, y la línea "Gratis · Seis preguntas · …" no aparece. No hay redirect |
 | La sesión venció o `getClaims()` devuelve error (Supabase caído) | Se trata como sin sesión. La landing no depende de ninguna otra query |
 | JS deshabilitado o todavía sin hidratar | Todo el texto y los mockups se ven en su estado final. Sin `data-journey-ready` no hay estados ocultos |
-| `prefers-reduced-motion` | Sin flotar, titilar, marquee, confetti ni "pop". El astronauta cambia de nodo sin transición y los mockups se ven terminados |
+| `prefers-reduced-motion` | Sin flotar, titilar, marquee, confetti ni "pop". El astronauta cambia de nodo sin transición y los mockups se ven terminados. En el hero, la estela y los planetas se ven completos desde el inicio y la chispa no aparece |
 | Una pantalla alta muestra varias estaciones a la vez | La actual es la que cruza la línea central. El resto queda `visited` o `upcoming` |
 | Scroll muy rápido, o clic en "Preguntas" (salto de ancla) | El astronauta termina en la última estación. Las transiciones intermedias se redirigen (CSS), no se encolan |
 | El usuario vuelve a subir | El astronauta retrocede hasta la estación que está en pantalla. Las poses y los mockups ya animados no se repiten (`data-reached`) |
 | Cambia el ancho de la ventana, rota el celular o terminan de cargar imágenes | El `ResizeObserver` vuelve a medir los nodos y el astronauta y el riel se recolocan |
-| Clics seguidos en la mascota del hero | Cada clic avanza una pose. Los confetti se superponen sin romper nada |
-| Falla el `import()` de `canvas-confetti` | La pose cambia igual: `launchConfetti` sí propaga el error, y `HeroMascot` lo atrapa con `.catch(console.error)`, como `use-celebration.ts` del spec 14 |
+| Clics seguidos en el astronauta del hero | Cada clic vuelve a montar la capa y repite el impulso desde el inicio |
+| Pantalla táctil | Los tooltips de la escena solo abren con puntero o foco (así funcionan en Base UI). Las etiquetas visibles ya dicen curso y horas, y el `aria-label` de cada planeta tiene el detalle completo |
 | Tema claro | Los logos de DevPathlles y Code Quest van sobre `bg-logo-backdrop`. El degradado del `h1` y los textos mantienen el contraste medido |
 | 360 px de ancho | El marquee queda dentro de `overflow-hidden`. El riel pasa a la izquierda. No hay scroll horizontal |
 | Se pega el link del deploy en Discord | Muestra la tarjeta OG de la landing |
@@ -305,46 +322,53 @@ import type { StepOrigin } from "@/lib/paths/types";
 export type ExampleCourse = {
   slug: string;
   title: string; // igual que en data/courses.json
+  shortTitle: string; // la etiqueta de la escena del hero, donde el título completo no entra
   hours: number; // igual que en data/courses.json
   origin: StepOrigin;
-  engineReason: string; // con la misma plantilla que build-path.ts
+  engineReason: string; // la razón que escribe buildPath()
 };
 
 export type ExampleDiscardedCourse = {
   slug: string;
   title: string;
+  shortTitle: string;
   hours: number;
   discardReason: string; // el mismo texto que usa build-path.ts
 };
 
+// Sin intereses: así la ruta es la progresión TypeScript → React → Next.js.
 export const EXAMPLE_ANSWERS: readonly string[];
-// ["Meta: React", "Nivel: tengo bases", "Ya domino: JavaScript", "Interés: Docker",
-//  "6 h por semana", "Plazo: 6 meses"]
+// ["Meta: React", "Nivel: tengo bases", "Ya domino: JavaScript", "4 h por semana", "Plazo: 6 meses"]
 
 export const EXAMPLE_FREE_TEXT: string;
-// "Quiero conseguir mi primer trabajo como frontend y ya sé algo de JavaScript."
+// "Quiero enfocarme en frontend y ya manejo JavaScript."
 
 export const EXAMPLE_COURSES: readonly ExampleCourse[];
-// react-de-cero       "React: de cero a experto"                         46 h  requerido
-//   "Requerido para llegar a React en 6 meses."
 // typescript-guia-completa "TypeScript: Tu completa guía y manual de mano." 8.5 h recomendado
-//   "Recomendado para llegar a React en 6 meses."
-// docker-guia-practica "Docker - Guía práctica de uso para desarrolladores" 14 h interes
-//   "Sumado por tu interés en Docker."
+//   "Recomendado en la ruta oficial de React."
+// react-de-cero "React: de cero a experto" 46 h requerido
+//   "Requerido en la ruta oficial de React."
+// nextjs "Next.js: El framework de React para producción" 39 h requerido
+//   "Requerido en la ruta oficial de React."
 
 export const EXAMPLE_DISCARDED: readonly ExampleDiscardedCourse[];
 // javascript-moderno "JavaScript Moderno: Guía para dominar el lenguaje" 28.5 h "ya lo dominas"
 
-export const EXAMPLE_AI: { title: string; firstCourseReason: string };
-// title: "Tu camino a tu primer empleo frontend con React"
-// firstCourseReason: "Es la base que piden las ofertas junior de frontend: con él armas tus
-//   primeros proyectos de portafolio."
+export const EXAMPLE_AI: { title: string; mainCourseReason: string };
+// title: "Tu ruta frontend con React"
+// mainCourseReason: "Como ya manejas JavaScript y buscas frontend, React se alinea con la meta que
+//   elegiste."
 ```
+
+- El orden, las razones y el curso quitado son los que da `buildPath()` para meta React, "tengo bases",
+  JavaScript dominado, 4 h por semana y 6 meses (el resto se recorta por tiempo). Lo comprueba
+  `lib/paths/build-path.test.ts`: si cambian las reglas del motor, el test avisa antes de que la
+  landing muestre una ruta que el motor no arma.
 
 - La IA de ejemplo retoma visiblemente el texto libre ("primer trabajo como frontend"), igual que exige
   el spec 11.
 - El XP del mockup de progreso **no se escribe a mano**: sale de `courseXp` y `levelFromXp`
-  (`lib/gamification/xp.ts`, spec 14) sobre el primer curso (46 h → 460 XP → nivel 3, 160 / 300).
+  (`lib/gamification/xp.ts`, spec 14) sobre el primer curso de `EXAMPLE_COURSES`.
 
 ### `lib/landing/journey-state.ts`
 
@@ -367,11 +391,9 @@ export type MascotPose = { src: string; width: number; height: number };
 
 // Tamaños reales de los archivos: 512×728, 384×384, 512×506, 512×554, 512×481, 512×637.
 export const MASCOT_POSES: Record<MascotPoseId, MascotPose>;
-
-export const HERO_POSE_CYCLE: readonly MascotPoseId[]; // rocket, wave, orb, torch, orbit, flame
-
-export function nextHeroPose(current: MascotPoseId): MascotPoseId; // después de la última, la primera
 ```
+
+_`HERO_POSE_CYCLE` y `nextHeroPose` se borraron con el rediseño del hero._
 
 ## Plan de implementación
 
@@ -481,9 +503,10 @@ export function nextHeroPose(current: MascotPoseId): MascotPoseId; // después d
 - [ ] La pose y el mockup de cada estación se animan solo la primera vez que llega, después del viaje
       del astronauta.
 - [ ] Las 5 estaciones y el hero usan las poses de la tabla de reparto.
-- [ ] La mascota del hero cambia de pose con clic, Enter o Espacio, en el orden del ciclo, vuelve a la
-      primera después de la sexta y lanza confetti. El globo "¡Tócame!" desaparece después del primer
-      cambio.
+- [ ] _(Rediseño del hero)_ El astronauta del hero da un impulso con clic, Enter o Espacio, sin
+      confetti. Cada planeta de la escena muestra su curso completo y su razón al pasar el puntero o
+      enfocarlo con el teclado, y la ruta de ejemplo coincide con `buildPath()` (test en
+      `lib/paths/build-path.test.ts`).
 - [ ] La franja muestra las 15 tecnologías de `TECHNOLOGIES`. El marquee se detiene con el puntero
       encima.
 - [ ] Con "reducir movimiento" no hay flotar, titilar, marquee, confetti ni "pop". El astronauta cambia
@@ -568,9 +591,25 @@ export function nextHeroPose(current: MascotPoseId): MascotPoseId; // después d
   oscuro no cambian.
 - **Sí:** el bloque de la IA del mockup va sin fondo propio, con un borde `border-ai`. **No:**
   `bg-ai/10` ni `bg-surface`, porque el `AiBadge` ya trae su tinta y sobre otro fondo bajaba a 3.5–4.1:1.
-- **Sí:** los mockups que usan `step-meta` o el contexto del recorrido son Client Components
-  (`engine-mockup`, `progress-mockup`), igual que `landing-faq` por el `Accordion`. Los iconos de
-  Phosphor sin `/ssr` usan un contexto de React que no corre en el servidor.
+- **Sí:** los mockups que usan el contexto del recorrido son Client Components (`progress-mockup`),
+  igual que `landing-faq` por el `Accordion`. Los iconos de Phosphor sin `/ssr` usan un contexto de
+  React que no corre en el servidor.
+- **Sí (rediseño del hero, 2026-09-28):** una escena de trayectoria espacial en lugar de la mascota con
+  ciclo de poses más la tarjeta de ejemplo. El usuario pidió menos información y más impacto, y eligió
+  esta dirección entre varias. Es una composición propia de la landing, no un componente reusable:
+  toma el astronauta en vuelo, la técnica de trazo del mapa del 12, el `Tooltip` de `components/ui` y
+  solo tokens del tema. **No:** conservar la tarjeta de ejemplo con chips y motivos junto al título,
+  porque competía con él; el detalle quedó en tooltips.
+- **Sí:** la ruta de ejemplo TypeScript → React → Next.js, con un test contra `buildPath()`. **No:**
+  Docker → TypeScript → React (la de antes, por un interés en Docker), que no se leía como una
+  progresión.
+- **Sí:** la chispa con `<animateMotion>` de SMIL, que sigue la curva en coordenadas del `viewBox` y
+  escala con el SVG. **No:** CSS `offset-path`, que usa píxeles del contenedor y se desalinea cuando la
+  escena cambia de tamaño. Su id va sin guiones porque en `begin` SMIL lee un guion como una resta.
+- **Sí:** `astronauta-vuelo.webp` a 640 × 640 (912 KB → 50 KB) sin recortar el margen. **No:** el `trim`
+  habitual, porque cuatro componentes lo dibujan cuadrado y cambiaría su encuadre.
+- **Sí:** el token `--text-hero` solo para el título del hero. **No:** agrandar `text-display`, que usan
+  otros títulos.
 
 ## Riesgos
 
@@ -582,5 +621,5 @@ export function nextHeroPose(current: MascotPoseId): MascotPoseId; // después d
 | `opengraph-image` dentro de un route group no se resuelve para `/` | Resuelto en el paso 8: funciona, y Next le agrega un sufijo a la URL (`/opengraph-image-<hash>`) para no chocar con otros grupos. El `<head>` de `/` la referencia y el de `/login` no |
 | El link "Licencia MIT" da 404 mientras no exista `LICENSE` | Resuelto: `LICENSE` (MIT, "Code Crafters", 2026) se agregó en esta rama a pedido del usuario. El link funciona cuando la rama llega a `master` |
 | El ejemplo queda viejo si el admin cambia el curso en Supabase | El test compara contra `data/courses.json`, no contra la base, y los mockups están rotulados como ejemplo. Una diferencia de nombre u horas no rompe nada |
-| Peso de las poses (6 imágenes de 45–83 KB) | Las poses de las estaciones cargan lazy. El hero solo carga la pose actual y la siguiente |
+| Peso de las poses (6 imágenes de 45–83 KB) | Las poses de las estaciones cargan lazy. El hero solo carga `astronauta-vuelo.webp` (50 KB) |
 | Demasiado movimiento junto (flotar, titilar, marquee y el recorrido) | En cada vista hay como mucho 1 o 2 cosas animándose (el hero y la franja quedan arriba, fuera de la vista del recorrido), y todo se apaga con "reducir movimiento" |
